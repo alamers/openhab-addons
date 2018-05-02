@@ -90,9 +90,9 @@ public class AlarmController {
                 setStatus(ALARM);
             } else if (isStatus(INTERNALLY_ARMED, EXTERNALLY_ARMED, EXIT, ENTRY) && isType(alarmZone, IMMEDIATELY)) {
                 setStatus(ALARM);
-            } else if (isStatus(INTERNALLY_ARMED) && isType(alarmZone, INTERN_ACTIVE, EXIT_ENTRY)) {
+            } else if (isStatus(INTERNALLY_ARMED) && isType(alarmZone, INTERN_ACTIVE, EXIT_ENTRY, INTERN_MOTION)) {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
-            } else if (isStatus(EXTERNALLY_ARMED) && isType(alarmZone, ACTIVE, INTERN_ACTIVE)) {
+            } else if (isStatus(EXTERNALLY_ARMED) && isType(alarmZone, ACTIVE, INTERN_ACTIVE, MOTION, INTERN_MOTION)) {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
             } else if (isStatus(EXTERNALLY_ARMED) && isType(alarmZone, EXIT_ENTRY)) {
                 startCountdown(config.getEntryTime(), ENTRY, ALARM);
@@ -102,7 +102,11 @@ public class AlarmController {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
             }
         }
-        validate();
+
+        boolean isMotionWhenDisarmed = isStatus(DISARMED) && isType(alarmZone, MOTION, INTERN_MOTION);
+        if (!isMotionWhenDisarmed) {
+            validate();
+        }
     }
 
     /**

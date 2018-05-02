@@ -23,7 +23,9 @@ public enum AlarmZoneType {
     IMMEDIATELY,
     SABOTAGE,
     ALWAYS,
-    ALWAYS_IMMEDIATELY;
+    ALWAYS_IMMEDIATELY,
+    MOTION,
+    INTERN_MOTION;
 
     /**
      * Parses a string with an alarm zone type.
@@ -46,6 +48,10 @@ public enum AlarmZoneType {
                 return ALWAYS;
             } else if (ALWAYS_IMMEDIATELY.toString().equalsIgnoreCase(strType)) {
                 return ALWAYS_IMMEDIATELY;
+            } else if (MOTION.toString().equalsIgnoreCase(strType)) {
+                return MOTION;
+            } else if (INTERN_MOTION.toString().equalsIgnoreCase(strType)) {
+                return INTERN_MOTION;
             }
         }
         throw new AlarmException("AlarmZoneType " + strType + " not available");

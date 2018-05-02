@@ -44,6 +44,8 @@ All alarm zone channels have a type. With the alarm zone types you can define th
 |--------------------------|-------------------------------------------------------------------------------------------------------------------|
 | ```DISABLED```           | Ignored by the controller                                                                                         |
 | ```ACTIVE```             | Default type, active on external arming                                                                           |
+| ```MOTION```             | Alarm zone for motion detectors, disabled on ```DISARMED```, ```EXIT```, ```ENTRY``` and ```PASSTHROUGH```        |
+| ```INTERN_MOTION```      | Same as ```MOTION```, but is active on internal **AND** external arming                                           |
 | ```INTERN_ACTIVE```      | Alarm zone is active on internal **AND** external arming                                                          |
 | ```EXIT_ENTRY```         | Set this type to an alarm zone, where you enter and leave the secured area, e.g door(s)                           |
 | ```IMMEDIATELY```        | Activates the alarm if armed, ignoring the configured delays                                                      |
