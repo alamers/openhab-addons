@@ -142,7 +142,8 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
     public void handleUpdate(ChannelUID channelUID, State newState) {
         if (isAlarmZone(channelUID)) {
             try {
-                alarm.alarmZoneChanged(channelUID.getId(), newState == OpenClosedType.CLOSED);
+                alarm.alarmZoneChanged(channelUID.getId(),
+                        newState == OpenClosedType.CLOSED || newState == OnOffType.OFF);
             } catch (AlarmException ex) {
                 logger.warn("{}", ex.getMessage());
             }
