@@ -30,6 +30,7 @@ import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
 import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.alarm.internal.AlarmController;
 import org.openhab.binding.alarm.internal.AlarmException;
 import org.openhab.binding.alarm.internal.AlarmListener;
@@ -142,8 +143,24 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
     public void handleUpdate(ChannelUID channelUID, State newState) {
         if (isAlarmZone(channelUID)) {
             try {
-                alarm.alarmZoneChanged(channelUID.getId(),
-                        newState == OpenClosedType.CLOSED || newState == OnOffType.OFF);
+                boolean isClosed = false;
+                if (newState instanceof OpenClosedType) {
+                    isClosed = newState == OpenClosedType.CLOSED;
+                } else if (newState instanceof OnOffType) {
+                    isClosed = newState == OnOffType.OFF;
+                } else if (newState instanceof StringType) {
+                    isClosed = !"OPEN".equalsIgnoreCase(((StringType) newState).toFullString());
+                } else if (newState instanceof DecimalType) {
+                    handleUpdate(channelUID, newState.as(OnOffType.class));
+                } else if (newState instanceof UnDefType) {
+                    isClosed = false;
+                } else {
+                    throw new AlarmException("Unsupported type " + newState.getClass().getSimpleName()
+                            + ", only Contact, Switch, String and Number supported");
+                }
+                logger.debug("Alarmzone {} received state {}, zone set to {}", channelUID.getId(), newState,
+                        isClosed ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
+                alarm.alarmZoneChanged(channelUID.getId(), isClosed);
             } catch (AlarmException ex) {
                 logger.warn("{}", ex.getMessage());
             }
