@@ -94,7 +94,7 @@ public class AlarmController {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
             } else if (isStatus(EXTERNALLY_ARMED) && isType(alarmZone, ACTIVE, INTERN_ACTIVE, MOTION, INTERN_MOTION)) {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
-            } else if (isStatus(EXTERNALLY_ARMED) && isType(alarmZone, EXIT_ENTRY)) {
+            } else if (isStatus(EXTERNALLY_ARMED, ALARM) && isType(alarmZone, EXIT_ENTRY)) {
                 startCountdown(config.getEntryTime(), ENTRY, ALARM);
             } else if (isStatus(EXIT, ENTRY) && isType(alarmZone, ACTIVE, INTERN_ACTIVE)) {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);

@@ -785,4 +785,28 @@ public class AlarmTest {
         alarm.doCommand(AlarmCommand.DISARM);
         alarm.alarmZoneChanged(ID_ZONE_MOTION, true);
     }
+
+    @Test
+    public void testEntryAfterAlarm() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.doCommand(AlarmCommand.ARM_EXTERNALLY);
+        sleep(1.5);
+        assertEquals(AlarmStatus.EXTERNALLY_ARMED, status);
+
+        alarm.alarmZoneChanged(ID_ZONE_ACTIVE, false);
+        sleep(0.5);
+        assertEquals(AlarmStatus.PREALARM, status);
+        sleep(1);
+        assertEquals(AlarmStatus.ALARM, status);
+
+        alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, false);
+        sleep(0.5);
+        assertEquals(AlarmStatus.ENTRY, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_ACTIVE, true);
+        alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, true);
+    }
 }
