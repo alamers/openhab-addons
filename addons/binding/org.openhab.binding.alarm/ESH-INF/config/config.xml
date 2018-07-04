@@ -46,6 +46,8 @@
 				<option value="SABOTAGE">SABOTAGE</option>
 				<option value="ALWAYS">ALWAYS</option>
 				<option value="ALWAYS_IMMEDIATELY">ALWAYS_IMMEDIATELY</option>
+                <option value="MOTION">MOTION</option>
+                <option value="INTERN_MOTION">INTERN_MOTION</option>
 			</options>
 			<default>ACTIVE</default>
 		</parameter>
