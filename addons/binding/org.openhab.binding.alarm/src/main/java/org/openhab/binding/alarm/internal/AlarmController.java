@@ -30,7 +30,7 @@ import org.openhab.binding.alarm.internal.model.AlarmZoneType;
 public class AlarmController {
     private Map<String, AlarmZone> alarmZones = new HashMap<>();
     private AlarmListener listener;
-    private AlarmControllerConfig config;
+    private AlarmControllerConfig config = new AlarmControllerConfig();
     private AlarmStatus status = DISARMED;
     private Countdown countDown = new Countdown();
     private Boolean isReadyToArmInternally;
@@ -38,9 +38,9 @@ public class AlarmController {
     private Boolean isReadyToPassthrough;
 
     /**
-     * Creates a new alarm controller with the given configuration and listener.
+     * Initializes the alarm controller with the given configuration and listener.
      */
-    public AlarmController(AlarmControllerConfig config, AlarmListener listener) {
+    public void initialize(AlarmControllerConfig config, AlarmListener listener) {
         this.config = config;
         this.listener = listener;
     }
@@ -48,7 +48,12 @@ public class AlarmController {
     /**
      * Adds an alarm zone to the controller.
      */
-    public void addAlarmZone(AlarmZone alarmZone) {
+    public void addOrUpdateAlarmZone(AlarmZone alarmZone) {
+        AlarmZone currentAlarmZone = alarmZones.get(alarmZone.getId());
+        if (currentAlarmZone != null) {
+            // preserve state of alarm zone
+            alarmZone.setClosed(currentAlarmZone.isClosed());
+        }
         alarmZones.put(alarmZone.getId(), alarmZone);
         validate();
     }
@@ -129,10 +134,14 @@ public class AlarmController {
     private void setStatus(AlarmStatus newStatus) {
         if (countDown.isActive()) {
             countDown.stop();
-            listener.alarmCountdownChanged(0);
+            if (listener != null) {
+                listener.alarmCountdownChanged(0);
+            }
         }
         status = newStatus;
-        listener.alarmStatusChanged(status);
+        if (listener != null) {
+            listener.alarmStatusChanged(status);
+        }
         validate();
     }
 
@@ -212,17 +221,23 @@ public class AlarmController {
 
         if (isReadyToArmInternally == null || currentIsReadyToArmInternally != isReadyToArmInternally) {
             isReadyToArmInternally = currentIsReadyToArmInternally;
-            listener.readyToArmInternallyChanged(isReadyToArmInternally);
+            if (listener != null) {
+                listener.readyToArmInternallyChanged(isReadyToArmInternally);
+            }
         }
 
         if (isReadyToArmExternally == null || currentIsReadyToArmExternally != isReadyToArmExternally) {
             isReadyToArmExternally = currentIsReadyToArmExternally;
-            listener.readyToArmExternallyChanged(isReadyToArmExternally);
+            if (listener != null) {
+                listener.readyToArmExternallyChanged(isReadyToArmExternally);
+            }
         }
 
         if (isReadyToPassthrough == null || currentIsReadyToPassthrough != isReadyToPassthrough) {
             isReadyToPassthrough = currentIsReadyToPassthrough;
-            listener.readyToPassthroughChanged(isReadyToPassthrough);
+            if (listener != null) {
+                listener.readyToPassthroughChanged(isReadyToPassthrough);
+            }
         }
     }
 
@@ -288,7 +303,9 @@ public class AlarmController {
 
                 @Override
                 public void finished() {
-                    listener.alarmCountdownChanged(0);
+                    if (listener != null) {
+                        listener.alarmCountdownChanged(0);
+                    }
                     if (targetStatus == EXTERNALLY_ARMED && !isReadyToArm(false, true)) {
                         setStatus(ALARM);
                     } else {
@@ -298,7 +315,9 @@ public class AlarmController {
 
                 @Override
                 public void countdownChanged(int value) {
-                    listener.alarmCountdownChanged(value);
+                    if (listener != null) {
+                        listener.alarmCountdownChanged(value);
+                    }
                 }
 
             });

@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AlarmThingHandler extends BaseThingHandler implements AlarmListener {
     private final Logger logger = LoggerFactory.getLogger(AlarmThingHandler.class);
-    private AlarmController alarm;
+    private AlarmController alarm = new AlarmController();
     private AlarmControllerConfig controllerConfig;
 
     public AlarmThingHandler(Thing thing) {
@@ -59,7 +59,7 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
     @Override
     public void initialize() {
         controllerConfig = getConfigAs(AlarmControllerConfig.class);
-        alarm = new AlarmController(controllerConfig, this);
+        alarm.initialize(controllerConfig, this);
 
         ThingBuilder thingBuilder = editThing();
         ChannelTypeUID channelTypeUid = new ChannelTypeUID(BINDING_ID, CHANNEL_TYPE_ID_ALARMZONE);
@@ -80,7 +80,7 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
                 }
                 AlarmZoneConfig alarmZoneConfig = channel.getConfiguration().as(AlarmZoneConfig.class);
                 AlarmZone alarmZone = new AlarmZone(channel.getUID().getId(), alarmZoneConfig);
-                alarm.addAlarmZone(alarmZone);
+                alarm.addOrUpdateAlarmZone(alarmZone);
             }
 
             for (Channel channel : getThing().getChannels()) {
@@ -88,6 +88,7 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
                     int zoneNumber = getAlarmZoneNumber(channel.getUID());
                     if (zoneNumber > controllerConfig.getAlarmZones()) {
                         thingBuilder.withoutChannel(channel.getUID()); // remove channel
+                        alarm.removeAlarmZone(channel.getUID().getId());
                     }
                 }
             }
@@ -104,7 +105,6 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
     @Override
     public void dispose() {
         alarm.dispose();
-        alarm = null;
     }
 
     @Override

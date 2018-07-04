@@ -40,7 +40,8 @@ public class AlarmTest {
         config.setEntryTime(1);
         config.setExitTime(1);
         config.setPassthroughTime(1);
-        alarm = new AlarmController(config, new AlarmListener() {
+        alarm = new AlarmController();
+        alarm.initialize(config, new AlarmListener() {
 
             @Override
             public void alarmStatusChanged(AlarmStatus status) {
@@ -68,15 +69,15 @@ public class AlarmTest {
             }
         });
 
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_ACTIVE, AlarmZoneType.ACTIVE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_EXIT_ENTRY, AlarmZoneType.EXIT_ENTRY));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_IMMEDIATELY, AlarmZoneType.IMMEDIATELY));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_SABOTAGE, AlarmZoneType.SABOTAGE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_MOTION, AlarmZoneType.MOTION));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_INTERN_MOTION, AlarmZoneType.INTERN_MOTION));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ACTIVE, AlarmZoneType.ACTIVE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_EXIT_ENTRY, AlarmZoneType.EXIT_ENTRY));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_IMMEDIATELY, AlarmZoneType.IMMEDIATELY));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_SABOTAGE, AlarmZoneType.SABOTAGE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_MOTION, AlarmZoneType.MOTION));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_MOTION, AlarmZoneType.INTERN_MOTION));
     }
 
     private void sleep(double seconds) {
@@ -651,36 +652,36 @@ public class AlarmTest {
         assertEquals(false, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
         assertEquals(true, isReadyToArmExternally);
         assertEquals(true, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_INTERN_ACTIVE);
         assertEquals(false, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
         assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_ALWAYS);
         assertEquals(false, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
         assertEquals(false, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_DISABLED);
         assertEquals(false, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_ACTIVE, AlarmZoneType.ACTIVE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_EXIT_ENTRY, AlarmZoneType.EXIT_ENTRY));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_IMMEDIATELY, AlarmZoneType.IMMEDIATELY));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_SABOTAGE, AlarmZoneType.SABOTAGE));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_MOTION, AlarmZoneType.MOTION));
-        alarm.addAlarmZone(new AlarmZone(ID_ZONE_INTERN_MOTION, AlarmZoneType.INTERN_MOTION));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ACTIVE, AlarmZoneType.ACTIVE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_EXIT_ENTRY, AlarmZoneType.EXIT_ENTRY));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_IMMEDIATELY, AlarmZoneType.IMMEDIATELY));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_SABOTAGE, AlarmZoneType.SABOTAGE));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_MOTION, AlarmZoneType.MOTION));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_MOTION, AlarmZoneType.INTERN_MOTION));
     }
 
     @Test
