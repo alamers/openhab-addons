@@ -13,13 +13,19 @@ import static org.openhab.binding.alarm.internal.model.AlarmZoneType.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.smarthome.core.common.ThreadPoolManager;
 import org.openhab.binding.alarm.internal.Countdown.CountdownCallback;
 import org.openhab.binding.alarm.internal.config.AlarmControllerConfig;
 import org.openhab.binding.alarm.internal.model.AlarmCommand;
 import org.openhab.binding.alarm.internal.model.AlarmStatus;
 import org.openhab.binding.alarm.internal.model.AlarmZone;
 import org.openhab.binding.alarm.internal.model.AlarmZoneType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class for all alarm functions.
@@ -28,6 +34,8 @@ import org.openhab.binding.alarm.internal.model.AlarmZoneType;
  */
 
 public class AlarmController {
+    private final Logger logger = LoggerFactory.getLogger(AlarmController.class);
+
     private Map<String, AlarmZone> alarmZones = new HashMap<>();
     private AlarmListener listener;
     private AlarmControllerConfig config = new AlarmControllerConfig();
@@ -36,6 +44,9 @@ public class AlarmController {
     private Boolean isReadyToArmInternally;
     private Boolean isReadyToArmExternally;
     private Boolean isReadyToPassthrough;
+
+    private ScheduledExecutorService scheduler = ThreadPoolManager.getScheduledPool("alarmController");
+    private Map<String, TempDisabledZoneInfo> tempDisabledZones = new HashMap<>();
 
     /**
      * Initializes the alarm controller with the given configuration and listener.
@@ -111,6 +122,53 @@ public class AlarmController {
         boolean isMotionWhenDisarmed = isStatus(DISARMED) && isType(alarmZone, MOTION, INTERN_MOTION);
         if (!isMotionWhenDisarmed) {
             validate();
+        }
+    }
+
+    /**
+     * Temporary disable alarm zone for maximum the configured tempDisableTime.
+     */
+    public void temporaryDisableZone(final String id) throws AlarmException {
+        synchronized (this) {
+            if (tempDisabledZones.containsKey(id)) {
+                throw new AlarmException("Alarm zone with id '" + id + "' already disabled");
+            }
+
+            AlarmZone alarmZone = getAlarmZone(id);
+            TempDisabledZoneInfo zoneInfo = new TempDisabledZoneInfo();
+            zoneInfo.type = alarmZone.getType();
+            zoneInfo.future = scheduler.schedule(() -> {
+                try {
+                    zoneInfo.future.cancel(false);
+                    zoneInfo.future = null;
+                    enableTemporaryDisabledZone(id);
+                } catch (AlarmException ex) {
+                    logger.warn(ex.getMessage());
+                }
+            }, config.getTempDisableTime(), TimeUnit.SECONDS);
+            tempDisabledZones.put(id, zoneInfo);
+            alarmZone.setType(DISABLED);
+            logger.info("Temporary disabled alarm zone '{}' for max. {} seconds", id, config.getTempDisableTime());
+        }
+    }
+
+    /**
+     * Enables a temporary disabled alarm zone.
+     */
+    public synchronized void enableTemporaryDisabledZone(final String id) throws AlarmException {
+        synchronized (this) {
+            TempDisabledZoneInfo zoneInfo = tempDisabledZones.get(id);
+            if (zoneInfo == null) {
+                throw new AlarmException("Temporary disabled alarm zone '" + id + "' not found");
+            }
+            AlarmZone alarmZone = getAlarmZone(id);
+            alarmZone.setType(zoneInfo.type);
+            if (zoneInfo.future != null) {
+                zoneInfo.future.cancel(false);
+            }
+            tempDisabledZones.remove(id);
+            logger.info("Enabled temporary disabled alarm zone '{}'", id);
+            alarmZoneChanged(id, alarmZone.isClosed());
         }
     }
 
@@ -209,6 +267,13 @@ public class AlarmController {
 
     public void dispose() {
         countDown.stop();
+
+        for (TempDisabledZoneInfo zoneInfo : tempDisabledZones.values()) {
+            if (zoneInfo.future != null) {
+                zoneInfo.future.cancel(true);
+            }
+        }
+        tempDisabledZones.clear();
     }
 
     /**
@@ -324,5 +389,10 @@ public class AlarmController {
         } else {
             setStatus(targetStatus);
         }
+    }
+
+    private class TempDisabledZoneInfo {
+        public AlarmZoneType type;
+        public ScheduledFuture<?> future;
     }
 }

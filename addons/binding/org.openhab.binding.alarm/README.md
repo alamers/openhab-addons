@@ -2,7 +2,7 @@
 
 This is the binding for an alarm controller inspired by [Aritech](https://aritech-security.de) and [Abus](https://www.abus.com)  
 
-The binding is kept very simple and allows you to create alarm controllers with a configurable amount of alarm zones. Each alarm zone has a type like ACTIVE, SABOTAGE, EXIT_ENTRY, ... and you can bind a (Window/Motiondetector/...) Contact to each alarm zone. You can also send some commands to the controller for arming and disarming.
+The binding is kept very simple and allows you to create alarm controllers with a configurable amount of alarm zones. Each alarm zone has a type like ACTIVE, SABOTAGE, EXIT_ENTRY, ... and you can bind a (Window/Motiondetector/...) Contact to each alarm zone. You can also send some commands to the controller for arming and disarming and also temporary disable alarm zones.
 
 ## Supported Bridges
 
@@ -23,7 +23,7 @@ One alarm controller is created automatically, you can handle it in PaperUI.
 You can also configure one or multiple controllers (things) manually:
 
 ```java
-alarm:controller:home [alarmZones=10, entryTime=30, exitTime=30, passthroughTime=30, alarmDelay=30] {
+alarm:controller:home [alarmZones=10, entryTime=30, exitTime=30, passthroughTime=30, alarmDelay=30, tempDisableTime=600] {
     Channels:
         Type alarmZone : alarmZone_1 "My alarm zone"    [ type = "ACTIVE" ]
         Type alarmZone : alarmZone_2 "My sabotage zone" [ type = "SABOTAGE" ]
@@ -37,21 +37,22 @@ alarm:controller:home [alarmZones=10, entryTime=30, exitTime=30, passthroughTime
 | exitTime        | The time in seconds until arming at exit                                       |
 | passthroughTime | The time in seconds to passthrough a exit/entry alarm zone on internally armed |
 | alarmDelay      | The time in seconds the alarm is delayed                                       |
+| tempDisableTime | The time in seconds, that an alarm zone remains temporary disabled             |
 
 All alarm zone channels have a type. With the alarm zone types you can define the behaviour of the individual alarm zone:
 
-| Alarm zone types         | Description                                                                                                       |
-|--------------------------|-------------------------------------------------------------------------------------------------------------------|
-| ```DISABLED```           | Ignored by the controller                                                                                         |
-| ```ACTIVE```             | Default type, active on external arming                                                                           |
-| ```MOTION```             | Alarm zone for motion detectors, disabled on ```DISARMED```, ```EXIT```, ```ENTRY``` and ```PASSTHROUGH```        |
-| ```INTERN_MOTION```      | Same as ```MOTION```, but is active on internal **AND** external arming                                           |
-| ```INTERN_ACTIVE```      | Alarm zone is active on internal **AND** external arming                                                          |
-| ```EXIT_ENTRY```         | Set this type to an alarm zone, where you enter and leave the secured area, e.g door(s)                           |
-| ```IMMEDIATELY```        | Activates the alarm if armed, ignoring the configured delays                                                      |
-| ```SABOTAGE```           | Tags the alarm zone as sabotage zone, triggers a ```SABOTAGE_ALARM```, even when the controller is ```DISARMED``` |
-| ```ALWAYS```             | Always triggers an alarm, even when the controller is ```DISARMED```                                              |
-| ```ALWAYS_IMMEDIATELY``` | Same as ```ALWAYS``` but ignores the configured delays                                                            |
+| Alarm zone types         | Description                                                                                                             |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| ```DISABLED```           | Ignored by the controller                                                                                               |
+| ```ACTIVE```             | Default type, active on external arming                                                                                 |
+| ```INTERN_ACTIVE```      | Alarm zone is active on internal **AND** external arming                                                                |
+| ```MOTION```             | Alarm zone for motion detectors, disabled on alarm status ```DISARMED```, ```EXIT```, ```ENTRY``` and ```PASSTHROUGH``` |
+| ```INTERN_MOTION```      | Same as ```MOTION```, but is active on internal **AND** external arming                                                 |
+| ```EXIT_ENTRY```         | Set this type to an alarm zone, where you enter and leave the secured area, e.g door(s)                                 |
+| ```IMMEDIATELY```        | Activates the alarm if armed, ignoring the configured delays                                                            |
+| ```SABOTAGE```           | Tags the alarm zone as sabotage zone, triggers a ```SABOTAGE_ALARM```, even when the controller is ```DISARMED```       |
+| ```ALWAYS```             | Always triggers an alarm, even when the controller is ```DISARMED```                                                    |
+| ```ALWAYS_IMMEDIATELY``` | Same as ```ALWAYS``` but ignores the configured delays                                                                  |
 
 
 You can send these commands to the controller:
@@ -69,8 +70,8 @@ Available status:
 | Status                 | Description                                                                                             |
 |------------------------|---------------------------------------------------------------------------------------------------------|
 | ```DISARMED```         | Disarmed, watching only alarm zones with type ```SABOTAGE```, ```ALWAYS``` and ```ALWAYS_IMMEDIATELY``` |
-| ```INTERNALLY_ARMED``` | Watches also all ```INTERN_ACTIVE``` alarm zones                                                        |
-| ```EXTERNALLY_ARMED``` | Watches all alarm zones                                                                                 |
+| ```INTERNALLY_ARMED``` | Watches also all ```INTERN_ACTIVE```, ```INTERN_MOTION``` and ```IMMEDIATELY``` alarm zones                                                        |
+| ```EXTERNALLY_ARMED``` | Watches all alarm zones (except ```DISABLED```)                                                                               |
 | ```ENTRY```            | Someone opens a ```ENTRY_EXIT``` alarm zone in external armed mode and a entry time has been configured |
 | ```EXIT```             | After activating external armed mode and a exit time has been configured                                |
 | ```PASSTHROUGH```      | After activating passthrough and a passthrough time has been configured                                 |
@@ -82,12 +83,14 @@ Available status:
 ## Item examples
 
 ```java
-String  Alarm_Status     "Status"           { channel = "alarm:controller:home:status" }
-String  Alarm_Command    "Command"          { channel = "alarm:controller:home:command" }
-Number  Alarm_Countdown  "Countdown [%d]"   { channel = "alarm:controller:home:countdown" }
-Switch  Can_Arm_Internal "Can Arm Internal" { channel = "alarm:controller:home:internalArmingPossible" }
-Switch  Can_Arm_External "Can Arm External" { channel = "alarm:controller:home:externalArmingPossible" }
-Switch  Can_Passthrough  "Can Passthrough"  { channel = "alarm:controller:home:passthroughPossible" }
+String  Alarm_Status      "Status"             { channel = "alarm:controller:home:status" }
+String  Alarm_Command     "Command"            { channel = "alarm:controller:home:command" }
+Number  Alarm_Countdown   "Countdown [%d]"     { channel = "alarm:controller:home:countdown" }
+Switch  Can_Arm_Internal  "Can Arm Internal"   { channel = "alarm:controller:home:internalArmingPossible" }
+Switch  Can_Arm_External  "Can Arm External"   { channel = "alarm:controller:home:externalArmingPossible" }
+Switch  Can_Passthrough   "Can Passthrough"    { channel = "alarm:controller:home:passthroughPossible" }
+Number  Temp_Disable_Zone "Temp Disable Zone"  { channel = "alarm:controller:home:tempDisableZone" }
+Number  Temp_Enable_Zone  "Temp Enable Zone"   { channel = "alarm:controller:home:tempEnableZone" }
 
 Contact Alarmzone_1      "Alarmzone_1"      { channel = "alarm:controller:home:alarmZone_1" }
 Contact Alarmzone_2      "Alarmzone_2"      { channel = "alarm:controller:home:alarmZone_2" }
@@ -113,3 +116,18 @@ sendCommand(Alarm_Command, "ARM_EXTERNALLY")
 // disarming
 sendCommand(Alarm_Command, "DISARM")
 ```
+
+## Temporary disable alarm zones
+
+What's this for? Suppose you have a cleaning robot that starts when you are not at home and the alarm controller is externally armed. If you have motion detectors, the cleaning robot may be detected and an alarm triggered.
+
+Therefore you can temporary disable the alarm zone of the motion detector and when the robot has finished its work, you can enable it again. If you 'forget' to enable the alarm zone, it will be automatically enabled after the configured ```tempDisableTime``` of the controller.
+
+```java
+// disable alarm zone 1
+sendCommand(Temp_Disable_Zone, 1)
+
+// enable alarm zone 1
+sendCommand(Temp_Enable_Zone, 1)
+```
+After sending the command, the item will reset to NULL again. In the logfile you can see the disable/enable message.

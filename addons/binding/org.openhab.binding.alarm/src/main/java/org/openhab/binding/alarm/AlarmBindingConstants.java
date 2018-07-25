@@ -37,4 +37,6 @@ public class AlarmBindingConstants {
     public static final String CHANNEL_ID_EXTERNAL_ARMING_POSSIBLE = "externalArmingPossible";
     public static final String CHANNEL_ID_PASSTHROUGH_POSSIBLE = "passthroughPossible";
 
+    public static final String CHANNEL_ID_TEMP_DISABLE_ZONE = "tempDisableZone";
+    public static final String CHANNEL_ID_TEMP_ENABLE_ZONE = "tempEnableZone";
 }

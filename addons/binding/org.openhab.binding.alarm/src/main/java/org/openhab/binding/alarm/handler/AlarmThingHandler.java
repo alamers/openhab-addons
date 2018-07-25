@@ -30,6 +30,7 @@ import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
 import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.alarm.internal.AlarmController;
 import org.openhab.binding.alarm.internal.AlarmException;
 import org.openhab.binding.alarm.internal.AlarmListener;
@@ -160,6 +161,23 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
             } catch (AlarmException ex) {
                 logger.warn("{}", ex.getMessage());
             }
+        } else {
+            boolean isTempDisableZone = channelUID.getId().equals(CHANNEL_ID_TEMP_DISABLE_ZONE);
+            boolean isTempEnsableZone = channelUID.getId().equals(CHANNEL_ID_TEMP_ENABLE_ZONE);
+            if (isTempDisableZone || isTempEnsableZone) {
+                String alarmZone = CHANNEL_ID_ALARMZONE + String.valueOf(((DecimalType) command).intValue());
+                try {
+                    if (isTempDisableZone) {
+                        alarm.temporaryDisableZone(alarmZone);
+                    } else {
+                        alarm.enableTemporaryDisabledZone(alarmZone);
+                    }
+                } catch (AlarmException ex) {
+                    logger.warn("{}", ex.getMessage());
+                } finally {
+                    updateState(channelUID, UnDefType.NULL);
+                }
+            }
         }
     }
 
@@ -211,5 +229,4 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
         return new ChannelUID(String.format("%s:%s:%s:%s", BINDING_ID, CONTROLLER, getThing().getUID().getId(),
                 CHANNEL_ID_ALARMZONE + zoneNumber));
     }
-
 }
