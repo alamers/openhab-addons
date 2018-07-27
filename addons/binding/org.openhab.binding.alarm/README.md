@@ -2,7 +2,7 @@
 
 This is the binding for an alarm controller inspired by [Aritech](https://aritech-security.de) and [Abus](https://www.abus.com)  
 
-The binding is kept very simple and allows you to create alarm controllers with a configurable amount of alarm zones. Each alarm zone has a type like ACTIVE, SABOTAGE, EXIT_ENTRY, ... and you can bind a (Window/Motiondetector/...) Contact to each alarm zone. You can also send some commands to the controller for arming and disarming and also temporary disable alarm zones.
+The binding allows you to create alarm controllers with a configurable amount of alarm zones. Each alarm zone has a type like ACTIVE, SABOTAGE, EXIT_ENTRY, ... and you can bind a (Window/Motiondetector/...) Contact to each alarm zone. You can also send some commands to the controller for arming and disarming and also temporary disable alarm zones.
 
 ## Supported Bridges
 
