@@ -40,6 +40,7 @@ public class AlarmTest {
         config.setEntryTime(1);
         config.setExitTime(1);
         config.setPassthroughTime(1);
+        config.setTempDisableTime(1);
         alarm = new AlarmController();
         alarm.initialize(config, new AlarmListener() {
 
@@ -809,5 +810,85 @@ public class AlarmTest {
         alarm.doCommand(AlarmCommand.DISARM);
         alarm.alarmZoneChanged(ID_ZONE_ACTIVE, true);
         alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, true);
+    }
+
+    @Test
+    public void testTemporaryDisableZoneAutomatic() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.doCommand(AlarmCommand.ARM_INTERNALLY);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.temporaryDisableZone(ID_ZONE_IMMEDIATELY);
+
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, false);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        sleep(1.5);
+        assertEquals(AlarmStatus.ALARM, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
+    }
+
+    @Test
+    public void testTemporaryDisableZoneAutomatic2() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.doCommand(AlarmCommand.ARM_INTERNALLY);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.temporaryDisableZone(ID_ZONE_IMMEDIATELY);
+
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, false);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
+
+        sleep(1.5);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
+    }
+
+    @Test
+    public void testTemporaryEnableZone() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.doCommand(AlarmCommand.ARM_INTERNALLY);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.temporaryDisableZone(ID_ZONE_IMMEDIATELY);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, false);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.enableTemporaryDisabledZone(ID_ZONE_IMMEDIATELY);
+        assertEquals(AlarmStatus.ALARM, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
+    }
+
+    @Test
+    public void testTemporaryEnableZone2() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.doCommand(AlarmCommand.ARM_INTERNALLY);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.temporaryDisableZone(ID_ZONE_IMMEDIATELY);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, false);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
+
+        alarm.enableTemporaryDisabledZone(ID_ZONE_IMMEDIATELY);
+        assertEquals(AlarmStatus.INTERNALLY_ARMED, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
     }
 }
