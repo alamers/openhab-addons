@@ -4,6 +4,8 @@ This is the binding for an alarm controller inspired by [Aritech](https://aritec
 
 The binding allows you to create alarm controllers with a configurable amount of alarm zones. Each alarm zone has a type like ACTIVE, SABOTAGE, EXIT_ENTRY, ... and you can bind a (Window/Motiondetector/...) Contact to each alarm zone. You can also send some commands to the controller for arming and disarming and also temporary disable alarm zones.
 
+It does NOT connect to any real piece of hardware, the binding itself is the alarm controller! Therefore, a binding is not the best fit here. This functionality should be included in rule templates, but they are not yet implemented in openHab. As soon as the rule templates are ready, this binding will be migrated.
+
 ## Supported Bridges
 
 None, this binding does not need a bridge
@@ -121,7 +123,7 @@ sendCommand(Alarm_Command, "DISARM")
 
 What's this for? Suppose you have a cleaning robot that starts when you are not at home and the alarm controller is externally armed. If you have motion detectors, the cleaning robot may be detected and an alarm triggered.
 
-Therefore you can temporary disable the alarm zone of the motion detector and when the robot has finished its work, you can enable it again. If you 'forget' to enable the alarm zone, it will be automatically enabled after the configured ```tempDisableTime``` of the controller.
+Therefore you can temporary disable an alarm zone (e.g of the motion detector) and when the robot has finished its work, you can enable it again. If you 'forget' to enable the alarm zone, it will be automatically enabled after the configured ```tempDisableTime``` of the controller.
 
 ```java
 // disable alarm zone 1
