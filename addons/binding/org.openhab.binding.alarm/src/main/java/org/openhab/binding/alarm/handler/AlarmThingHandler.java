@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.config.core.Configuration;
+import org.eclipse.smarthome.core.library.CoreItemFactory;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
@@ -75,8 +76,10 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
                     properties.put("type", AlarmZoneType.ACTIVE.toString());
                     Configuration config = new Configuration(properties);
                     ChannelUID channelUid = getAlarmzoneChannelUID(zoneNumber);
-                    channel = ChannelBuilder.create(channelUid, "Contact").withLabel("Alarm zone " + zoneNumber)
-                            .withType(channelTypeUid).withConfiguration(config).build();
+                    channel = ChannelBuilder.create(channelUid, CoreItemFactory.CONTACT)
+                            .withLabel("Alarm zone " + zoneNumber).withType(channelTypeUid).withConfiguration(config)
+                            .build();
+
                     thingBuilder.withChannel(channel);
                 }
                 AlarmZoneConfig alarmZoneConfig = channel.getConfiguration().as(AlarmZoneConfig.class);
@@ -113,8 +116,30 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
         if (isAlarmZone(channelUID)) {
             try {
                 AlarmZone alarmZone = alarm.getAlarmZone(channelUID.getId());
-                updateStateIfLinked(channelUID.getId(),
-                        alarmZone.isClosed() ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
+                Channel channel = getThing().getChannel(channelUID.getId());
+                State state = null;
+                switch (channel.getAcceptedItemType()) {
+                    case CoreItemFactory.SWITCH:
+                        state = alarmZone.isClosed() ? OnOffType.OFF : OnOffType.ON;
+                        break;
+                    case CoreItemFactory.STRING:
+                        state = new StringType(alarmZone.isClosed() ? OpenClosedType.CLOSED.toString()
+                                : OpenClosedType.OPEN.toString());
+                        break;
+                    case CoreItemFactory.NUMBER:
+                        state = new DecimalType(alarmZone.isClosed() ? 0 : 1);
+                        break;
+                    case CoreItemFactory.CONTACT:
+                        state = alarmZone.isClosed() ? OpenClosedType.CLOSED : OpenClosedType.OPEN;
+                        break;
+                    default:
+                        logger.warn("Unsupported channel type: {}", channel.getAcceptedItemType());
+
+                }
+
+                if (state != null) {
+                    updateStateIfLinked(channelUID.getId(), state);
+                }
             } catch (AlarmException ex) {
                 logger.warn("{}", ex.getMessage());
             }
@@ -143,10 +168,32 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
     public void handleUpdate(ChannelUID channelUID, State newState) {
         if (isAlarmZone(channelUID)) {
             try {
-                boolean isClosed = newState == OpenClosedType.CLOSED;
-                logger.debug("Alarmzone {} received state {}, zone set to {}", channelUID.getId(), newState,
-                        isClosed ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
-                alarm.alarmZoneChanged(channelUID.getId(), isClosed);
+                Channel channel = getThing().getChannel(channelUID.getId());
+                Boolean isClosed = null;
+                switch (channel.getAcceptedItemType()) {
+                    case CoreItemFactory.SWITCH:
+                        isClosed = newState == OnOffType.OFF;
+                        break;
+                    case CoreItemFactory.STRING:
+                        isClosed = StringUtils.startsWithAny(newState.toString().toLowerCase(),
+                                new String[] { "closed", "off", "false", "no_error" });
+                        break;
+                    case CoreItemFactory.NUMBER:
+                        isClosed = newState.equals(new DecimalType(0));
+                        break;
+                    case CoreItemFactory.CONTACT:
+                        isClosed = newState == OpenClosedType.CLOSED;
+                        break;
+                    default:
+                        logger.warn("Unsupported channel type: {}", channel.getAcceptedItemType());
+
+                }
+
+                if (isClosed != null) {
+                    logger.debug("Alarmzone {} received state {}, zone set to {}", channelUID.getId(), newState,
+                            isClosed ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
+                    alarm.alarmZoneChanged(channelUID.getId(), isClosed);
+                }
             } catch (AlarmException ex) {
                 logger.warn("{}", ex.getMessage());
             }

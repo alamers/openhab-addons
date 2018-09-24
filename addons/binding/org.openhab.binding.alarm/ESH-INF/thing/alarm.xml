@@ -104,4 +104,25 @@
 		<config-description-ref uri="channel-type:alarm:config" />
 	</channel-type>
 
+    <channel-type id="alarmZoneSwitch">
+        <item-type>Switch</item-type>
+        <label>Alarm zone</label>
+        <description>The alarm zone to attach a switch</description>
+        <config-description-ref uri="channel-type:alarm:config" />
+    </channel-type>
+
+    <channel-type id="alarmZoneNumber">
+        <item-type>Number</item-type>
+        <label>Alarm zone</label>
+        <description>The alarm zone to attach a number</description>
+        <config-description-ref uri="channel-type:alarm:config" />
+    </channel-type>
+
+    <channel-type id="alarmZoneString">
+        <item-type>String</item-type>
+        <label>Alarm zone</label>
+        <description>The alarm zone to attach a string</description>
+        <config-description-ref uri="channel-type:alarm:config" />
+    </channel-type>
+
 </thing:thing-descriptions>

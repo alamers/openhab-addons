@@ -27,6 +27,6 @@ public class AlarmZoneConfig {
      * Sets the alarm zone type.
      */
     public void setType(String type) {
-        this.type = type;
+        this.type = type != null ? type.toUpperCase() : type;
     }
 }
