@@ -97,12 +97,20 @@
         <state min="1"/>
     </channel-type>
 
+    <!-- deprecated, use alarmZoneContact -->
 	<channel-type id="alarmZone">
 		<item-type>Contact</item-type>
 		<label>Alarm zone</label>
 		<description>The alarm zone to attach a contact</description>
 		<config-description-ref uri="channel-type:alarm:config" />
 	</channel-type>
+
+    <channel-type id="alarmZoneContact">
+        <item-type>Contact</item-type>
+        <label>Alarm zone</label>
+        <description>The alarm zone to attach a contact</description>
+        <config-description-ref uri="channel-type:alarm:config" />
+    </channel-type>
 
     <channel-type id="alarmZoneSwitch">
         <item-type>Switch</item-type>
@@ -122,7 +130,7 @@
         <item-type>String</item-type>
         <label>Alarm zone</label>
         <description>The alarm zone to attach a string</description>
-        <config-description-ref uri="channel-type:alarm:config" />
+        <config-description-ref uri="channel-type:alarm:configString" />
     </channel-type>
 
 </thing:thing-descriptions>

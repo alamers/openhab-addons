@@ -31,11 +31,11 @@
 			<description>The time in seconds the alarm is delayed</description>
 			<default>30</default>
 		</parameter>
-        <parameter name="tempDisableTime" type="integer" min="1">
-            <label>Temporary disable time</label>
-            <description>The time in seconds, that an alarm zone remains temporary disabled</description>
-            <default>600</default>
-        </parameter>
+		<parameter name="tempDisableTime" type="integer" min="1">
+			<label>Temporary disable time</label>
+			<description>The time in seconds, that an alarm zone remains temporary disabled</description>
+			<default>600</default>
+		</parameter>
 	</config-description>
 
 	<config-description uri="channel-type:alarm:config">
@@ -51,10 +51,35 @@
 				<option value="SABOTAGE">SABOTAGE</option>
 				<option value="ALWAYS">ALWAYS</option>
 				<option value="ALWAYS_IMMEDIATELY">ALWAYS_IMMEDIATELY</option>
-                <option value="MOTION">MOTION</option>
-                <option value="INTERN_MOTION">INTERN_MOTION</option>
+				<option value="MOTION">MOTION</option>
+				<option value="INTERN_MOTION">INTERN_MOTION</option>
 			</options>
 			<default>ACTIVE</default>
 		</parameter>
 	</config-description>
+
+	<config-description uri="channel-type:alarm:configString">
+		<parameter name="type" type="text">
+			<label>Type</label>
+			<description>The type of the alarm zone</description>
+			<options>
+				<option value="DISABLED">DISABLED</option>
+				<option value="ACTIVE">ACTIVE</option>
+				<option value="INTERN_ACTIVE">INTERN_ACTIVE</option>
+				<option value="EXIT_ENTRY">EXIT_ENTRY</option>
+				<option value="IMMEDIATELY">IMMEDIATELY</option>
+				<option value="SABOTAGE">SABOTAGE</option>
+				<option value="ALWAYS">ALWAYS</option>
+				<option value="ALWAYS_IMMEDIATELY">ALWAYS_IMMEDIATELY</option>
+				<option value="MOTION">MOTION</option>
+				<option value="INTERN_MOTION">INTERN_MOTION</option>
+			</options>
+			<default>ACTIVE</default>
+		</parameter>
+		<parameter name="closedMapping" type="text">
+			<label>Closed Mapping</label>
+			<description>A comma separated list of strings that map to CLOSED</description>
+		</parameter>
+	</config-description>
+
 </config-description:config-descriptions>

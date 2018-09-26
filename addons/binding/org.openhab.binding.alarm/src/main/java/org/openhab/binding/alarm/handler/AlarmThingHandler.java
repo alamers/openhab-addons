@@ -13,6 +13,7 @@ import static org.openhab.binding.alarm.AlarmBindingConstants.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.config.core.Configuration;
@@ -51,6 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AlarmThingHandler extends BaseThingHandler implements AlarmListener {
     private final Logger logger = LoggerFactory.getLogger(AlarmThingHandler.class);
+    private final String[] DEFAULT_CLOSED_MAPPING = new String[] { "CLOSED", "OFF", "FALSE", "NO_ERROR" };
     private AlarmController alarm = new AlarmController();
     private AlarmControllerConfig controllerConfig;
 
@@ -175,8 +177,13 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
                         isClosed = newState == OnOffType.OFF;
                         break;
                     case CoreItemFactory.STRING:
-                        isClosed = StringUtils.startsWithAny(newState.toString().toLowerCase(),
-                                new String[] { "closed", "off", "false", "no_error" });
+                        AlarmZoneConfig alarmZoneConfig = channel.getConfiguration().as(AlarmZoneConfig.class);
+                        String[] closedMapping = DEFAULT_CLOSED_MAPPING;
+                        if (StringUtils.isNotEmpty(alarmZoneConfig.getClosedMapping())) {
+                            closedMapping = (String[]) ArrayUtils.addAll(closedMapping,
+                                    StringUtils.split(alarmZoneConfig.getClosedMapping().toUpperCase(), ","));
+                        }
+                        isClosed = StringUtils.startsWithAny(newState.toString().toUpperCase(), closedMapping);
                         break;
                     case CoreItemFactory.NUMBER:
                         isClosed = newState.equals(new DecimalType(0));

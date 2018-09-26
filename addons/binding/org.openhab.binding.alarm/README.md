@@ -27,8 +27,8 @@ You can also configure one or multiple controllers (things) manually:
 ```java
 alarm:controller:home [alarmZones=10, entryTime=30, exitTime=30, passthroughTime=30, alarmDelay=30, tempDisableTime=600] {
     Channels:
-        Type alarmZone : alarmZone_1 "My alarm zone"    [ type = "ACTIVE" ]
-        Type alarmZone : alarmZone_2 "My sabotage zone" [ type = "SABOTAGE" ]
+        Type alarmZoneContact : alarmZone_1 "My alarm zone"    [ type = "ACTIVE" ]
+        Type alarmZoneContact : alarmZone_2 "My sabotage zone" [ type = "SABOTAGE" ]
 }
 ```
 
@@ -40,6 +40,30 @@ alarm:controller:home [alarmZones=10, entryTime=30, exitTime=30, passthroughTime
 | passthroughTime | The time in seconds to passthrough a exit/entry alarm zone on internally armed |
 | alarmDelay      | The time in seconds the alarm is delayed                                       |
 | tempDisableTime | The time in seconds, that an alarm zone remains temporary disabled             |
+
+In PaperUI, all alarm zones are Contact channel types. If you are using a things file, you can choose between multiple channel types. This is usefull to directly map a Item to an alarm zone.
+
+| Channel type     | Description                                                                    | 
+|------------------|--------------------------------------------------------------------------------|
+| alarmZoneContact | Uses ```CLOSED```, ```OPEN``` (default type) |
+| alarmZoneSwitch  | Maps ```OFF``` to ```CLOSED``` and ```ON``` to ```OPEN``` |
+| alarmZoneNumber  | Maps the number 0 to ```CLOSED```, every other number to ```OPEN``` |
+| alarmZoneString  | Maps the strings CLOSED, OFF, FALSE and NO_ERROR to ```CLOSED```, other strings to ```OPEN``` |
+
+With the optional ```closedMapping``` config (only available for type alarmZoneString), you can configure additional strings that should map to CLOSED (case is ignored)
+
+Example:
+```java
+alarm:controller:home [alarmZones=4] {
+    Channels:
+        Type alarmZoneContact : alarmZone_1 "My Contact alarm zone"     [ type = "ACTIVE" ]
+        Type alarmZoneSwitch  : alarmZone_2 "My Switch alarm zone"      [ type = "ACTIVE" ]
+        Type alarmZoneNumber  : alarmZone_3 "My Number alarm zone"      [ type = "ACTIVE" ]
+        Type alarmZoneString  : alarmZone_4 "My String alarm zone"      [ type = "ACTIVE",  closedMapping = "string_1, string_2" ]
+}
+```
+
+
 
 All alarm zone channels have a type. With the alarm zone types you can define the behaviour of the individual alarm zone:
 

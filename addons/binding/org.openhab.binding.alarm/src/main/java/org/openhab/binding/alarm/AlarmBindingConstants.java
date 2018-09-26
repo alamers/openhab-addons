@@ -27,7 +27,7 @@ public class AlarmBindingConstants {
 
     public static final ThingTypeUID THING_TYPE_ALARM_CONTROLLER = new ThingTypeUID(BINDING_ID, CONTROLLER);
 
-    public static final String CHANNEL_TYPE_ID_ALARMZONE = "alarmZone";
+    public static final String CHANNEL_TYPE_ID_ALARMZONE = "alarmZoneContact";
     public static final String CHANNEL_ID_ALARMZONE = "alarmZone_";
 
     public static final String CHANNEL_ID_STATUS = "status";

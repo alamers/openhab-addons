@@ -15,6 +15,7 @@ package org.openhab.binding.alarm.internal.config;
  */
 public class AlarmZoneConfig {
     private String type;
+    private String closedMapping;
 
     /**
      * Returns the alarm zone type.
@@ -27,6 +28,20 @@ public class AlarmZoneConfig {
      * Sets the alarm zone type.
      */
     public void setType(String type) {
-        this.type = type != null ? type.toUpperCase() : type;
+        this.type = type.toUpperCase();
+    }
+
+    /**
+     * Returns the closed mapping strings.
+     */
+    public String getClosedMapping() {
+        return closedMapping;
+    }
+
+    /**
+     * Sets the closed mapping strings.
+     */
+    public void setClosedMapping(String closedMapping) {
+        this.closedMapping = closedMapping;
     }
 }
