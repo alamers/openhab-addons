@@ -116,6 +116,8 @@ public class AlarmController {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
             } else if (isStatus(PASSTHROUGH) && isType(alarmZone, INTERN_ACTIVE)) {
                 startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
+            } else if (isStatus(EXIT) && isType(alarmZone, EXIT_ENTRY)) {
+                startCountdown(config.getAlarmDelay(), PREALARM, ALARM);
             }
         }
 

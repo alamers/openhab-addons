@@ -527,6 +527,31 @@ public class AlarmTest {
     }
 
     @Test
+    public void testAlarmOnExit2() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.getConfig().setAlarmDelay(10);
+        alarm.getConfig().setExitTime(10);
+
+        alarm.doCommand(AlarmCommand.ARM_EXTERNALLY);
+        sleep(0.5);
+        assertEquals(10, countdown);
+        assertEquals(AlarmStatus.EXIT, status);
+        sleep(2);
+        alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, false);
+        sleep(0.5);
+        assertEquals(10, countdown);
+        assertEquals(AlarmStatus.PREALARM, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        assertEquals(AlarmStatus.DISARMED, status);
+        alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, true);
+        alarm.getConfig().setAlarmDelay(1);
+        alarm.getConfig().setExitTime(1);
+    }
+
+    @Test
     public void testAlarmOnEntryExternally() throws AlarmException {
         assertEquals(true, isReadyToArmInternally);
         assertEquals(true, isReadyToArmExternally);
