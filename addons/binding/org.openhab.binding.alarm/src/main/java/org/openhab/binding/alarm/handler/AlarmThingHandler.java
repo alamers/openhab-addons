@@ -197,7 +197,8 @@ public class AlarmThingHandler extends BaseThingHandler implements AlarmListener
                 }
 
                 if (isClosed != null) {
-                    logger.debug("Alarmzone {} received state {}, zone set to {}", channelUID.getId(), newState,
+                    logger.debug("Alarmzone {} received ({}) state {}, zone set to {}", channelUID.getId(),
+                            channel.getAcceptedItemType(), newState,
                             isClosed ? OpenClosedType.CLOSED : OpenClosedType.OPEN);
                     alarm.alarmZoneChanged(channelUID.getId(), isClosed);
                 }

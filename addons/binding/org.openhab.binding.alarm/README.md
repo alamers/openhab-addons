@@ -157,3 +157,10 @@ sendCommand(Temp_Disable_Zone, 1)
 sendCommand(Temp_Enable_Zone, 1)
 ```
 After sending the command, the item will reset to NULL again. In the logfile you can see the disable/enable message.
+
+## Debugging
+
+```java
+// show alarm zone status
+log:set DEBUG org.openhab.binding.alarm.handler
+```
