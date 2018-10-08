@@ -164,3 +164,12 @@ After sending the command, the item will reset to NULL again. In the logfile you
 // show alarm zone status
 log:set DEBUG org.openhab.binding.alarm.handler
 ```
+
+## Changelog
+
+```
+1.0.0 2018-08-08 Initial release
+1.1.0 2018-09-26 Added support for multiple alarm zone types
+                 Added closedMapping channel configuration
+1.1.1 2018-10-08 Fixed alarm on exit
+```
