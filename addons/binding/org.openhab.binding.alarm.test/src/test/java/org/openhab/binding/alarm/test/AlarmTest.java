@@ -22,7 +22,8 @@ public class AlarmTest {
     private static String ID_ZONE_INTERN_ACTIVE = "6";
     private static String ID_ZONE_SABOTAGE = "7";
     private static String ID_ZONE_MOTION = "8";
-    private static String ID_ZONE_INTERN_MOTION = "9";
+    private static String ID_ZONE_MOTION_2 = "9";
+    private static String ID_ZONE_INTERN_MOTION = "10";
 
     private static AlarmController alarm;
     private static AlarmControllerConfig config;
@@ -78,6 +79,7 @@ public class AlarmTest {
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_SABOTAGE, AlarmZoneType.SABOTAGE));
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_MOTION, AlarmZoneType.MOTION));
+        alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_MOTION_2, AlarmZoneType.MOTION));
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_MOTION, AlarmZoneType.INTERN_MOTION));
     }
 
@@ -916,4 +918,33 @@ public class AlarmTest {
         alarm.doCommand(AlarmCommand.DISARM);
         alarm.alarmZoneChanged(ID_ZONE_IMMEDIATELY, true);
     }
+
+    @Test
+    public void testTwoMotionSensorsOnExternalArmed() throws AlarmException {
+        assertEquals(true, isReadyToArmInternally);
+        assertEquals(true, isReadyToArmExternally);
+
+        alarm.alarmZoneChanged(ID_ZONE_MOTION, false);
+        alarm.alarmZoneChanged(ID_ZONE_MOTION_2, false);
+
+        alarm.doCommand(AlarmCommand.ARM_EXTERNALLY);
+        sleep(1.5);
+        assertEquals(AlarmStatus.EXTERNALLY_ARMED, status);
+
+        alarm.alarmZoneChanged(ID_ZONE_MOTION, true);
+        sleep(0.5);
+        assertEquals(AlarmStatus.EXTERNALLY_ARMED, status);
+        alarm.alarmZoneChanged(ID_ZONE_MOTION_2, true);
+        sleep(0.5);
+        assertEquals(AlarmStatus.EXTERNALLY_ARMED, status);
+
+        alarm.alarmZoneChanged(ID_ZONE_MOTION, false);
+        sleep(0.5);
+        assertEquals(AlarmStatus.PREALARM, status);
+
+        alarm.doCommand(AlarmCommand.DISARM);
+        alarm.alarmZoneChanged(ID_ZONE_MOTION, true);
+        alarm.alarmZoneChanged(ID_ZONE_MOTION_2, true);
+    }
+
 }
