@@ -172,4 +172,5 @@ log:set DEBUG org.openhab.binding.alarm.handler
 1.1.0 2018-09-26 Added support for multiple alarm zone types
                  Added closedMapping channel configuration
 1.1.1 2018-10-08 Fixed alarm on exit
+1.1.2 2018-12-12 Fixed alarm on exit and reenter
 ```

@@ -543,8 +543,9 @@ public class AlarmTest {
         sleep(2);
         alarm.alarmZoneChanged(ID_ZONE_EXIT_ENTRY, false);
         sleep(0.5);
-        assertEquals(10, countdown);
-        assertEquals(AlarmStatus.PREALARM, status);
+        assertEquals(AlarmStatus.EXIT, status);
+        assertEquals(false, isReadyToArmInternally);
+        assertEquals(false, isReadyToArmExternally);
 
         alarm.doCommand(AlarmCommand.DISARM);
         assertEquals(AlarmStatus.DISARMED, status);
@@ -677,28 +678,28 @@ public class AlarmTest {
         assertEquals(false, isReadyToArmInternally);
 
         alarm.removeAlarmZone(ID_ZONE_ACTIVE);
-        assertEquals(false, isReadyToArmExternally);
+        assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_INTERN_ACTIVE, AlarmZoneType.INTERN_ACTIVE));
         assertEquals(true, isReadyToArmExternally);
         assertEquals(true, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_INTERN_ACTIVE);
-        assertEquals(false, isReadyToArmExternally);
+        assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ALWAYS, AlarmZoneType.ALWAYS));
         assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_ALWAYS);
-        assertEquals(false, isReadyToArmExternally);
+        assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_DISABLED, AlarmZoneType.DISABLED));
-        assertEquals(false, isReadyToArmExternally);
+        assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
         alarm.removeAlarmZone(ID_ZONE_DISABLED);
-        assertEquals(false, isReadyToArmExternally);
+        assertEquals(true, isReadyToArmExternally);
         assertEquals(false, isReadyToArmInternally);
 
         alarm.addOrUpdateAlarmZone(new AlarmZone(ID_ZONE_ACTIVE, AlarmZoneType.ACTIVE));
