@@ -232,13 +232,14 @@
 
     <feature name="openhab-binding-exec" description="Exec Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.exec/${project.version}</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.exec/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-feed" description="Feed Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
-        <feature>openhab-transport-feed</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.feed/${project.version}</bundle>
+        <bundle dependency="true">mvn:com.rometools/rome/1.12.0</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/2.0.6_1</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.feed/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-feican" description="Feican Binding" version="${project.version}">
@@ -500,6 +501,13 @@
         <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.lutron/${project.version}</bundle>
     </feature>
 
+    <feature name="openhab-binding-mail" description="Mail Binding" version="${project.version}">
+        <feature>openhab-runtime-base</feature>
+        <bundle dependency="true" start-level="80">mvn:com.sun.mail/javax.mail/1.6.2</bundle>
+        <bundle dependency="true" start-level="80">mvn:org.apache.commons/commons-email/1.5</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.mail/${project.version}</bundle>
+    </feature>
+
     <feature name="openhab-binding-max" description="MAX! Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.max/${project.version}</bundle>
@@ -661,7 +669,7 @@
     <feature name="openhab-binding-onkyo" description="Onkyo Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-upnp</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.onkyo/${project.version}</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.onkyo/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-opensprinkler" description="OpenSprinkler Binding" version="${project.version}">
@@ -767,7 +775,7 @@
     <feature name="openhab-binding-samsungtv" description="Samsung TV Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-upnp</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.samsungtv/${project.version}</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.samsungtv/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-satel" description="Satel Binding" version="${project.version}">
@@ -1010,7 +1018,8 @@
 
     <feature name="openhab-binding-zoneminder" description="ZoneMinder Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.zoneminder/${project.version}</bundle>
+        <bundle dependency="true">mvn:org.jsoup/jsoup/1.10.1</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.zoneminder/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-zway" description="Z-Way Binding" version="${project.version}">
@@ -1021,11 +1030,6 @@
 
     <!-- io -->
 
-    <feature name="openhab-transport-feed" description="Feed Transport" version="${project.version}">
-        <feature>openhab-runtime-base</feature>
-        <bundle start-level="80">mvn:org.openhab.io/org.openhab.io.transport.feed/${project.version}</bundle>
-    </feature>
-
     <feature name="openhab-transport-modbus" description="Modbus Transport" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-serial</feature>
@@ -1034,7 +1038,6 @@
         <bundle dependency="true">mvn:org.apache.commons/commons-pool2/2.4.3</bundle>
         <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.io.transport.modbus/${project.version}</bundle>
     </feature>
-
 
     <feature name="openhab-io-javasound" description="JavaSound Audio Support" version="${project.version}">
         <feature>openhab-runtime-base</feature>
@@ -1053,12 +1056,22 @@
     <feature name="openhab-misc-azureiothub" description="Azure IoT Hub Connector" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-mqtt</feature>
-        <bundle start-level="80">mvn:org.openhab.io/org.openhab.io.azureiothub/${project.version}</bundle>
+        <feature prerequisite="true">wrap</feature>
+        <bundle dependency="true">wrap:mvn:com.microsoft.azure.sdk.iot/iot-device-client/1.2.27$Bundle-Name=Azure%20IoT%20Hub%20Device%20Client&amp;Bundle-SymbolicName=com.microsoft.azure.sdk.iot.iot-device-client&amp;Bundle-Version=1.2.27</bundle>
+        <bundle dependency="true">wrap:mvn:com.microsoft.azure.sdk.iot/iot-service-client/1.4.20$Bundle-Name=Azure%20IoT%20Hub%20Service%20Client&amp;Bundle-SymbolicName=com.microsoft.azure.sdk.iot.iot-service-client&amp;Bundle-Version=1.4.20</bundle>
+        <bundle dependency="true">wrap:mvn:com.microsoft.azure/azure-eventhubs/0.14.0$Bundle-Name=Azure%20EventHubs&amp;Bundle-SymbolicName=com.microsoft.azure.azure-eventhubs&amp;Bundle-Version=0.14.0</bundle>
+        <bundle dependency="true">mvn:javax.json/javax.json-api/1.0</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.io.azureiothub/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-misc-openhabcloud" description="openHAB Cloud Connector" version="${project.version}">
         <feature>openhab-runtime-base</feature>
-        <bundle start-level="80">mvn:org.openhab.io/org.openhab.io.openhabcloud/${project.version}</bundle>
+        <bundle dependency="true">mvn:org.json/json/20180813</bundle>
+        <bundle dependency="true">wrap:mvn:com.squareup.okhttp3/okhttp/3.12.1$Bundle-Name=OkHttp&amp;Bundle-SymbolicName=com.squareup.okhttp&amp;Bundle-Version=3.12.1</bundle>
+        <bundle dependency="true">wrap:mvn:com.squareup.okio/okio/1.15.0$Bundle-Name=Okio&amp;Bundle-SymbolicName=com.squareup.okio&amp;Bundle-Version=1.15.0</bundle>   
+        <bundle dependency="true">wrap:mvn:io.socket/socket.io-client/1.0.0$Bundle-Name=Socket.IO%20Client&amp;Bundle-SymbolicName=io.socket.socket.io-client&amp;Bundle-Version=1.0.0</bundle>
+        <bundle dependency="true">wrap:mvn:io.socket/engine.io-client/1.0.0$Bundle-Name=Engine.IO%20Client&amp;Bundle-SymbolicName=io.socket.engine.io-client&amp;Bundle-Version=1.0.0</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.io.openhabcloud/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-misc-hueemulation" description="Hue Emulation" version="${project.version}">
@@ -1220,7 +1233,16 @@
 
     <feature name="openhab-voice-pollytts" description="Polly Text-to-Speech" version="${project.version}">
         <feature>openhab-runtime-base</feature>
-        <bundle start-level="80">mvn:org.openhab.voice/org.openhab.voice.pollytts/${project.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.httpcomponents/httpcore-osgi/4.4.9</bundle>
+        <bundle dependency="true">mvn:org.apache.httpcomponents/httpclient-osgi/4.5.5</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.9.8</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.9.8</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.9.8</bundle>
+        <bundle dependency="true">wrap:mvn:com.amazonaws/aws-java-sdk-core/1.11.490</bundle>
+        <bundle dependency="true">wrap:mvn:com.amazonaws/aws-java-sdk-polly/1.11.490</bundle>
+        <bundle dependency="true">mvn:commons-logging/commons-logging/1.2</bundle>
+        <bundle dependency="true">mvn:joda-time/joda-time/2.8.1</bundle> 
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.voice.pollytts/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-voice-voicerss" description="VoiceRSS Text-to-Speech" version="${project.version}">

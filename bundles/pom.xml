@@ -50,6 +50,8 @@
     <module>org.openhab.binding.dwdunwetter</module>
     <module>org.openhab.binding.elerotransmitterstick</module>
     <module>org.openhab.binding.evohome</module>
+    <module>org.openhab.binding.exec</module>
+    <module>org.openhab.binding.feed</module>
     <module>org.openhab.binding.feican</module>
     <module>org.openhab.binding.folding</module>
     <module>org.openhab.binding.freebox</module>
@@ -87,6 +89,7 @@
     <module>org.openhab.binding.lirc</module>
     <module>org.openhab.binding.logreader</module>
     <module>org.openhab.binding.lutron</module>
+    <module>org.openhab.binding.mail</module>
     <module>org.openhab.binding.max</module>
     <module>org.openhab.binding.mcp23017</module>
     <module>org.openhab.binding.meteoblue</module>
@@ -116,6 +119,7 @@
     <module>org.openhab.binding.onebusaway</module>
     <module>org.openhab.binding.onewiregpio</module>
     <module>org.openhab.binding.onewire</module>
+    <module>org.openhab.binding.onkyo</module>
     <module>org.openhab.binding.opensprinkler</module>
     <module>org.openhab.binding.openuv</module>
     <module>org.openhab.binding.openweathermap</module>
@@ -133,6 +137,7 @@
     <module>org.openhab.binding.robonect</module>
     <module>org.openhab.binding.rotelra1x</module>
     <module>org.openhab.binding.russound</module>
+    <module>org.openhab.binding.samsungtv</module>
     <module>org.openhab.binding.satel</module>
     <module>org.openhab.binding.seneye</module>
     <module>org.openhab.binding.sensebox</module>
@@ -170,12 +175,15 @@
     <module>org.openhab.binding.xmppclient</module>
     <module>org.openhab.binding.yamahareceiver</module>
     <module>org.openhab.binding.yeelight</module>
+    <module>org.openhab.binding.zoneminder</module>
     <module>org.openhab.binding.zway</module>
     <module>org.openhab.extensionservice.marketplace</module>
     <module>org.openhab.extensionservice.marketplace.automation</module>
+    <module>org.openhab.io.azureiothub</module>
     <module>org.openhab.io.imperihome</module>
     <module>org.openhab.io.javasound</module>
     <module>org.openhab.io.neeo</module>
+    <module>org.openhab.io.openhabcloud</module>
     <module>org.openhab.io.transport.modbus</module>
     <module>org.openhab.io.mqttembeddedbroker</module>
     <module>org.openhab.io.webaudio</module>
@@ -194,6 +202,7 @@
     <module>org.openhab.voice.mactts</module>
     <module>org.openhab.voice.marytts</module>
     <module>org.openhab.voice.picotts</module>
+    <module>org.openhab.voice.pollytts</module>
     <module>org.openhab.voice.voicerss</module>
   </modules>
 
