@@ -112,6 +112,11 @@
         <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.bosesoundtouch/${project.version}</bundle>
     </feature>
 
+    <feature name="openhab-binding-buienradar" description="Buienradar Binding" version="${project.version}">
+        <feature>openhab-runtime-base</feature>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.buienradar/${project.version}</bundle>
+    </feature>
+
     <feature name="openhab-binding-chromecast" description="Chromecast Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-mdns</feature>
@@ -371,12 +376,11 @@
         <feature prerequisite="true">wrap</feature>
         <bundle dependency="true">mvn:org.apache.httpcomponents/httpcore-osgi/4.4.4</bundle>
         <bundle dependency="true">mvn:org.apache.httpcomponents/httpclient-osgi/4.5.2</bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.9.8</bundle>
         <bundle dependency="true">mvn:com.google.guava/guava/20.0</bundle>
         <bundle dependency="true">mvn:commons-codec/commons-codec/1.10</bundle>
         <bundle dependency="true">mvn:com.google.oauth-client/google-oauth-client/1.27.0</bundle>
         <bundle dependency="true">mvn:com.google.http-client/google-http-client/1.27.0</bundle>
-        <bundle dependency="true">wrap:mvn:com.google.http-client/google-http-client-jackson2/1.27.0$Bundle-Name=Jackson%202%20Extensions&amp;Bundle-SymbolicName=com.google.http-client.google-http-client-jackson2&amp;Bundle-Version=1.27.0</bundle>
+        <bundle dependency="true">wrap:mvn:com.google.http-client/google-http-client-gson/1.27.0$Bundle-Name=GSON%202%20Extensions&amp;Bundle-SymbolicName=com.google.http-client.google-http-client-gson&amp;Bundle-Version=1.27.0</bundle>
         <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.innogysmarthome/${project.version}</bundle>
     </feature>
 
@@ -492,7 +496,7 @@
     <feature name="openhab-binding-loxone" description="Loxone Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
         <feature>openhab-transport-upnp</feature>
-        <bundle start-level="80">mvn:org.openhab.binding/org.openhab.binding.loxone/${project.version}</bundle>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.loxone/${project.version}</bundle>
     </feature>
 
     <feature name="openhab-binding-lutron" description="Lutron Binding" version="${project.version}">
@@ -1153,7 +1157,7 @@
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.9.8</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.9.8</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.9.8</bundle>
-        <bundle dependency="true">mvn:com.google.guava/guava/20.0</bundle>
+        <bundle dependency="true">mvn:com.google.guava/guava/21.0</bundle>
         <bundle dependency="true">mvn:ch.obermuhlner/big-math/2.1.0</bundle>
         <bundle dependency="true">mvn:org.jsoup/jsoup/1.8.3</bundle>
         <bundle dependency="true">wrap:mvn:com.google.re2j/re2j/1.2$Bundle-Name=re2j&amp;Bundle-SymbolicName=com.google.re2j.re2j&amp;Bundle-Version=1.2</bundle>

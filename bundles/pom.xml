@@ -34,6 +34,7 @@
     <module>org.openhab.binding.bluetooth.ruuvitag</module>
     <module>org.openhab.binding.boschindego</module>
     <module>org.openhab.binding.bosesoundtouch</module>
+    <module>org.openhab.binding.buienradar</module>
     <module>org.openhab.binding.chromecast</module>
     <module>org.openhab.binding.cm11a</module>
     <module>org.openhab.binding.coolmasternet</module>
@@ -88,6 +89,7 @@
     <module>org.openhab.binding.lifx</module>
     <module>org.openhab.binding.lirc</module>
     <module>org.openhab.binding.logreader</module>
+    <module>org.openhab.binding.loxone</module>
     <module>org.openhab.binding.lutron</module>
     <module>org.openhab.binding.mail</module>
     <module>org.openhab.binding.max</module>
