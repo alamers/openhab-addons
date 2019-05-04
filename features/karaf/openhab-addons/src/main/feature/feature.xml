@@ -693,11 +693,11 @@
     </feature>
 
 	<feature name="openhab-binding-openwebnet" description="OpenWebNet (BTicino/Legrand) Binding" version="${project.version}">
-+        <feature>openhab-runtime-base</feature>
-+        <feature>openhab-transport-upnp</feature>
-+        <feature>openhab-transport-serial</feature>
-+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.openwebnet/${project.version}</bundle>
-+    </feature>
+        <feature>openhab-runtime-base</feature>
+        <feature>openhab-transport-upnp</feature>
+        <feature>openhab-transport-serial</feature>
+        <bundle start-level="80">mvn:org.openhab.addons.bundles/org.openhab.binding.openwebnet/${project.version}</bundle>
+    </feature>
 	
     <feature name="openhab-binding-orvibo" description="Orvibo Binding" version="${project.version}">
         <feature>openhab-runtime-base</feature>
