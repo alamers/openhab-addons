@@ -32,16 +32,15 @@ These gateways have been tested with the binding:
 The following Things and OpenWebNet `WHOs` are supported:
 ### BUS/SCS
 
-| Category             | WHO    | Thing Type IDs                    | Description                                                 | Status           |
-| -------------------- | :---:  | :-------------------------------: | ----------------------------------------------------------- | ---------------- |
-| Gateway Management   | `13`  | `bus_gateway`                 | Any IP gateway supporting OpenWebNet protocol should work (e.g. F454 / MyHOMEServer1 / MH202 / F455 / MH200N,...) | Successfully tested: F454, MyHOMEServer1, MyHOME_Screen10, F455, F453AV, MH202, MH200N. Some connection stability issues/gateway resets reported with MH202  |
-| Lightning            | `1`   | `bus_on_off_switch`, `bus_dimmer`   | BUS switches and dimmers. Green switches.                                                                 | Successfully tested: F411/2, F411/4, F411U2, F422, F429. AM5658 Green Switch. Some discovery issues reported with F429 (DALI Dimmers)  |
+| Category             | WHO          | Thing Type IDs                      | Description                                                 | Status           |
+| -------------------- | :----------: | :---------------------------------: | ----------------------------------------------------------- | ---------------- |
+| Gateway Management   | `13`         | `bus_gateway`                       | Any IP gateway supporting OpenWebNet protocol should work (e.g. F454 / MyHOMEServer1 / MH202 / F455 / MH200N,...) | Successfully tested: F454, MyHOMEServer1, MyHOME_Screen10, F455, F453AV, MH202, MH200N. Some connection stability issues/gateway resets reported with MH202  |
+| Lightning            | `1`          | `bus_on_off_switch`, `bus_dimmer`   | BUS switches and dimmers. Green switches.                   | Successfully tested: F411/2, F411/4, F411U2, F422, F429. AM5658 Green Switch. Some discovery issues reported with F429 (DALI Dimmers)  |
+| Automation           | `2`          | `bus_automation`                    | BUS roller shutters, with position feedback and auto-calibration | Successfully tested: LN4672M2  |
+| Temperature Control  | `4`          | `bus_thermostat`, `bus_temp_sensor` | Zones room thermostats, external wireless temperature sensors | Successfully tested: HD4692/HD4693 via H3550 Central Unit; H/LN4691; external probes: L/N/NT4577 + 3455 |
 
-
-| Automation | `2`   | `bus_automation`                | BUS roller shutters, with position feedback and auto-calibration | Successfully tested: LN4672M2  |
-| Temperature Control | `4`   | `bus_thermostat`, `bus_temp_sensor`   | Zones room thermostats, external wireless temperature sensors | Successfully tested: HD4692/HD4693 via H3550 Central Unit; H/LN4691; external probes: L/N/NT4577 + 3455 |
-| CEN & CEN+ Commands | `15` & `25`   | `bus_cen_scenario_control`, `bus_cenplus_scenario_control`, `bus_dry_contact_ir`   | CEN/CEN+ events and virtual activation for scenario control. Dry Contact and IR sensor devices events. | Successfully tested: scenario buttons: HC/HD/HS/L/N/NT4680. Contact interfaces: F428 and 3477. IR sensors: HC/HD/HS/L/N/NT4610 |
-| Energy Management | `18`   | `bus_energy_central_unit`   | Energy Management Central Unit | Successfully tested: F520, F521 |
+| CEN & CEN+ Commands  | `15` & `25`  | `bus_cen_scenario_control`, `bus_cenplus_scenario_control`, `bus_dry_contact_ir`  | CEN/CEN+ events and virtual activation for scenario control. Dry Contact and IR sensor devices events. | Successfully tested: scenario buttons: HC/HD/HS/L/N/NT4680. Contact interfaces: F428 and 3477. IR sensors: HC/HD/HS/L/N/NT4610 |
+| Energy Management    | `18`         | `bus_energy_central_unit`           | Energy Management Central Unit | Successfully tested: F520, F521 |
 
 
 ### ZigBee (Radio)
