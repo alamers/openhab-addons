@@ -1,4 +1,4 @@
-# OpenWebNet (BTicino/Legrand) Binding - BETA instructions
+# OpenWebNet (BTicino/Legrand) Binding - Installation instructions (BETA phase)
 
 The OpenWebNet binding is still under development. This documentation is useful during the beta phase until the binding is added to the official openHAB 2 Addons distribution.
 See the [README](./README.md) for overall documentation of the binding.
