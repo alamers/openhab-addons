@@ -1,16 +1,20 @@
 # OpenWebNet (BTicino/Legrand) Binding - BETA instructions
 
-The OpenWebNet binding is still under development. The following documentation is useful during the beta stage.
-See the full README for full documentation of the binding.
+The OpenWebNet binding is still under development. This documentation is useful during the beta phase until the binding is added to the official openHAB 2 Addons distribution.
+See the [README](./README.md) for overall documentation of the binding.
 
 ## Installation
 
 The binding it's still *under development* and not part of the official openHAB distribution.
-You must **follow carefully the following instruction steps 1a./1b. and 2.** in order to have the binding properly installed and working.
+You must **follow carefully the following instruction steps 1. and 2.** in order to have the binding properly installed and working.
+
+### 1. Bundle Installation
+
+To install this binding two **alternative** options are available: from Marketplace or Manually
 
 ### 1a. Install from Marketplace
 
-The easiest way to install this binding is from the [Eclipse IoT Marketplace](https://marketplace.eclipse.org/content/openwebnet-2x-binding-testing).
+The binding can be installed from the [Eclipse IoT Marketplace](https://marketplace.eclipse.org/content/openwebnet-2x-binding-testing).
 
 Make sure that the [marketplace plugin is activated](https://www.openhab.org/docs/configuration/eclipseiotmarket.html), and then install the *OpenWebNet binding* from PaperUI (Add-ons -> Bindings -> search for 'openwebnet' then INSTALL).
 
@@ -20,17 +24,13 @@ You will have to re-install the binding after an openHAB upgrade. This is a limi
 
 ### 1b. Install Manually
 
-***Alternatively*** this binding can be installed manually:
-
 1. Download the [latest released JAR file](https://github.com/mvalla/openhab2-addons/releases)
 
-1. Copy the JAR file to your openHAB2 `addons` folder. On Linux or RaspberryPi it is under: 
-
-      `/usr/share/openhab2/addons/`
+1. Copy the JAR file to your openHAB2 `addons` folder. On Linux and RaspberryPi it is under `/usr/share/openhab2/addons/`
 
 ### 2. Activate Dependencies
 
-After the binding is installed, from Marketplace or manually, some *features dependencies must be activated manually*:
+After the binding has been installed, from Marketplace or manually, some *features dependencies must be activated manually*:
 
 - from [Karaf console](https://www.openhab.org/docs/administration/console.html):
     - `feature:install openhab-transport-serial`
@@ -44,7 +44,7 @@ After upgrading the binding to a new version, there is no need to activate depen
 
 ## Upgrade of the binding
 
-When upgrading the binding to a new version it's suggested also to remove OpenWebNet Things before uninstalling the old binding, and discover/configure them again after binding has been updated. Instead of removing things also re-setting the bridge in things properties should work.
+When upgrading the binding to a new version it's suggested also to remove OpenWebNet Things before un-installing the old binding, and discover/configure them again after binding has been updated. Instead of removing things also re-setting the bridge in things properties should work.
 If things are defined using .things file, they do not need to be re-created.
 
 ### Upgrade - Marketplace installation
@@ -93,7 +93,7 @@ See: https://github.com/openhab/openhab-google-assistant/issues/59
 #### My BTicino devices are visible from PaperUI but cannot be discovered by Google Home / Alexa
 
 Not all device types are supported by Google Home / Alexa and the respective openHAB add-ons. This is not a limitation of the binding.
-Visit the links at the end of section [Integration with Assistants](#integration-with-assistants) to check compatibility with your assistant.
+Visit the links at the end of section [Integration with Assistants](./README.md#integration-with-assistants) to check compatibility with your assistant.
 
 #### When message/feature XXXX will be supported ?
 
@@ -152,7 +152,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX #4] added support for BTicino movement sensors (like AM5658 Green Switch) 
 - updated to openHAB 2.5.0 dev branch
 
-**v2.4.0-b9-2** - 18/01/2019
+**v2.4.0-b9-2** - **EXPIRED** - 18/01/2019
 
 - [FIX #37] CEN commands WHAT (buttons) 0-9 are now 00-09
 - [FIX] CEN/CEN+ scenarioButton channel is now able to receive commands
@@ -161,15 +161,15 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX #42 & #43] Devices with same WHERE receive wrong messages from BUS
 - [FIX] improved device registration to BridgeHandler
 
-**v2.4.0-b9-1** - 27/12/2018
+**v2.4.0-b9-1** - **EXPIRED** - 27/12/2018
 
-- [FIX #6] and [FIX #33] Initial support for `WHO=15/25` CEN/CEN+ for receiving events from BUS Scenario Control physical devices/buttons (for example Scenario Control: HC/HD/HS/L/N/NT4680) and sending virtual pressure commands to activate MH202 scenarios on the BUS from openHAB. Use [discovery by activation](#discovery-by-activation) to discover CEN/CEN+ scenario control devices. Further buttons/channels are discovered by pressing the corresponding physical button after the device has been added from Inbox
+- [FIX #6] and [FIX #33] Initial support for `WHO=15/25` CEN/CEN+ for receiving events from BUS Scenario Control physical devices/buttons (for example Scenario Control: HC/HD/HS/L/N/NT4680) and sending virtual pressure commands to activate MH202 scenarios on the BUS from openHAB
 - [FIX #9] Support for `WHO=25` Dry Contact interfaces and IR Sensors on BUS, with discovery
 - [FIX #11] Initial support for `WHO=18` Energy Management on BUS, with discovery. Currently supported: Energy Management Central Unit (F521) power measures
 - [FIX #29] Added support for command translation (1000# ) for Automation
-- [FIX #27] Device **Discovery by Activation** ( [discovery by activation](#discovery-by-activation) ) for Lighting and CEN/CEN+: if a BUS physical device is not found in Inbox during a Scan, activate the device to discover it
+- [FIX #27] Device Discovery by Activation for Lighting and CEN/CEN+: if a BUS physical device is not found in Inbox during a Scan, activate the device to discover it
 
-**v2.4.0-b8** - 11/11/2018
+**v2.4.0-b8** - **EXPIRED** - 11/11/2018
 
 - [FIX #25] added `Blinds` tag for shutter channels (Rollershutter items) 
 - [FIX #17] now a disconnection from the gateway is detected within few minutes
@@ -183,7 +183,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - updated README examples and added .sitemap example
 - moved to new repository, forked from openhab/openhab2-addons
 
-**v2.4.0-b7** - 01/09/2018
+**v2.4.0-b7** - **EXPIRED** - 01/09/2018
 
 - [FIX #5] Initial support for `WHO=4` Thermoregulation on BUS. Currently supported: zones room thermostats and external (wireless) temperature sensors. Both heating and cooling functions are supported
 - The binding is now available on the [Eclipse IoT Marketplace](https://marketplace.eclipse.org/content/openwebnet-2x-binding-testing)
@@ -192,7 +192,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX] improved Shutter management and position estimation, thanks to previous 2 enhancements
 - minimum requirement is now openHAB 2.3, which is needed to support measurements units like °C
 
-**v2.4.0-b6** - 02/07/2018
+**v2.4.0-b6** - **EXPIRED** - 02/07/2018
 
 - updated to openHAB 2.4.0 dev branch
 - [FIX #7] added support for inverted UP/DOWN automation commands for older USB ZigBee dongles
@@ -200,13 +200,13 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX] added support for SCS/ZIGBEE_SHUTTER_SWITCH (515/513) device types
 - [FIX] added support for F455 gateways using `*99*0##` command session
 
-**v2.3.0-b5** - 26/05/2018
+**v2.3.0-b5** - **EXPIRED** - 26/05/2018
 
 - [FIX #1] state monitoring from BUS (feedback) is no longer stopped if unsupported messages are received from BUS
 - [FIX] automatic reconnect to BUS when connection is lost
 - [NEW] support for Gateways with string passwords (HMAC authentication), like MyHOMEServer1 
 - [NEW] support for `WHO=2` Automation (shutters), both on BUS and ZigBee, with position feedback and  goto Percent. It requires setting the shutter run-time in the thing configuration. Experimental auto-calibration of the run-time is also supported!
 
-**v2.3.0-b4** - 09/04/2018
+**v2.3.0-b4** - **EXPIRED** - 09/04/2018
 
 - first public release
