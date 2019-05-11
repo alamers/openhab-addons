@@ -44,11 +44,11 @@ The following Things and OpenWebNet `WHOs` are supported:
 
 ### ZigBee (Radio)
 
-| Category   | WHO   | Thing Type IDs                               | Description                                                 | Status                               |
-| ---------- | :---: | :------------------------------------------: | :----------------: | :--------: | ----------------------------------------------------------- | ------------------------------------ |
-| Gateway    | `13`  | `zb_gateway`                            | Wireless ZigBee USB Gateway (BTicino/Legrand models: BTI-3578/088328) | Tested: BTI-3578 and LG 088328             |
-| Lightning| `1`   | `zb_dimmer`, `zb_on_off_switch`, `zb_on_off_switch2u` | ZigBee dimmers, switches and 2-unit switches                | Tested: BTI-4591, BTI-3584, BTI-4585 |
-| Automation | `2`   | `zb_automation`                         | ZigBee roller shutters        | *To be tested*    |
+| Category   | WHO   | Thing Type IDs                    | Description                                                           | Status                               |
+| ---------- | :---: | :-------------------------------: | :-------------------------------------------------------------------: | ------------------------------------ |
+| Gateway    | `13`  | `zb_gateway`                      | Wireless ZigBee USB Gateway (BTicino/Legrand models: BTI-3578/088328) | Tested: BTI-3578 and LG 088328       |
+| Lightning  | `1`   | `zb_dimmer`, `zb_on_off_switch`, `zb_on_off_switch2u` | ZigBee dimmers, switches and 2-unit switches      | Tested: BTI-4591, BTI-3584, BTI-4585 |
+| Automation | `2`   | `zb_automation`                   | ZigBee roller shutters                                                | *To be tested*                       |
 
 ## Requirements
 

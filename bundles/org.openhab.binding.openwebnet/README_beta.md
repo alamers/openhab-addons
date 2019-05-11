@@ -110,7 +110,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M3 =IN PROGRESS=** - dd/04/2019
+**v2.5.0.M3 =IN PROGRESS=** - dd/05/2019
 
 - [FIX #30] manually configured things are now ignored during auto-discovery
 - [FIX #67] *[BREAKING CHANGE]* param discoveryByActivation changed to boolean ("false" -> false)
@@ -119,6 +119,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - removed logging INFO when discovering devices via UPnP
 - firmware ver. and MAC address are now read from BUS gateway
 - BUS gateway MAC addr. used as `serialNumber` (representation-property) to avoid discovery of same gateway that was added manually
+- removed dependency on Guava
 - on the ZigBee part:
     - [FIX] fixed detecting wrong device id for discovered Zigbee devices
     - [FIX #77] Zigbee bridge: serial port as config parameter
