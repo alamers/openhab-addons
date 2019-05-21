@@ -85,15 +85,10 @@ The interesting file to provide for feedback is `openhab.log` (`events.log` is n
 
 ### FAQs
 
-#### I want to control blinds from Google Home (Google Assistant): how?
-
-Blinds are not currently supported by the Google Home add-on for openHAB, this is not a limitation of this binding. 
-See: https://github.com/openhab/openhab-google-assistant/issues/59
-
 #### My BTicino devices are visible from PaperUI but cannot be discovered by Google Home / Alexa
 
 Not all device types are supported by Google Home / Alexa and the respective openHAB add-ons. This is not a limitation of the binding.
-Visit the links at the end of section [Integration with Assistants](./README.md#integration-with-assistants) to check compatibility with your assistant.
+Visit the links at the end of section [Integration with Assistants](./README.md#integration-with-assistants) to check compatibility with your selected assistant.
 
 #### When message/feature XXXX will be supported ?
 
@@ -113,7 +108,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 **v2.5.0.M3 =IN PROGRESS=** - dd/05/2019
 
 - [FIX #30] manually configured things are now ignored during auto-discovery
-- [FIX #67] *[BREAKING CHANGE]* param discoveryByActivation changed to boolean ("false" -> false)
+- [FIX #67] *[BREAKING CHANGE]* param discoveryByActivation changed to boolean (`"false"` -> `false`)
 - [FIX #74] Updated README with energy example
 - checked licence headers & javadocs. Improved logging
 - removed logging INFO when discovering devices via UPnP

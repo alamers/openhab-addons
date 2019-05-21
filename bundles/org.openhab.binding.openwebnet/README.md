@@ -9,7 +9,7 @@ It supports:
 - numeric (`12345`) and alpha-numeric (`abcde` - HMAC authentication) gateway passwords
 
 NOTE
-The new BTicino Living Now wireless system is not supported as it does not use the OpenWebNet protocol
+The new BTicino Living Now(r) wireless system is not supported as it does not use the OpenWebNet protocol
 
 ## Prerequisites
 
@@ -87,7 +87,7 @@ If a device cannot be discovered automatically it's always possible to add them 
     $ sudo usermod -a -G dialout openhab
     ```
 
-    + The user will need to logout and login to see the new group added. If you added your user to this group and still cannot get permission, reboot Linux to ensure the new group permission is attached to the `openhab` user.
+    The user will need to logout and login to see the new group added. If you added your user to this group and still cannot get permission, reboot Linux to ensure the new group permission is attached to the `openhab` user.
 - Once the gateway is discovered and added, a second discovery request from Inbox will discover devices. Because of the ZigBee radio network, discovery will take ~40-60 sec. Be patient!
 - Wireless devices must be part of the same ZigBee network of the ZigBee USB Gateway to discover them. Please refer to [this guide by BTicino](http://www.bticino.com/products-catalogue/management-of-connected-lights-and-shutters/#installation) to setup a ZigBee wireless network which includes the ZigBee USB Gateway 
 - Only powered wireless devices part of the same ZigBee network and within radio coverage of the ZigBee USB Gateway will be discovered. Unreachable or not powered devices will be discovered as *GENERIC* devices and cannot be controlled. Control units cannot be discovered by the ZigBee USB Gateway and therefore are not supported
@@ -196,7 +196,7 @@ To ensure the heating/cooling actuators are set up correctly for a Thermostat:
 ## Integration with assistants
 
 To be visible to assistants like Google Assistant/Amazon Alexa/Apple HomeKit (Siri) an item must have the correct tag.
-Items created automatically with PaperUI (Simple Mode item linking: `Configuration > System > Item Linking > Simple mode > SAVE`) will get automatically the correct tag from the binding: in particular items associated with these channels will have the following tags:
+Items created automatically with PaperUI (Simple Mode item linking: `Configuration > System > Item Linking > Simple mode > SAVE`) will get automatically the default tag from the binding: in particular items associated with these channels will have the following tags:
 
 - `switch` / `brightness` channels will have the `Lighting` tag
 - `shutter` channel will have the `Blinds` tag
@@ -206,12 +206,11 @@ Items created automatically with PaperUI (Simple Mode item linking: `Configurati
 
 After configuration, you can double-check which tags are set looking at the `tags` attribute in the REST API: http://openhabianpi.local:8080/rest/items.
 
-**NOTE For items created automatically with PaperUI tags are added automatically by the OpenWebNet binding, but you have to check which tags are actually supported by each openHAB add-on (Google Assistant/Alexa/HomeKit). 
-For example the Google Assitant add-on for openHAB does not support the 'Blinds' tag yet.**
+**NOTE For items created automatically with PaperUI tags are added automatically by the OpenWebNet binding, but you have to check which tags are actually supported by each openHAB add-on (Google Assistant/Alexa/HomeKit).**
 
-After items and their tags are set, it will be enough to link openHAB with [myopenhab](https://www.openhab.org/addons/integrations/openhabcloud/) and with the Google Assistant/Alexa/HomeKit add-on, and you will be able to discover/control BTicino items.
+After items and their correct tags are set, it will be enough to link openHAB with [myopenhab](https://www.openhab.org/addons/integrations/openhabcloud/) and with the Google Assistant/Alexa/HomeKit add-on, and you will be able to discover/control BTicino items from assistants.
 
-Names used will be the names of the channels (Brightness, etc.); they cannot be changed in PaperUI, usually you can change names in the assistants.
+The device names imported in the assistant will be the names of the channels (Brightness, etc.); they cannot be changed in PaperUI, usually you can rename devices in the assistants.
 
 Note that the most flexible configuration is obtained using `.items` file: see the examples below.
 
@@ -340,7 +339,7 @@ end
 ## Disclaimer
 
 - This binding is not associated by any means with BTicino or Legrand companies
-- Contributors of this binding have no liability for any direct, indirect, incidental, special, exemplary, or consequential damage to things or people caused by using the binding connected to a real BTicino/Legrand (OpenWebNet) plant/system and its physical devices. The final user is the only responsible for using this binding in a real environment. See Articles 5. and 6. of [Eclipse Public Licence 1.0](https://www.eclipse.org/legal/epl-v10.html) under which this binding software is distributed
+- Contributors of this binding have no liability for any direct, indirect, incidental, special, exemplary, or consequential damage to things or people caused by using the binding connected to a real BTicino/Legrand (OpenWebNet) plant/system and its physical devices. The final user is the only responsible for using this binding in a real environment. See Articles 5. and 6. of [Eclipse Public Licence 2.0](https://www.eclipse.org/legal/epl-2.0/l) under which this binding software is distributed
 - The OpenWebNet protocol is maintained and Copyright by BTicino/Legrand. The documentation of the protocol if freely accessible for developers on the [MyOpen Community website - https://www.myopen-legrandgroup.com/developers](https://www.myopen-legrandgroup.com/developers/)
 - OpenWebNet, MyHOME and MyHOME_Play are registered trademarks by BTicino/Legrand
 - This binding uses `openwebnet-lib 0.9.x`, an OpenWebNet Java lib partly based on [openwebnet/rx-openwebnet](https://github.com/openwebnet/rx-openwebnet) client library by @niqdev, to support:
