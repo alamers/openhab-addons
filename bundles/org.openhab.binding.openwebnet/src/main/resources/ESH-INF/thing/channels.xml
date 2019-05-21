@@ -26,6 +26,7 @@
 		</tags>
 	</channel-type>
 
+    <!-- 
 	<channel-type id="dimmerLevel">
 		<item-type>Number</item-type>
 		<label>Dimmer Level (OpenWebNet)</label>
@@ -35,7 +36,7 @@
 			<tag>Lighting</tag>
 		</tags>
 	</channel-type>
-	
+	-->
 
 	<!-- Shutter Channel -->
 	<channel-type id="shutter">
@@ -199,13 +200,7 @@
 		<label>Sensor</label>
 		<description>Indicates if a Dry Contact interface is ON or a IR Sensor has detected movement</description>
 		<category></category>
-		
 		<state readOnly="true">
-		<!--	<options>
-				<option value="ON">ON - IR Detection</option>
-				<option value="OFF">OFF - IR No Detection</option>
-			</options>
-		-->
 		</state>
 		
 	</channel-type>
