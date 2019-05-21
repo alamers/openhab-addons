@@ -122,15 +122,6 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
             isBusGateway = true;
         }
 
-        // DEUBG
-        if (!this.testTransformations()) {
-            logger.error("==OWN== @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TRANSFORMATION ERORR");
-            return;
-        } else {
-            logger.info("==OWN== @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TRANSFORMATION *OK* ");
-        }
-        // END-DEBUG
-
         gateway.subscribe(this);
         if (gateway.isConnected()) { // gateway is already connected, device can go ONLINE
             isGatewayConnected = true;
@@ -555,74 +546,6 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
     public String thingIdFromWhere(String where) {
         return normalizeWhere(where).replace('#', 'h'); // '#' cannot be used in ThingUID;
     }
-
-    // @formatter:off
-    /**
-     *
-     *                              deviceWhere
-     *                              (DevAddrParam)
-     * TYPE         WHERE           normalizeWhere()  ownId       ThingID
-     * ---------------------------------------------------------------
-     * Zigbee       789309801#9     7893098           1.7893098   7893098
-     * Switch       51              51                1.51        51
-     * Dimmer       25#4#01         25#4#01           1.25#4#01   25h4h01
-     * Autom        93              93                2.93        93
-     * Thermo       #1 or 1         1                 4.1         1
-     * TempSen      500             500               4.500       500
-     * Energy       51              51                18.51       51
-     * CEN          51              51                15.51       51
-     * CEN+         212             212               25.212      212
-     * DryContact   399             399               25.399      399
-     *
-     *        METHOD                            CALLED FROM                                     CALLING
-     *        ------                            -----------                                     -------
-     *      - OpenWebNetDeviceDiscoveryService new discovery result                             --> deviceWhere = normalizeWhere()
-     *      - ThingHandler.initialize                                                           --> ownId = ownIdFromDeviceWhere()
-     *      - public    normalizeWhere()        locally and OpenWebNetDeviceDiscoveryService    --> getAddrFromWhere()
-     *      - public    getAddrFromWhere()                                                      --> remove last 4
-     *      - protected ownIdFromDeviceWhere()  ThingHandler.initialize                         --> ownIdPrefix() + "." + deviceWhere
-
-     *      - private   ownIdFromMessage()      onMessage()
-     *      - public    thingIdFromWhere()      OpenWebNetDeviceDiscoveryService                --> normalizeWhere().replace(#)
-     */
-
-    public enum TEST {
-        zigbee("789309801#9","1","7893098","1.7893098","7893098"),
-        sw("51","1","51","1.51","51"),
-        dimmer("25#4#01","1","25#4#01","1.25#4#01","25h4h01"),
-        thermo("#1","4","1","4.1","1"),
-        tempSen("500","4","500","4.500","500"),
-        energy("51","18","51","18.51","51");
-
-        public final String where, who,norm,ownId,thing ;
-
-        private TEST(String where,String who, String norm,String ownId,String thing) {
-            this.where = where;
-            this.who = who;
-            this.norm=norm;
-            this.ownId= ownId;
-            this.thing = thing;
-        }
-    }
-
-    private boolean testTransformations() {
-        boolean[] testResults = new boolean[6];
-     for  (int i = 0; i < TEST.values().length; i++) {
-         TEST test = TEST.values()[i];
-         if ( (isBusGateway && test!=TEST.zigbee) || (!isBusGateway && test == TEST.zigbee) ) {
-             testResults[i] = test.norm.equals(normalizeWhere(test.where));
-             testResults[i] = testResults[i] && test.ownId.equals(ownIdFromWhoWhere(test.where, test.who));
-             testResults[i] = testResults[i] && test.ownId.equals(ownIdFromMessage((BaseOpenMessage)OpenMessageFactory.parse("*"+test.who+"*1*"+test.where+"##")));
-             testResults[i] = testResults[i] && test.thing.equals(thingIdFromWhere(test.where));
-         }  else {
-             testResults[i] = true;
-         }
-     }
-    return testResults[0]&&testResults[1]&&testResults[2]&&testResults[3]&&testResults[4]&&testResults[5];
-
-    }
-
- // @formatter:on
 
     /**
      * Normalize a WHERE address for Thermo and Zigbee devices

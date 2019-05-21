@@ -14,17 +14,6 @@
   <name>openHAB Add-ons :: Bundles :: OpenWebNet (BTicino/Legrand) Binding</name>
 
  
-  <dependencies>
-
-  <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-<!--     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>21.0</version>
-    </dependency>
-     -->
-  </dependencies>
-
 </project>
 
   

@@ -170,8 +170,8 @@ public abstract class OpenWebNetThingHandler extends BaseThingHandler {
     protected abstract String ownIdPrefix();
 
     protected <U extends Quantity<U>> QuantityType<U> commandToQuantityType(Command command, Unit<U> defaultUnit) {
-        if (command instanceof QuantityType) {
-            return (QuantityType<U>) command;
+        if (command instanceof QuantityType<?>) {
+            return ((QuantityType<U>) command);
         }
         return new QuantityType<U>(new BigDecimal(command.toString()), defaultUnit);
     }

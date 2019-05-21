@@ -82,6 +82,10 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
             this.function = f;
         }
 
+        public int getValue() {
+            return function;
+        }
+
     }
 
     public final static Set<ThingTypeUID> SUPPORTED_THING_TYPES = OpenWebNetBindingConstants.THERMOREGULATION_SUPPORTED_THING_TYPES;
