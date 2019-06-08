@@ -26,7 +26,7 @@
 		</tags>
 	</channel-type>
 
-    <!-- 
+    
 	<channel-type id="dimmerLevel">
 		<item-type>Number</item-type>
 		<label>Dimmer Level (OpenWebNet)</label>
@@ -36,7 +36,7 @@
 			<tag>Lighting</tag>
 		</tags>
 	</channel-type>
-	-->
+	
 
 	<!-- Shutter Channel -->
 	<channel-type id="shutter">

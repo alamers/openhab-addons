@@ -210,7 +210,9 @@ After configuration, you can double-check which tags are set looking at the `tag
 
 After items and their correct tags are set, it will be enough to link openHAB with [myopenhab](https://www.openhab.org/addons/integrations/openhabcloud/) and with the Google Assistant/Alexa/HomeKit add-on, and you will be able to discover/control BTicino items from assistants.
 
-The device names imported in the assistant will be the names of the channels (Brightness, etc.); they cannot be changed in PaperUI, usually you can rename devices in the assistants.
+
+The device name imported in the assistant will be label given to the item, and not the item name; usually you can rename devices in the assistants.
+(item labels are not mandatory in openHAB, but for the Google Assistant Action they are absolutely necessary)
 
 Note that the most flexible configuration is obtained using `.items` file: see the examples below.
 
@@ -253,31 +255,31 @@ Bridge openwebnet:zb_gateway:myZBgateway  [serialPort="kkkkkkk"] {
 
 ### openwebnet.items:
 
-Items in the example (Light, Dimmer, Thermostat, etc.) will be discovered by Google Assistant/Alexa/HomeKit if their tags are configured like in the example.
+Items (Light, Dimmer, Thermostat, etc.) will be discovered by Google Assistant/Alexa/HomeKit if their tags are configured like in the example.
 
 ```xtend
-Switch         iLR_switch        "Switch"                 <light>          (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_on_off_switch:mybridge:LR_switch:switch" }
-Dimmer         iLR_dimmer        "Brightness [%.0f %%]"   <DimmableLight>  (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_dimmer:mybridge:LR_dimmer:brightness" }
-Dimmer         iLR_dalidimmer    "Brightness [%.0f %%]"   <DimmableLight>  (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_dimmer:mybridge:LR_dalidimmer:brightness" }
+Switch			iLR_switch			"Light"								<light>          (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_on_off_switch:mybridge:LR_switch:switch" }
+Dimmer			iLR_dimmer			"Dimmer [%.0f %%]"					<DimmableLight>  (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_dimmer:mybridge:LR_dimmer:brightness" }
+Dimmer			iLR_dalidimmer		"Dali-Dimmer [%.0f %%]"				<DimmableLight>  (gLivingRoom)                [ "Lighting" ]  { channel="openwebnet:bus_dimmer:mybridge:LR_dalidimmer:brightness" }
 /* For Dimmers, use category DimmableLight to have Off/On switch in addition to the Percent slider in PaperUI */
-Rollershutter  iLR_shutter       "Shutter [%.0f %%]"      <rollershutter>  (gShutters, gLivingRoom)     [ "Blinds"   ]  { channel="openwebnet:bus_automation:mybridge:LR_shutter:shutter" }
-Number         iEXT_tempsensor   "Temperature [%.1f °C]"  <temperature>                                 [ "CurrentTemperature" ]  { channel="openwebnet:bus_temp_sensor:mybridge:EXT_tempsensor:temperature" }
-Number         iCENTRAL_en_power "Power [%.0f W]"         <energy>            { channel="openwebnet:bus_energy_central_unit:mybridge:CENTRAL_energy:power" }
-String         iLR_scenario_btn4  "Scenario Button 4"     <network>           { channel="openwebnet:bus_cen_scenario_control:mybridge:LR_CEN_scenario:button_4" }  
-String         iLR_scenario_btn1  "Scenario Button 1"     <network>           { channel="openwebnet:bus_cenplus_scenario_control:mybridge:LR_CENplus_scenario:button_1" }  
-Switch         iLR_IR_sensor      "Living Room IR sensor" <motion>            { channel="openwebnet:bus_dry_contact_ir:mybridge:LR_IR_sensor:sensor" }
+Rollershutter	iLR_shutter			"Shutter [%.0f %%]"					<rollershutter>  (gShutters, gLivingRoom)     [ "Blinds"   ]  { channel="openwebnet:bus_automation:mybridge:LR_shutter:shutter" }
+Number			iEXT_tempsensor		"External Temperature [%.1f °C]"	<temperature>                                 [ "CurrentTemperature" ]  { channel="openwebnet:bus_temp_sensor:mybridge:EXT_tempsensor:temperature" }
+Number			iCENTRAL_en_power	"Power [%.0f W]"					<energy>            { channel="openwebnet:bus_energy_central_unit:mybridge:CENTRAL_energy:power" }
+String			iLR_scenario_btn4	"Scenario Button 4"					<network>           { channel="openwebnet:bus_cen_scenario_control:mybridge:LR_CEN_scenario:button_4" }  
+String			iLR_scenario_btn1	"Scenario Button 1"					<network>           { channel="openwebnet:bus_cenplus_scenario_control:mybridge:LR_CENplus_scenario:button_1" }  
+Switch			iLR_IR_sensor		"Sensor"							<motion>            { channel="openwebnet:bus_dry_contact_ir:mybridge:LR_IR_sensor:sensor" }
 
 /* Thermostat Setup (Google Assitant/Alexa require thermostat items to be grouped together) */
-Group   gLR_thermostat               "Living Room Thermostat"                                     [ "Thermostat" ]
-Number:Temperature  iLR_temp         "Temperature [%.1f °C]"  <temperature>  (gLR_Thermostat)     [ "CurrentTemperature" ]          { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:temperature" }
-String              iLR_offset       "Offset"                                (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:localMode" }
-Switch              iLR_heating      "Heating is"                            (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:heating" }
-Switch              iLR_cooling      "Cooling is"                            (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:cooling" }
-Number:Temperature  iLR_targetTemp   "Target [%.1f °C]"                      (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:targetTemperature" }
-String              iLR_activeMode   "Active Mode"                           (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:activeMode" }
-String              iLR_heatCool     "HeatingCoolingMode"                    (gLR_Thermostat)     [ "homekit:HeatingCoolingMode" ]  { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:heatingCoolingMode" }
-Number:Temperature  iLR_setpointTemp "Setpoint Temperature [%.1f °C]"  <temperature> (gLR_Thermostat)  [ "TargetTemperature" ]      { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:setpointTemperature" }
-String              iLR_setMode      "Set Mode"                              (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:setMode"}
+Group				gLR_thermostat		"Living Room Thermostat"                                     [ "Thermostat" ]
+Number:Temperature  iLR_temp			"Temperature [%.1f °C]"  <temperature>  (gLR_Thermostat)     [ "CurrentTemperature" ]          { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:temperature" }
+String				iLR_offset			"Offset"                                (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:localMode" }
+Switch				iLR_heating			"Heating is"                            (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:heating" }
+Switch				iLR_cooling			"Cooling is"                            (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:cooling" }
+Number:Temperature	iLR_targetTemp		"Target [%.1f °C]"                      (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:targetTemperature" }
+String				iLR_activeMode		"Active Mode"                           (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:activeMode" }
+String				iLR_heatCool		"HeatingCoolingMode"                    (gLR_Thermostat)     [ "homekit:HeatingCoolingMode" ]  { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:heatingCoolingMode" }
+Number:Temperature	iLR_setpointTemp	"Setpoint Temperature [%.1f °C]"  <temperature> (gLR_Thermostat)  [ "TargetTemperature" ]      { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:setpointTemperature" }
+String				iLR_setMode			"Set Mode"                              (gLR_Thermostat)                                       { channel="openwebnet:bus_thermostat:mybridge:LR_thermostat:setMode"}
 ```
 
 ### openwebnet.sitemap
