@@ -1,7 +1,7 @@
 # OpenWebNet (BTicino/Legrand) Binding - Installation instructions (BETA phase)
 
 The OpenWebNet binding is still under development. This documentation is useful during the beta phase until the binding is added to the official openHAB 2 Addons distribution.
-See the [README](./README.md) for overall documentation of the binding.
+See the [README](./README.md) for the main documentation of the binding.
 
 ## Installation
 
@@ -99,14 +99,13 @@ If not, add a new issue. Issues are organised by milestones, but deadlines -of c
 
 For a full list of current open issues / features requests see [GitHub repo](https://github.com/mvalla/openhab2-addons/issues)
 
-- With some latest firmware versions of MyHOMEServer_1, rollershutters are not discovered because this gateways responds to device status request with a invalid OpenWebNet message. This is a BUG by BTicino and not a problem of the binding. See: https://github.com/mvalla/openhab2-addons/issues/34
-
 - In some cases dimmers connected to a F429 Dali-interface cannot be discovered, even if switched ON and dimmed. This looks like as a limitation of some gateways that do not report status of Dali devices when requested. See: https://github.com/mvalla/openhab2-addons/issues/14
 
 ## Changelog
 
-**v2.5.0.M3 =IN PROGRESS=** - dd/05/2019
+**v2.5.0.M2-2** - 16/06/2019
 
+- [FIX #76] Migrated to new OH2 build system (bndtools)
 - [FIX #30] manually configured things are now ignored during auto-discovery
 - [FIX #67] *[BREAKING CHANGE]* param discoveryByActivation changed to boolean (`"false"` -> `false`)
 - [FIX #74] Updated README with energy example
@@ -114,13 +113,15 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - removed logging INFO when discovering devices via UPnP
 - firmware ver. and MAC address are now read from BUS gateway
 - BUS gateway MAC addr. used as `serialNumber` (representation-property) to avoid discovery of same gateway that was added manually
-- removed dependency on Guava
+- removed dependency on Guava lib
+- Now using openwebnet-lib-0.9.20
 - on the ZigBee part:
     - [FIX] fixed detecting wrong device id for discovered Zigbee devices
     - [FIX #77] Zigbee bridge: serial port as config parameter
     - *[BREAKING CHANGE]* ZigBee gateway: now `zigbeeid` is used as representation-property
     - *[BREAKING CHANGE]* renamed thing-types for ZigBee devices and GenericDevice. Previous ZigBee configured things must be updated (file) / re-discovered (PaperUI)
     - debug messages for ZB connect/connectGateway
+
 
 **v2.5.0.M2-1** - 20/03/2019
 

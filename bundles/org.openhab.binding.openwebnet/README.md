@@ -343,7 +343,7 @@ end
 - This binding is not associated by any means with BTicino or Legrand companies
 - Contributors of this binding have no liability for any direct, indirect, incidental, special, exemplary, or consequential damage to things or people caused by using the binding connected to a real BTicino/Legrand (OpenWebNet) plant/system and its physical devices. The final user is the only responsible for using this binding in a real environment. See Articles 5. and 6. of [Eclipse Public Licence 2.0](https://www.eclipse.org/legal/epl-2.0/l) under which this binding software is distributed
 - The OpenWebNet protocol is maintained and Copyright by BTicino/Legrand. The documentation of the protocol if freely accessible for developers on the [MyOpen Community website - https://www.myopen-legrandgroup.com/developers](https://www.myopen-legrandgroup.com/developers/)
-- OpenWebNet, MyHOME and MyHOME_Play are registered trademarks by BTicino/Legrand
+- OpenWebNet, MyHOME, MyHOME_Play and Living Now are registered trademarks by BTicino/Legrand
 - This binding uses `openwebnet-lib 0.9.x`, an OpenWebNet Java lib partly based on [openwebnet/rx-openwebnet](https://github.com/openwebnet/rx-openwebnet) client library by @niqdev, to support:
     - gateways and OWN frames for ZigBee
     - frame parsing
