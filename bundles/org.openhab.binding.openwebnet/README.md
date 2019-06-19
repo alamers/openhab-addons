@@ -54,10 +54,6 @@ The following Things and OpenWebNet `WHOs` are supported:
 
 This binding requires **openHAB 2.4** or later.
 
-## Installation (BETA)
-During the BETA phase see installation instructions here: [README_beta.md](./README_beta.md)
-
-
 ## Discovery
 
 Gateway and Things discovery is supported using PaperUI by pressing the discovery ("+") button form Inbox.
