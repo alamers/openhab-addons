@@ -156,6 +156,7 @@
     <module>org.openhab.binding.plugwise</module>
     <module>org.openhab.binding.powermax</module>
     <module>org.openhab.binding.pulseaudio</module>
+    <module>org.openhab.binding.pushbullet</module>
     <module>org.openhab.binding.regoheatpump</module>
     <module>org.openhab.binding.rfxcom</module>
     <module>org.openhab.binding.rme</module>
@@ -171,6 +172,7 @@
     <module>org.openhab.binding.sleepiq</module>
     <module>org.openhab.binding.smaenergymeter</module>
     <module>org.openhab.binding.smartmeter</module>
+    <module>org.openhab.binding.snmp</module>
     <module>org.openhab.binding.solaredge</module>
     <module>org.openhab.binding.solarlog</module>
     <module>org.openhab.binding.somfytahoma</module>
@@ -246,8 +248,8 @@
       <optional>true</optional>
       <exclusions>
         <exclusion>
-            <groupId>*</groupId>
-            <artifactId>*</artifactId>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
