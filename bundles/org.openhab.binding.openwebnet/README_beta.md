@@ -110,6 +110,8 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 - [FIX #86] Added support for MH201 gateway
 - changed label for UPnP discovered gateways, keeping model name discovered with UPnP  
+- [FIX #92] In ZigBee automation UP/DOWN messages are now inverted only if firmware version is <= 1.2.0
+- Now using openwebnet-lib-0.9.21
 
 
 **v2.5.0.M2-2** - **EXPIRED** - 16/06/2019
