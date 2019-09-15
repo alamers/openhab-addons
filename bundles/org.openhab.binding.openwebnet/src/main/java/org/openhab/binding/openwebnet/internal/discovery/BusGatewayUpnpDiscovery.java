@@ -23,6 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.config.discovery.upnp.UpnpDiscoveryParticipant;
+import org.eclipse.smarthome.config.discovery.upnp.internal.UpnpDiscoveryService;
 //import org.eclipse.smarthome.config.discovery.UpnpDiscoveryParticipant;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
@@ -51,6 +52,7 @@ public class BusGatewayUpnpDiscovery implements UpnpDiscoveryParticipant {
     private final Logger logger = LoggerFactory.getLogger(BusGatewayUpnpDiscovery.class);
 
     public enum BusGatewayId {
+        MH201("IPscenarioModule", "MH201"),
         MH202("scheduler", "MH202"),
         F454("webserver", "F454"),
         MY_HOME_SERVER1("myhomeserver1", "MYHOMESERVER1"),
@@ -154,8 +156,9 @@ public class BusGatewayUpnpDiscovery implements UpnpDiscoveryParticipant {
                 Map<String, Object> properties = new HashMap<>(4);
                 String label = "BUS Gateway (" + thingId.getId().split("-")[0] + ")";
                 try {
-                    label = "BUS Gateway " + devInfo.friendlyName + " (" + devInfo.host + ", v" + devInfo.modelNumber
-                            + ")";
+                    label = ((devInfo.friendlyName != null && !("".equals(devInfo.friendlyName))) ? devInfo.friendlyName
+                            : "NO_FRIENDLY_NAME");
+                    label = label + " (" + devInfo.modelName + ", " + devInfo.modelNumber + ", " + devInfo.host + ")";
                 } catch (Exception e) {
                     logger.warn("==OWN:UPnP== Exception while getting devInfo for device UDN={}. Exception={}",
                             devInfo.udn, e.getMessage());
@@ -186,10 +189,10 @@ public class BusGatewayUpnpDiscovery implements UpnpDiscoveryParticipant {
     }
 
     /**
-     * Returns a ThingUID from already extracted DeviceInfo
+     * Returns a ThingUID for supported devices from already extracted DeviceInfo
      *
      * @param devInfo the device info
-     * @return a new ThingUID
+     * @return a new ThingUID, or null if the device is not supported by the binding
      */
     private @Nullable ThingUID generateThingUID(DeviceInfo devInfo) {
         if (devInfo != null && devInfo.isBTicino) {
@@ -204,7 +207,8 @@ public class BusGatewayUpnpDiscovery implements UpnpDiscoveryParticipant {
                             gwId.getThingId() + "_" + normalizedMac);
                 }
             } else {
-                logger.warn("==OWN:UPnP== device is not supported by the binding (UDN={})", idString);
+                logger.warn("==OWN:UPnP== this BTicino device is not a OpenWebNet gateway or is not supported (UDN={})",
+                        idString);
             }
         }
         return null;

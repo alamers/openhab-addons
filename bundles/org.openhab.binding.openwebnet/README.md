@@ -1,6 +1,7 @@
 # OpenWebNet (BTicino/Legrand) Binding
 
-This binding integrates BTicino / Legrand MyHOME(r) BUS & ZigBee wireless (MyHOME_Play) devices using the **[OpenWebNet](https://en.wikipedia.org/wiki/OpenWebNet) protocol**.
+This binding integrates BTicino / Legrand MyHOME&reg; BUS & ZigBee wireless (MyHOME_Play&reg;) devices using the **[OpenWebNet](https://en.wikipedia.org/wiki/OpenWebNet) protocol**.
+
 It supports:
 
 - *both* wired BUS/SCS (MyHOME) and wireless setups (MyHOME ZigBee) in the same biding; the two networks can be configured simultaneously
@@ -8,8 +9,8 @@ It supports:
 - commands from openHAB and feedback (events) from BUS/SCS and wireless network
 - numeric (`12345`) and alpha-numeric (`abcde` - HMAC authentication) gateway passwords
 
-NOTE
-The new BTicino Living Now(r) wireless system is not supported as it does not use the OpenWebNet protocol
+**NOTE**
+The new BTicino Living Now&reg; wireless system is not supported as it does not use the OpenWebNet protocol
 
 ## Prerequisites
 
@@ -20,6 +21,7 @@ These gateways have been tested with the binding:
 [F454](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?productId=006), 
 [MyHOMEServer1](http://www.bticino.com/products-catalogue/myhome_up-simple-home-automation-system/), 
 [MyHOME_Screen10](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?lang=EN&productId=001), 
+[MH201](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?productId=053),
 [MH202](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?productId=059), 
 [F455](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?productId=051),
 [MH200N](http://www.homesystems-legrandgroup.com/BtHomeSystems/productDetail.action?productId=016), 
@@ -34,7 +36,7 @@ The following Things and OpenWebNet `WHOs` are supported:
 
 | Category             | WHO          | Thing Type IDs                      | Description                                                 | Status           |
 | -------------------- | :----------: | :---------------------------------: | ----------------------------------------------------------- | ---------------- |
-| Gateway Management   | `13`         | `bus_gateway`                       | Any IP gateway supporting OpenWebNet protocol should work (e.g. F454 / MyHOMEServer1 / MH202 / F455 / MH200N,...) | Successfully tested: F454, MyHOMEServer1, MyHOME_Screen10, F455, F453AV, MH202, MH200N. Some connection stability issues/gateway resets reported with MH202  |
+| Gateway Management   | `13`         | `bus_gateway`                       | Any IP gateway supporting OpenWebNet protocol should work (e.g. F454 / MyHOMEServer1 / MH202 / F455 / MH200N, ...) | Successfully tested: F454, MyHOMEServer1, MyHOME_Screen10, F455, F453AV, MH201, MH202, MH200N. Some connection stability issues/gateway resets reported with MH202  |
 | Lightning            | `1`          | `bus_on_off_switch`, `bus_dimmer`   | BUS switches and dimmers. Green switches.                   | Successfully tested: F411/2, F411/4, F411U2, F422, F429. AM5658 Green Switch. Some discovery issues reported with F429 (DALI Dimmers)  |
 | Automation           | `2`          | `bus_automation`                    | BUS roller shutters, with position feedback and auto-calibration | Successfully tested: LN4672M2  |
 | Temperature Control  | `4`          | `bus_thermostat`, `bus_temp_sensor` | Zones room thermostats, external wireless temperature sensors | Successfully tested: HD4692/HD4693 via H3550 Central Unit; H/LN4691; external probes: L/N/NT4577 + 3455 |
@@ -60,7 +62,7 @@ Gateway and Things discovery is supported using PaperUI by pressing the discover
 
 ### BUS/SCS Discovery
 
-- BUS Gateway automatic discovery will work only for newer gateways supporting UPnP: F454, MyHOMEServer1, MH202, MH200N, MyHOME_Screen 10.
+- BUS Gateway automatic discovery will work only for newer gateways supporting UPnP: F454, MyHOMEServer1, MH201, MH202, MH200N, MyHOME_Screen 10.
 For other gateways you can add them manually, see [Thing Configuration](#thing-configuration) below.
 - After gateway is discovered and added a connection with default password (`12345`) is tested first: if it does not work the gateway will go offline and an error status will be set. A correct password must then be set in the gateway Thing configuration otherwise the gateway will not become online.
 - Once the gateway is online, a second Scan request from Inbox will discover BUS devices

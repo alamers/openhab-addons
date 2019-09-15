@@ -44,7 +44,10 @@ After upgrading the binding to a new version, there is no need to activate depen
 
 ## Upgrade of the binding
 
-When upgrading the binding to a new version it's suggested also to remove OpenWebNet Things before un-installing the old binding, and discover/configure them again after binding has been updated. Instead of removing things also re-setting the bridge in things properties should work.
+When upgrading the binding to a new version it's suggested also to remove OpenWebNet Things before un-installing the old binding, and discover/configure them again after binding has been updated. Re-discoverd things will not change their ID, so no other configuration change is needed and re-discovered things will be automatically linked to previous items.
+
+Instead of removing things also re-setting the bridge in things properties should work.
+
 If things are defined using .things file, they do not need to be re-created.
 
 ### Upgrade - Marketplace installation
@@ -103,7 +106,13 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M2-2** - 16/06/2019
+**v2.5.0.M3** - 15/09/2019
+
+- [FIX #86] Added support for MH201 gateway
+- changed label for UPnP discovered gateways, keeping model name discovered with UPnP  
+
+
+**v2.5.0.M2-2** - **EXPIRED** - 16/06/2019
 
 - [FIX #76] Migrated to new OH2 build system (bndtools)
 - [FIX #30] manually configured things are now ignored during auto-discovery

@@ -414,12 +414,14 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
         } else {
             logger.info("==OWN== ------------------- CONNECTED to BUS gateway '{}' ({}:{})", thing.getUID(),
                     ((OpenGatewayBus) gateway).getHost(), ((OpenGatewayBus) gateway).getPort());
-            // update gw model
-            if (properties.get(PROPERTY_MODEL) != ((OpenGatewayBus) gateway).getModelName()) {
-                properties.put(PROPERTY_MODEL, ((OpenGatewayBus) gateway).getModelName());
-                propertiesChanged = true;
-                logger.debug("==OWN== updated property gw model: {}", properties.get(PROPERTY_MODEL));
-            }
+            // update gw model //TODO keep this commented until gw model version is decoded from gw answer to *#13**15##
+            /*
+             * if (properties.get(PROPERTY_MODEL) != ((OpenGatewayBus) gateway).getModelName()) {
+             * properties.put(PROPERTY_MODEL, ((OpenGatewayBus) gateway).getModelName());
+             * propertiesChanged = true;
+             * logger.debug("==OWN== updated property gw model: {}", properties.get(PROPERTY_MODEL));
+             * }
+             */
             // update serial number (with MAC address)
             if (properties.get(PROPERTY_SERIAL_NO) != gateway.getMACAddrAsString().toUpperCase()) {
                 properties.put(PROPERTY_SERIAL_NO, gateway.getMACAddrAsString().toUpperCase());
