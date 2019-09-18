@@ -84,47 +84,53 @@ public class OpenWebNetBindingConstants {
     public static final ThingTypeUID THING_TYPE_ZB_AUTOMATION = new ThingTypeUID(BINDING_ID, "zb_automation");
     public static final String THING_LABEL_ZB_AUTOMATION = "ZigBee Automation";
 
-
     // #SUPPORTED THINGS SETS
     // ## Generic
-    public static final Set<ThingTypeUID> GENERIC_SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_DEVICE));
-    
+    public static final Set<ThingTypeUID> GENERIC_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_DEVICE));
+
     // ## Lighting
-    public static final Set<ThingTypeUID> LIGHTING_SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_ZB_ON_OFF_SWITCH, THING_TYPE_ZB_ON_OFF_SWITCH_2UNITS, THING_TYPE_ZB_DIMMER, THING_TYPE_BUS_ON_OFF_SWITCH,
-            THING_TYPE_BUS_DIMMER)) ;
-    // public static final Set<ThingTypeUID> LIGHTING_SUPPORTED_THING_TYPES = Sets.newHashSet(THING_TYPE_ZB_ON_OFF_SWITCH,
-    //       THING_TYPE_ZB_ON_OFF_SWITCH_2UNITS, THING_TYPE_ZB_DIMMER, THING_TYPE_BUS_ON_OFF_SWITCH,
-    //     THING_TYPE_BUS_DIMMER);
+    public static final Set<ThingTypeUID> LIGHTING_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_ZB_ON_OFF_SWITCH, THING_TYPE_ZB_ON_OFF_SWITCH_2UNITS, THING_TYPE_ZB_DIMMER,
+                    THING_TYPE_BUS_ON_OFF_SWITCH, THING_TYPE_BUS_DIMMER));
+    // public static final Set<ThingTypeUID> LIGHTING_SUPPORTED_THING_TYPES =
+    // Sets.newHashSet(THING_TYPE_ZB_ON_OFF_SWITCH,
+    // THING_TYPE_ZB_ON_OFF_SWITCH_2UNITS, THING_TYPE_ZB_DIMMER, THING_TYPE_BUS_ON_OFF_SWITCH,
+    // THING_TYPE_BUS_DIMMER);
     // ## Automation
-    public static final Set<ThingTypeUID> AUTOMATION_SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_ZB_AUTOMATION,
-            THING_TYPE_BUS_AUTOMATION));
+    public static final Set<ThingTypeUID> AUTOMATION_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_ZB_AUTOMATION, THING_TYPE_BUS_AUTOMATION));
     // ## Thermoregulation
-    public static final Set<ThingTypeUID> THERMOREGULATION_SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_BUS_TEMP_SENSOR, THING_TYPE_BUS_THERMOSTAT, THING_TYPE_BUS_THERMO_CENTRAL_UNIT));
+    public static final Set<ThingTypeUID> THERMOREGULATION_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_BUS_TEMP_SENSOR, THING_TYPE_BUS_THERMOSTAT, THING_TYPE_BUS_THERMO_CENTRAL_UNIT));
     // ## Energy Management
-    public static final Set<ThingTypeUID> ENERGY_SUPPORTED_THING_TYPES =  new HashSet<>(Arrays.asList(THING_TYPE_BUS_ENERGY_CENTRAL_UNIT));
+    public static final Set<ThingTypeUID> ENERGY_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_BUS_ENERGY_CENTRAL_UNIT));
     // ## CEN/CEN+ Scenario & Dry Contact/IR
-    public static final Set<ThingTypeUID> SCENARIO_SUPPORTED_THING_TYPES =  new HashSet<>(Arrays.asList(
-            THING_TYPE_BUS_CEN_SCENARIO_CONTROL, THING_TYPE_BUS_CENPLUS_SCENARIO_CONTROL,
-            THING_TYPE_BUS_DRY_CONTACT_IR));
+    public static final Set<ThingTypeUID> SCENARIO_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_BUS_CEN_SCENARIO_CONTROL, THING_TYPE_BUS_CENPLUS_SCENARIO_CONTROL,
+                    THING_TYPE_BUS_DRY_CONTACT_IR));
     // ## Groups
-    public static final Set<ThingTypeUID> DEVICE_SUPPORTED_THING_TYPES = Stream.of(LIGHTING_SUPPORTED_THING_TYPES, AUTOMATION_SUPPORTED_THING_TYPES, THERMOREGULATION_SUPPORTED_THING_TYPES, ENERGY_SUPPORTED_THING_TYPES, SCENARIO_SUPPORTED_THING_TYPES, GENERIC_SUPPORTED_THING_TYPES)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toCollection(HashSet::new));
-    	
-   	//	Sets.union(LIGHTING_SUPPORTED_THING_TYPES,
-    //        Sets.union(AUTOMATION_SUPPORTED_THING_TYPES,
-    //                Sets.union(THERMOREGULATION_SUPPORTED_THING_TYPES, Sets.union(ENERGY_SUPPORTED_THING_TYPES,
-    //                        Sets.union(SCENARIO_SUPPORTED_THING_TYPES, GENERIC_SUPPORTED_THING_TYPES)))));
+    public static final Set<ThingTypeUID> DEVICE_SUPPORTED_THING_TYPES = Stream
+            .of(LIGHTING_SUPPORTED_THING_TYPES, AUTOMATION_SUPPORTED_THING_TYPES,
+                    THERMOREGULATION_SUPPORTED_THING_TYPES, ENERGY_SUPPORTED_THING_TYPES,
+                    SCENARIO_SUPPORTED_THING_TYPES, GENERIC_SUPPORTED_THING_TYPES)
+            .flatMap(Collection::stream).collect(Collectors.toCollection(HashSet::new));
+    // Sets.union(LIGHTING_SUPPORTED_THING_TYPES,
+    // Sets.union(AUTOMATION_SUPPORTED_THING_TYPES,
+    // Sets.union(THERMOREGULATION_SUPPORTED_THING_TYPES, Sets.union(ENERGY_SUPPORTED_THING_TYPES,
+    // Sets.union(SCENARIO_SUPPORTED_THING_TYPES, GENERIC_SUPPORTED_THING_TYPES)))));
 
-    public static final Set<ThingTypeUID> BRIDGE_SUPPORTED_THING_TYPES = new HashSet<>(Arrays.asList(THING_TYPE_ZB_GATEWAY, THING_TYPE_BUS_GATEWAY));
-    //public static final Set<ThingTypeUID> BRIDGE_SUPPORTED_THING_TYPES = Sets.newHashSet(THING_TYPE_ZB_GATEWAY,
-    //        THING_TYPE_BUS_GATEWAY);
+    public static final Set<ThingTypeUID> BRIDGE_SUPPORTED_THING_TYPES = new HashSet<>(
+            Arrays.asList(THING_TYPE_ZB_GATEWAY, THING_TYPE_BUS_GATEWAY));
+    // public static final Set<ThingTypeUID> BRIDGE_SUPPORTED_THING_TYPES = Sets.newHashSet(THING_TYPE_ZB_GATEWAY,
+    // THING_TYPE_BUS_GATEWAY);
 
-    public static final Set<ThingTypeUID> ALL_SUPPORTED_THING_TYPES = Stream.of(DEVICE_SUPPORTED_THING_TYPES, BRIDGE_SUPPORTED_THING_TYPES)
-            .flatMap(Collection::stream)
+    public static final Set<ThingTypeUID> ALL_SUPPORTED_THING_TYPES = Stream
+            .of(DEVICE_SUPPORTED_THING_TYPES, BRIDGE_SUPPORTED_THING_TYPES).flatMap(Collection::stream)
             .collect(Collectors.toCollection(HashSet::new));
-    //public static final Set<ThingTypeUID> ALL_SUPPORTED_THING_TYPES = Sets.union(DEVICE_SUPPORTED_THING_TYPES,
-    //        BRIDGE_SUPPORTED_THING_TYPES);
+    // public static final Set<ThingTypeUID> ALL_SUPPORTED_THING_TYPES = Sets.union(DEVICE_SUPPORTED_THING_TYPES,
+    // BRIDGE_SUPPORTED_THING_TYPES);
 
     // LIST OF ALL CHANNEL IDs
     // lighting

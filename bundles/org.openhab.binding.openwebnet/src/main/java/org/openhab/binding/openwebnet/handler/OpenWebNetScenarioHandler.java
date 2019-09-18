@@ -171,8 +171,7 @@ public class OpenWebNetScenarioHandler extends OpenWebNetThingHandler {
                     } else {
                         bridgeHandler.gateway.send(CENScenario.virtualStartPressure(deviceWhere, buttonNumber));
                         scheduler.schedule(() -> { // let's schedule a CEN virtual release OWN message
-                            logger.debug(
-                                    "==OWN:ScenarioHandler== # " + deviceWhere + " sending CEN virtual release...");
+                            logger.debug("==OWN:ScenarioHandler== # {} # sending CEN virtual release...", deviceWhere);
                             bridgeHandler.gateway
                                     .send(CENScenario.virtualReleaseShortPressure(deviceWhere, buttonNumber));
                         }, SHORT_PRESSURE_DELAY, TimeUnit.MILLISECONDS);
@@ -189,8 +188,8 @@ public class OpenWebNetScenarioHandler extends OpenWebNetThingHandler {
                     } else {
                         bridgeHandler.gateway.send(CENScenario.virtualStartPressure(deviceWhere, buttonNumber));
                         scheduler.schedule(() -> { // let's schedule a CEN virtual ext pressure OWN message
-                            logger.debug("==OWN:ScenarioHandler== # " + deviceWhere
-                                    + " sending CEN virtual ext pressure...");
+                            logger.debug("==OWN:ScenarioHandler== # {} # sending CEN virtual ext pressure...",
+                                    deviceWhere);
                             bridgeHandler.gateway.send(CENScenario.virtualExtendedPressure(deviceWhere, buttonNumber));
                         }, EXT_PRESS_INTERVAL, TimeUnit.MILLISECONDS);
                     }
@@ -279,7 +278,7 @@ public class OpenWebNetScenarioHandler extends OpenWebNetThingHandler {
         }
         if (prState == PressureState.PRESSED) {
             scheduler.schedule(() -> { // let's schedule state -> RELEASED
-                logger.debug("==OWN:ScenarioHandler== # " + deviceWhere + " updating state to 'RELEASED'...");
+                logger.debug("==OWN:ScenarioHandler== # {} # updating state to 'RELEASED'...", deviceWhere);
                 updateState(channel.getUID(), new StringType(PressureState.RELEASED.toString()));
             }, SHORT_PRESSURE_DELAY, TimeUnit.MILLISECONDS);
         }
@@ -324,12 +323,14 @@ public class OpenWebNetScenarioHandler extends OpenWebNetThingHandler {
             case PRESSURE: // schedule a PRESSED-->RELEASED in case scenario is activated from Touchscreens (no new
                            // message will be received)
                 sch = scheduler.schedule(() -> {
-                    logger.debug("==OWN:ScenarioHandler== # " + deviceWhere
-                            + " no message after CEN.PRESSURE, updating state to 'PRESSED'...");
+                    logger.debug(
+                            "==OWN:ScenarioHandler== # {} # no message after CEN.PRESSURE, updating state to 'PRESSED'...",
+                            deviceWhere);
                     updateState(channel.getUID(), new StringType(PressureState.PRESSED.toString()));
                     scheduler.schedule(() -> {
-                        logger.debug("==OWN:ScenarioHandler== # " + deviceWhere
-                                + " no message after CEN.PRESSURE, updating state to 'RELEASED'...");
+                        logger.debug(
+                                "==OWN:ScenarioHandler== # {} # no message after CEN.PRESSURE, updating state to 'RELEASED'...",
+                                deviceWhere);
                         updateState(channel.getUID(), new StringType(PressureState.RELEASED.toString()));
                     }, SHORT_PRESSURE_DELAY, TimeUnit.MILLISECONDS);
                 }, EXT_PRESS_INTERVAL + 10, TimeUnit.MILLISECONDS);
@@ -339,14 +340,14 @@ public class OpenWebNetScenarioHandler extends OpenWebNetThingHandler {
                 sch = channelsSchedules.get(channel);
                 if (sch != null) {
                     sch.cancel(false);
-                    logger.debug("==OWN:ScenarioHandler== # " + deviceWhere + " schedule cancelled");
+                    logger.debug("==OWN:ScenarioHandler== # {} # schedule cancelled", deviceWhere);
                 }
                 return PressureState.PRESSED;
             case EXT_PRESSURE:
                 sch = channelsSchedules.get(channel);
                 if (sch != null) {
                     sch.cancel(false);
-                    logger.debug("==OWN:ScenarioHandler== # " + deviceWhere + " schedule cancelled");
+                    logger.debug("==OWN:ScenarioHandler== # {} # schedule cancelled", deviceWhere);
                 }
                 return PressureState.PRESSED_EXT;
             case RELEASE_EXT_PRESSURE:
