@@ -1,7 +1,7 @@
-# OpenWebNet (BTicino/Legrand) Binding - Installation instructions (BETA phase)
+# OpenWebNet (BTicino/Legrand) Binding - Installation instructions (Beta version)
 
 The OpenWebNet binding is still under development. This documentation is useful during the beta phase until the binding is added to the official openHAB 2 Addons distribution.
-See the [README](./README.md) for the main documentation of the binding.
+See the [README](./README.md) for the main documentation of the binding and configuration examples.
 
 ## Installation
 
@@ -16,7 +16,7 @@ To install this binding two **alternative** options are available: from Marketpl
 
 The binding can be installed from the [Eclipse IoT Marketplace](https://marketplace.eclipse.org/content/openwebnet-2x-binding-testing).
 
-Make sure that the [marketplace plugin is activated](https://www.openhab.org/docs/configuration/eclipseiotmarket.html), and then install the *OpenWebNet binding* from PaperUI (Add-ons -> Bindings -> search for 'openwebnet' then INSTALL).
+Make sure that the [marketplace plugin is activated](https://www.openhab.org/docs/configuration/eclipseiotmarket.html), and then install the *OpenWebNet binding*: from *PaperUI > Add-ons > Bindings > search for 'openwebnet' > INSTALL*.
 
 If you cannot find the binding in the search, probably you have an issue with certificates in your Java environment, that must be updated. Follow [this solution](https://community.openhab.org/t/solved-failed-downloading-marketplace-entries-received-fatal-alert-handshake-failure/52045) to add the required certificates to access all bindings on the Marketplace.
 
@@ -44,15 +44,15 @@ After upgrading the binding to a new version, there is no need to activate depen
 
 ## Upgrade of the binding
 
-When upgrading the binding to a new version it's suggested also to remove OpenWebNet Things before un-installing the old binding, and discover/configure them again after binding has been updated. Re-discoverd things will not change their ID, so no other configuration change is needed and re-discovered things will be automatically linked to previous items.
+When upgrading the binding to a new version you may need to remove OpenWebNet Things before un-installing the old binding, and discover/configure them again after binding has been updated. Re-discoverd things will not change their ID, so no other configuration change is needed and re-discovered things will be automatically linked to previous items.
 
-Instead of removing things also re-setting the bridge in things properties should work.
+Instead of removing things also re-setting the bridge in things properties should help.
 
-If things are defined using .things file, they do not need to be re-created.
+If things are defined using .things file, they do not need to be removed/re-created.
 
 ### Upgrade - Marketplace installation
 
-1. Goto PaperUI > Add-ons > Bindings > search `openweb` > UNINSTALL
+1. Go to *PaperUI > Add-ons > Bindings > search `openweb` > UNINSTALL*
 1. reload the page in the browser to make sure latest version is selected
 1. search again `openweb` > INSTALL
 
@@ -66,7 +66,7 @@ Since openHAB uses some cache mechanisms to load bindings, it is not enough to r
 1. remove the previous version of the binding JAR file from `addons/` folder
 1. copy the new version of the binding JAR file to `addons/` folder
 
-The new version of the binding should now be installed, check the version number in *PaperUI > Configuration > Bindings*.
+The new version of the binding should now be installed, check *PaperUI > Configuration > Bindings*.
 
 ## Debugging and Log Files
 
@@ -93,7 +93,7 @@ The interesting file to provide for feedback is `openhab.log` (`events.log` is n
 Not all device types are supported by Google Home / Alexa and the respective openHAB add-ons. This is not a limitation of the binding.
 Visit the links at the end of section [Integration with Assistants](./README.md#integration-with-assistants) to check compatibility with your selected assistant.
 
-#### When message/feature XXXX will be supported ?
+#### When message/feature XYZ will be supported ?
 
 You can check if someone has already requested support for a message/feature here: [GitHub repo](https://github.com/mvalla/openhab2-addons/issues).
 If not, add a new issue. Issues are organised by milestones, but deadlines -of course- are not guaranteed (other volunteer developers are welcome!).
@@ -106,7 +106,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M3** - 15/09/2019
+**v2.5.0.M3** - 22/09/2019
 
 - [FIX #86] Added support for MH201 gateway
 - changed label for UPnP discovered gateways, keeping model name discovered with UPnP  
