@@ -106,7 +106,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M3** - 15/09/2019
+**v2.5.0.M3** - 22/09/2019
 
 - [FIX #86] Added support for MH201 gateway
 - changed label for UPnP discovered gateways, keeping model name discovered with UPnP  
