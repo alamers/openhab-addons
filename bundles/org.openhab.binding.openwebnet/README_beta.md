@@ -34,7 +34,10 @@ After the binding has been installed, from Marketplace or manually, some *featur
 
 - from [Karaf console](https://www.openhab.org/docs/administration/console.html):
     - `feature:install openhab-transport-serial`
-    - `feature:install esh-io-transport-upnp`
+    - for openHAB 2.4.x:
+	    - `feature:install esh-io-transport-upnp`
+    - for openHAB 2.5.x and later:
+	    - `feature:install openhab-core-io-transport-upnp`
 
 The binding should now be installed: check in *PaperUI > Configuration > Bindings*.
 
@@ -105,6 +108,11 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - In some cases dimmers connected to a F429 Dali-interface cannot be discovered, even if switched ON and dimmed. This looks like as a limitation of some gateways that do not report status of Dali devices when requested. See: https://github.com/mvalla/openhab2-addons/issues/14
 
 ## Changelog
+
+**v2.5.0.M4** - =IN PROGRESS=/11/2019
+- [FIX #100] updated README & README_beta with new feature dependencies for OH 2.5.x
+- [FIX #95] ZigBee USB gateway: fix receive thread stopping receiving messages if unsupported message is received
+- Now using openwebnet-lib-0.9.22
 
 **v2.5.0.M3** - 22/09/2019
 

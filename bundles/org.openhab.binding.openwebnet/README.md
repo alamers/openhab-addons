@@ -112,7 +112,7 @@ Alternatively the BUS/SCS Gateway thing can be configured using the `.things` fi
 
 ### Configuring Wireless ZigBee USB Gateway 
 
-The wireless ZigBee USB Gateway is discovered automatically and added in Inbox.
+The wireless ZigBee USB Gateway is discovered automatically and added in Inbox. Configuration using `.things` file is not yet supported.
 
 Manual configuration *is not supported* at the moment.
 
@@ -244,11 +244,11 @@ Bridge openwebnet:bus_gateway:mybridge "MyHOMEServer1" [ host="192.168.1.35", pa
 
 
 ```xtend
-<TODO----- ZigBee USB Gateway configuration -- only needed for radio devices >
+<NOT YET SUPPORTED ----- ZigBee USB Gateway configuration -- only needed for radio devices >
 Bridge openwebnet:zb_gateway:myZBgateway  [serialPort="kkkkkkk"] {
     zb_dimmer          myzigbeedimmer [ where="xxxxx"]
     zb_on_off_switch   myzigbeeswitch [ where="yyyyy"]
-}
+}  
 ```
 
 ### openwebnet.items:
@@ -351,7 +351,7 @@ end
 
 ## Special thanks
 
-Special thanks for helping on testing this binding go to:
+Special thanks for helping to test this binding go to:
 [@m4rk](https://community.openhab.org/u/m4rk/),
 [@bastler](https://community.openhab.org/u/bastler),
 [@gozilla01](https://community.openhab.org/u/gozilla01),
@@ -359,5 +359,6 @@ Special thanks for helping on testing this binding go to:
 [@k0nti](https://community.openhab.org/u/k0nti/),
 [@gilberto.cocchi](https://community.openhab.org/u/gilberto.cocchi/),
 [@llegovich](https://community.openhab.org/u/llegovich),
-[@gabriele.daltoe](https://community.openhab.org/u/gabriele.daltoe)
+[@gabriele.daltoe](https://community.openhab.org/u/gabriele.daltoe),
+[@feodor](https://community.openhab.org/u/feodor)
 and many others at the fantastic openHAB community!
