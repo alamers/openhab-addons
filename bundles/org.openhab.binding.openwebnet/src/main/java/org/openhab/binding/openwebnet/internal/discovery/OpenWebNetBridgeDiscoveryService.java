@@ -16,13 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.config.discovery.DiscoveryService;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerService;
 import org.openhab.binding.openwebnet.OpenWebNetBindingConstants;
+import org.openhab.binding.openwebnet.handler.OpenWebNetBridgeHandler;
 //import org.openhab.binding.openwebnet.handler.OpenWebNetBridgeHandler;
 import org.openwebnet.OpenError;
 import org.openwebnet.OpenGatewayZigBee;
@@ -42,7 +46,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Component(service = DiscoveryService.class, configurationPid = "discovery.openwebent")
-public class OpenWebNetBridgeDiscoveryService extends AbstractDiscoveryService implements OpenListener {
+public class OpenWebNetBridgeDiscoveryService extends AbstractDiscoveryService
+        implements OpenListener, ThingHandlerService {
 
     private final Logger logger = LoggerFactory.getLogger(OpenWebNetBridgeDiscoveryService.class);
 
@@ -51,12 +56,14 @@ public class OpenWebNetBridgeDiscoveryService extends AbstractDiscoveryService i
     // TODO support multiple gateways at the same time
     private OpenGatewayZigBee zbgateway;
     private int gatewayZigBeeId = 0;
+    private OpenWebNetBridgeHandler bridgeHandler;
+
     private ThingUID gatewayUID = null;
 
     public OpenWebNetBridgeDiscoveryService() {
         super(OpenWebNetBindingConstants.BRIDGE_SUPPORTED_THING_TYPES, DISCOVERY_TIMEOUT, false);
         logger.debug(
-                "\n#############################################################################################\nOWN:BridgeDiscovery== constructor()");
+                "\n#############################################################################################\n==OWN:BridgeDiscovery== constructor()");
     }
 
     public OpenWebNetBridgeDiscoveryService(int timeout) throws IllegalArgumentException {
@@ -177,4 +184,21 @@ public class OpenWebNetBridgeDiscoveryService extends AbstractDiscoveryService i
 
     }
 
+    @Override
+    public void setThingHandler(@Nullable ThingHandler handler) {
+        if (handler instanceof OpenWebNetBridgeHandler) {
+            bridgeHandler = (OpenWebNetBridgeHandler) handler;
+            // gatewayUID = bridgeHandler.getUID();
+        }
+    }
+
+    @Override
+    public @Nullable ThingHandler getThingHandler() {
+        return bridgeHandler;
+    }
+
+    @Override
+    public void deactivate() {
+        super.deactivate();
+    }
 }

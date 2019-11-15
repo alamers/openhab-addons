@@ -32,8 +32,10 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.ConfigStatusBridgeHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerService;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.openwebnet.OpenWebNetBindingConstants;
+import org.openhab.binding.openwebnet.internal.discovery.OpenWebNetBridgeDiscoveryService;
 import org.openhab.binding.openwebnet.internal.discovery.OpenWebNetDeviceDiscoveryService;
 import org.openwebnet.OpenDeviceType;
 import org.openwebnet.OpenError;
@@ -328,7 +330,7 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
     /**
      * Register a device ThingHandler to this BridgHandler
      *
-     * @param ownId        the device OpenWebNet id
+     * @param ownId the device OpenWebNet id
      * @param thingHandler the thing handler to be registered
      */
     protected void registerDevice(String ownId, OpenWebNetThingHandler thingHandler) {
@@ -510,7 +512,7 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
      * handler.
      *
      * @param deviceWhere the device WHERE config parameter
-     * @param handler     the thing handler
+     * @param handler the thing handler
      * @return the ownId
      */
     protected String ownIdFromDeviceWhere(String deviceWhere, OpenWebNetThingHandler handler) {
@@ -521,7 +523,7 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
      * Returns a ownId string (=WHO.WHERE) from a WHERE address and WHO
      *
      * @param where the WHERE address (to be normalized)
-     * @param who   the WHO
+     * @param who the WHO
      * @return the ownId
      */
     public String ownIdFromWhoWhere(String where, String who) {
@@ -576,4 +578,9 @@ public class OpenWebNetBridgeHandler extends ConfigStatusBridgeHandler implement
         }
     }
 
+    @Override
+    public Collection<Class<? extends ThingHandlerService>> getServices() {
+        logger.debug("############ getServices()");
+        return Collections.singleton(OpenWebNetBridgeDiscoveryService.class);
+    }
 }
