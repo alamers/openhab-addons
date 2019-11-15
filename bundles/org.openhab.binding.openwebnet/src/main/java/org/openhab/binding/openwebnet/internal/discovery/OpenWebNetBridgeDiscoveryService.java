@@ -55,9 +55,8 @@ public class OpenWebNetBridgeDiscoveryService extends AbstractDiscoveryService i
 
     public OpenWebNetBridgeDiscoveryService() {
         super(OpenWebNetBindingConstants.BRIDGE_SUPPORTED_THING_TYPES, DISCOVERY_TIMEOUT, false);
-        logger.debug("#############################################################################################");
-        logger.debug("==OWN:BridgeDiscovery== constructor()");
-        logger.debug("#############################################################################################");
+        logger.debug(
+                "\n#############################################################################################\nOWN:BridgeDiscovery== constructor()");
     }
 
     public OpenWebNetBridgeDiscoveryService(int timeout) throws IllegalArgumentException {
