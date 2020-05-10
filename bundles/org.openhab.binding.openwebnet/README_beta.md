@@ -109,12 +109,14 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M4** - =IN PROGRESS=/11/2019
+**v2.5.0.M4** - 10/05/2020
 - [FIX #100] updated README & README_beta with new feature dependencies for OH 2.5.x
 - [FIX #95] ZigBee USB gateway: fix receive thread stopping receiving messages if unsupported message is received
+- [FIX #105] update expire to Sept 2020
 - Now using openwebnet-lib-0.9.22
 
-**v2.5.0.M3** - 22/09/2019
+
+**v2.5.0.M3** (EXPIRED) - 22/09/2019
 
 - [FIX #86] Added support for MH201 gateway
 - changed label for UPnP discovered gateways, keeping model name discovered with UPnP  
@@ -122,7 +124,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - Now using openwebnet-lib-0.9.21
 
 
-**v2.5.0.M2-2** - **EXPIRED** - 16/06/2019
+**v2.5.0.M2-2** (EXPIRED) - 16/06/2019
 
 - [FIX #76] Migrated to new OH2 build system (bndtools)
 - [FIX #30] manually configured things are now ignored during auto-discovery
@@ -142,13 +144,13 @@ For a full list of current open issues / features requests see [GitHub repo](htt
     - debug messages for ZB connect/connectGateway
 
 
-**v2.5.0.M2-1** - **EXPIRED** - 20/03/2019
+**v2.5.0.M2-1** (EXPIRED) - 20/03/2019
 
 - [FIX #66] USB dongle (gateway) cannot connect anymore
 - [FIX #65] Rollershutter % Position does not work in 2.5.0.M2
 - removed Switchable tag to shutter channel
 
-**v2.5.0.M2** - **EXPIRED** - 08/03/2019
+**v2.5.0.M2** (EXPIRED) - 08/03/2019
 
 - [FIX #29] Fixed (again) Automation command translation (1000#)
 - [FIX] Fixed Energy Meter subscription (every 10min)
@@ -160,7 +162,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - added ownId as representation-property
 - added Switchable tag to shutter channel
 
-**v2.5.0.M1** - **EXPIRED** - 28/01/2019
+**v2.5.0.M1** (EXPIRED) - 28/01/2019
 
 - [FIX #28] automatic discovery of BUS gateways is now supported
 - gateway model, firmwareVersion and serialNumber are now read from UPnP discovery
@@ -168,7 +170,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX #4] added support for BTicino movement sensors (like AM5658 Green Switch) 
 - updated to openHAB 2.5.0 dev branch
 
-**v2.4.0-b9-2** - **EXPIRED** - 18/01/2019
+**v2.4.0-b9-2** (EXPIRED) - 18/01/2019
 
 - [FIX #37] CEN commands WHAT (buttons) 0-9 are now 00-09
 - [FIX] CEN/CEN+ scenarioButton channel is now able to receive commands
@@ -177,7 +179,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX #42 & #43] Devices with same WHERE receive wrong messages from BUS
 - [FIX] improved device registration to BridgeHandler
 
-**v2.4.0-b9-1** - **EXPIRED** - 27/12/2018
+**v2.4.0-b9-1** (EXPIRED) - 27/12/2018
 
 - [FIX #6] and [FIX #33] Initial support for `WHO=15/25` CEN/CEN+ for receiving events from BUS Scenario Control physical devices/buttons (for example Scenario Control: HC/HD/HS/L/N/NT4680) and sending virtual pressure commands to activate MH202 scenarios on the BUS from openHAB
 - [FIX #9] Support for `WHO=25` Dry Contact interfaces and IR Sensors on BUS, with discovery
@@ -185,7 +187,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX #29] Added support for command translation (1000# ) for Automation
 - [FIX #27] Device Discovery by Activation for Lighting and CEN/CEN+: if a BUS physical device is not found in Inbox during a Scan, activate the device to discover it
 
-**v2.4.0-b8** - **EXPIRED** - 11/11/2018
+**v2.4.0-b8** (EXPIRED) - 11/11/2018
 
 - [FIX #25] added `Blinds` tag for shutter channels (Rollershutter items) 
 - [FIX #17] now a disconnection from the gateway is detected within few minutes
@@ -199,7 +201,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - updated README examples and added .sitemap example
 - moved to new repository, forked from openhab/openhab2-addons
 
-**v2.4.0-b7** - **EXPIRED** - 01/09/2018
+**v2.4.0-b7** (EXPIRED) - 01/09/2018
 
 - [FIX #5] Initial support for `WHO=4` Thermoregulation on BUS. Currently supported: zones room thermostats and external (wireless) temperature sensors. Both heating and cooling functions are supported
 - The binding is now available on the [Eclipse IoT Marketplace](https://marketplace.eclipse.org/content/openwebnet-2x-binding-testing)
@@ -208,7 +210,7 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX] improved Shutter management and position estimation, thanks to previous 2 enhancements
 - minimum requirement is now openHAB 2.3, which is needed to support measurements units like °C
 
-**v2.4.0-b6** - **EXPIRED** - 02/07/2018
+**v2.4.0-b6** (EXPIRED) - 02/07/2018
 
 - updated to openHAB 2.4.0 dev branch
 - [FIX #7] added support for inverted UP/DOWN automation commands for older USB ZigBee dongles
@@ -216,13 +218,13 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 - [FIX] added support for SCS/ZIGBEE_SHUTTER_SWITCH (515/513) device types
 - [FIX] added support for F455 gateways using `*99*0##` command session
 
-**v2.3.0-b5** - **EXPIRED** - 26/05/2018
+**v2.3.0-b5** (EXPIRED) - 26/05/2018
 
 - [FIX #1] state monitoring from BUS (feedback) is no longer stopped if unsupported messages are received from BUS
 - [FIX] automatic reconnect to BUS when connection is lost
 - [NEW] support for Gateways with string passwords (HMAC authentication), like MyHOMEServer1 
 - [NEW] support for `WHO=2` Automation (shutters), both on BUS and ZigBee, with position feedback and  goto Percent. It requires setting the shutter run-time in the thing configuration. Experimental auto-calibration of the run-time is also supported!
 
-**v2.3.0-b4** - **EXPIRED** - 09/04/2018
+**v2.3.0-b4** (EXPIRED) - 09/04/2018
 
 - first public release
