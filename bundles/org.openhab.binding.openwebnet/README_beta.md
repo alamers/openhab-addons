@@ -109,7 +109,11 @@ For a full list of current open issues / features requests see [GitHub repo](htt
 
 ## Changelog
 
-**v2.5.0.M4** - 10/05/2020
+**v2.5.0** - 20/09/2020
+- [FIX #105] update expire to Jan 2021
+- Now using openwebnet-lib-0.9.23
+
+**v2.5.0.M4** (EXPIRED) - 10/05/2020
 - [FIX #100] updated README & README_beta with new feature dependencies for OH 2.5.x
 - [FIX #95] ZigBee USB gateway: fix receive thread stopping receiving messages if unsupported message is received
 - [FIX #105] update expire to Sept 2020
