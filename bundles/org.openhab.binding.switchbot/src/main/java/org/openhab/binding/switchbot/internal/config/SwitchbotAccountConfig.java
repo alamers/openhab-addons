@@ -14,5 +14,4 @@ public class SwitchbotAccountConfig {
     public void setAuthorizationOpenToken(String authorizationOpenToken) {
         this.authorizationOpenToken = authorizationOpenToken;
     }
-
 }

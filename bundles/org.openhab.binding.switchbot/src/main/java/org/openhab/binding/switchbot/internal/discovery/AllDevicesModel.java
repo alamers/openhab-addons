@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class AllDevices {
+public class AllDevicesModel {
 
     /*
      * Example body from https://github.com/OpenWonderLabs/SwitchBotAPI
@@ -43,33 +43,69 @@ public class AllDevices {
     private Body body;
 
     public static class Body {
-        private List<DeviceList> deviceList;
-        private List<InfraredRemoteList> infraredRemoteList;
+        private List<Device> deviceList;
+        private List<InfraredRemote> infraredRemoteList;
 
-        public List<DeviceList> getDeviceList() {
+        public List<Device> getDeviceList() {
             return deviceList;
         }
 
-        public void setDeviceList(List<DeviceList> deviceList) {
+        public void setDeviceList(List<Device> deviceList) {
             this.deviceList = deviceList;
         }
 
-        public List<InfraredRemoteList> getInfraredRemoteList() {
+        public List<InfraredRemote> getInfraredRemoteList() {
             return infraredRemoteList;
         }
 
-        public void setInfraredRemoteList(List<InfraredRemoteList> infraredRemoteList) {
+        public void setInfraredRemoteList(List<InfraredRemote> infraredRemoteList) {
             this.infraredRemoteList = infraredRemoteList;
         }
-
     };
 
-    public static class DeviceList {
+    public static class Device {
         private String deviceId;
         private String deviceName;
         private String deviceType;
         private boolean enableCloudService;
         private String hubDeviceId;
+        private List<String> curtainDevicesIds;
+        private boolean calibrate;
+        private boolean group;
+        private boolean master;
+        private String openDirection;
+
+        public boolean isCalibrate() {
+            return calibrate;
+        }
+
+        public void setCalibrate(boolean calibrate) {
+            this.calibrate = calibrate;
+        }
+
+        public boolean isGroup() {
+            return group;
+        }
+
+        public void setGroup(boolean group) {
+            this.group = group;
+        }
+
+        public boolean isMaster() {
+            return master;
+        }
+
+        public void setMaster(boolean master) {
+            this.master = master;
+        }
+
+        public String getOpenDirection() {
+            return openDirection;
+        }
+
+        public void setOpenDirection(String openDirection) {
+            this.openDirection = openDirection;
+        }
 
         public String getDeviceId() {
             return deviceId;
@@ -111,9 +147,16 @@ public class AllDevices {
             this.hubDeviceId = hubDeviceId;
         }
 
+        public List<String> getCurtainDevicesIds() {
+            return curtainDevicesIds;
+        }
+
+        public void setCurtainDevicesIds(List<String> curtainDevicesIds) {
+            this.curtainDevicesIds = curtainDevicesIds;
+        }
     }
 
-    public static class InfraredRemoteList {
+    public static class InfraredRemote {
         private String deviceId;
         private String deviceName;
         private String remoteType;
@@ -150,7 +193,6 @@ public class AllDevices {
         public void setHubDeviceId(String hubDeviceId) {
             this.hubDeviceId = hubDeviceId;
         }
-
     }
 
     public int getStatusCode() {
@@ -176,5 +218,4 @@ public class AllDevices {
     public void setBody(Body body) {
         this.body = body;
     }
-
 }

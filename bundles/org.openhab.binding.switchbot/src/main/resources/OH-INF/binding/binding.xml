@@ -3,7 +3,7 @@
 	xmlns:binding="https://openhab.org/schemas/binding/v1.0.0"
 	xsi:schemaLocation="https://openhab.org/schemas/binding/v1.0.0 https://openhab.org/schemas/binding-1.0.0.xsd">
 
-	<name>switchbot Binding</name>
-	<description>This is the binding for Switch Bot (https://www.switch-bot.com/) items.</description>
+	<name>Switchbot Binding</name>
+	<description>This is the binding for Switch Bot devices.</description>
 
 </binding:binding>

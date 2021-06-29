@@ -21,38 +21,29 @@
 	<!-- Sample Thing Type -->
 	<thing-type id="curtain">
 		<supported-bridge-type-refs>
-			<bridge-type-ref id="switchbotAccouunt" />
+			<bridge-type-ref id="switchbotAccount"/>
 		</supported-bridge-type-refs>
 
 		<label>Switchbot Curtain</label>
 		<description>Switchbot Curtain</description>
 
-		<channels>
-			<channel id="channel1" typeId="sample-channel"/>
-		</channels>
+		<!-- <channels> <channel id="channel1" typeId="sample-channel"/> </channels> -->
 
 		<config-description>
-			<parameter name="hostname" type="text" required="true">
-				<context>network-address</context>
-				<label>Hostname</label>
-				<description>Hostname or IP address of the device</description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
 			</parameter>
-			<parameter name="password" type="text" required="true">
-				<context>password</context>
-				<label>Password</label>
-				<description>Passwort to access the device</description>
-			</parameter>
-			<parameter name="refreshInterval" type="integer" unit="s" min="1">
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
 				<description>Interval the device is polled in sec.</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
 
 	<!-- Sample Channel Type -->
-	<channel-type id="sample-channel">
-		<item-type>Number:Temperature</item-type>
-		<label>Example Temperature</label><!-- Use uppercase words, except prepositions. 2-3 words, max 25 chars -->
-		<description>Sample channel for switchbot Binding</description>
-	</channel-type>
+	<!-- <channel-type id="sample-channel"> <item-type>Number:Temperature</item-type> <label>Example Temperature</label> Use
+		uppercase words, except prepositions. 2-3 words, max 25 chars -->
+	<!-- <description>Sample channel for switchbot Binding</description> </channel-type> -->
 </thing:thing-descriptions>

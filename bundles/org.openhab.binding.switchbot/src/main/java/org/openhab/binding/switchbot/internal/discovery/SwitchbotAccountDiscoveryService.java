@@ -91,10 +91,8 @@ public class SwitchbotAccountDiscoveryService extends AbstractDiscoveryService {
 
         Map<String, Object> properties = new HashMap<>();
         ThingUID thingUID = new ThingUID(SwitchbotBindingConstants.THING_TYPE_CURTAIN, bridgeUID, device.getDeviceId());
-        // properties.put(SwitchbotBindingConstants.CONFIG_SECRET, robot.getSecretKey());
-        // properties.put(SwitchbotBindingConstants.CONFIG_SERIAL, robot.getSerial());
-        // properties.put(Thing.PROPERTY_MODEL_ID, robot.getModel());
-        // properties.put(SwitchbotBindingConstants.PROPERTY_NAME, robot.getName());
+
+        properties.put(SwitchbotBindingConstants.CONFIG_DEVICE_ID, device.getDeviceId());
 
         thingDiscovered(DiscoveryResultBuilder.create(thingUID).withLabel(device.getName()).withBridge(bridgeUID)
                 .withProperties(properties).build());

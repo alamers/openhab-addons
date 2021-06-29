@@ -30,6 +30,7 @@ public class SwitchbotBindingConstants {
     public static final ThingTypeUID BRIDGE_TYPE_SWITCHBOT_ACCOUNT = new ThingTypeUID(BINDING_ID, "switchbotAccount");
     public static final ThingTypeUID THING_TYPE_CURTAIN = new ThingTypeUID(BINDING_ID, "curtain");
 
-    // List of all Channel ids
-    public static final String CHANNEL_1 = "channel1";
+    public static final String COMMAND = "command";
+
+    public static final String CONFIG_DEVICE_ID = "deviceId";
 }

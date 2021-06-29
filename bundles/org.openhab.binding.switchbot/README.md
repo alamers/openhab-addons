@@ -1,35 +1,33 @@
 # Switchbot Binding
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
+This binding provides access to Switchbot devices via a Switchbot Account bridge. (An alternative route via direct bluetooth access could be implemented but is not yet done).
 
-_If possible, provide some resources like pictures, a video, etc. to give an impression of what can be done with this binding. You can place such resources into a `doc` folder next to this README.md._
 
 ## Supported Things
 
-_Please describe the different supported things / devices within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+This supports Switchbot Curtain and Switchbot Hub Mini (as that is all I can test). Other devices should be easy to add but I have no way of testing it.
+
 
 ## Discovery
 
-_Describe the available auto-discovery features here. Mention for what it works and what needs to be kept in mind when using it._
+You need an authentication token (see below) so the binding can access your Switchbot account. All devices will be auto-discovered after that.
 
 ## Binding Configuration
 
-_If your binding requires or supports general configuration settings, please create a folder ```cfg``` and place the configuration file ```<bindingId>.cfg``` inside it. In this section, you should link to this file and provide some information about the options. The file could e.g. look like:_
+Per the documentation at [https://github.com/OpenWonderLabs/SwitchBotAPI](https://github.com/OpenWonderLabs/SwitchBotAPI):
 
-```
-# Configuration for the switchbot Binding
-#
-# Default secret key for the pairing of the switchbot Thing.
-# It has to be between 10-40 (alphanumeric) characters.
-# This may be changed by the user for security reasons.
-secret=openHABSecret
-```
+Please follow these steps:
 
-_Note that it is planned to generate some part of this based on the information that is available within ```src/main/resources/OH-INF/binding``` of your binding._
+* Download the SwitchBot app on App Store or Google Play Store
+* Register a SwitchBot account and log in into your account
+* Generate an Open Token within the app 
+    * Go to Profile > Preference 
+    * Tap App Version 10 times. Developer Options will show up 
+    * Tap Developer Options 
+    * Tap Get Token
 
-_If your binding does not offer any generic configurations, you can remove this section completely._
+Then, add the `SwitchbotAccountBridge` and configure it with that token.
+
 
 ## Thing Configuration
 

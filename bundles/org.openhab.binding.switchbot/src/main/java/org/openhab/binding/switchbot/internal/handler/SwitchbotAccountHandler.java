@@ -19,7 +19,8 @@ import java.util.Properties;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.switchbot.internal.config.SwitchbotAccountConfig;
-import org.openhab.binding.switchbot.internal.discovery.AllDevices;
+import org.openhab.binding.switchbot.internal.discovery.AllDevicesModel;
+import org.openhab.binding.switchbot.internal.discovery.CurtainDevice;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotDevice;
 import org.openhab.core.io.net.http.HttpUtil;
 import org.openhab.core.thing.Bridge;
@@ -58,33 +59,62 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
 
     private List<SwitchbotDevice> sendGetDevices(String authorizationOpenToken) {
         Properties headers = new Properties();
-        // headers.setProperty("Accept", "application/vnd.neato.nucleo.v1");
         headers.setProperty("Authorization", authorizationOpenToken);
 
         try {
-            String resultString = HttpUtil.executeUrl("GET", "https://api.switch-bot.com/devices", headers, null,
+            String resultString = HttpUtil.executeUrl("GET", "https://api.switch-bot.com/v1.0/devices", headers, null,
                     "application/json", 20000);
 
             Gson gson = new Gson();
-            AllDevices allDevices = gson.fromJson(resultString, AllDevices.class);
+            AllDevicesModel allDevices = gson.fromJson(resultString, AllDevicesModel.class);
 
             logger.debug("Result from WS call to get /devices: {}", resultString);
 
             return toSwitchbotDevices(allDevices);
         } catch (IOException e) {
-            logger.debug("Error attempting to find robots registered to account", e);
+            logger.debug("Error attempting to get all devices registered to switchbot account", e);
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                    "Error attempting to find robots registered to account");
+                    "Error attempting to get all devices registered to switchbot account");
             return new ArrayList<>();
         }
     }
 
-    private List<SwitchbotDevice> toSwitchbotDevices(AllDevices allDevices) {
-        return new ArrayList<>();
+    private List<SwitchbotDevice> toSwitchbotDevices(AllDevicesModel allDevices) {
+        List<SwitchbotDevice> devices = new ArrayList<>();
+        for (AllDevicesModel.Device device : allDevices.getBody().getDeviceList()) {
+            switch (device.getDeviceType()) {
+
+                // curtains can be grouped. Create individual curtain devices as well as an additional device for the
+                // group.
+                case "Curtain":
+                    if (device.isGroup()) {
+                        if (device.isMaster()) {
+                            devices.add(new CurtainDevice(device.getDeviceName() + " (master)", device.getDeviceId(),
+                                    SwitchbotDevice.DeviceType.CURTAIN, false));
+                            String groupId = device.getCurtainDevicesIds().get(0) + "-"
+                                    + device.getCurtainDevicesIds().get(1);
+                            devices.add(new CurtainDevice(device.getDeviceName() + " (group)", groupId,
+                                    SwitchbotDevice.DeviceType.CURTAIN, true));
+                        } else {
+                            devices.add(new CurtainDevice(device.getDeviceName() + " (slave)", device.getDeviceId(),
+                                    SwitchbotDevice.DeviceType.CURTAIN, false));
+                        }
+                    } else {
+                        devices.add(new CurtainDevice(device.getDeviceName(), device.getDeviceId(),
+                                SwitchbotDevice.DeviceType.CURTAIN, false));
+                    }
+                    break;
+                default:
+                    logger.warn("Unknown device type discovered, will not be added to inbox: {} with deviceId {}",
+                            device.getDeviceType(), device.getDeviceId());
+            }
+
+        }
+        return devices;
     }
 
     public @NonNull List<SwitchbotDevice> getAllDevices() {
-        logger.debug("Attempting to find robots tied to account");
+        logger.debug("Attempting to GET /devices ");
         SwitchbotAccountConfig accountConfig = getConfigAs(SwitchbotAccountConfig.class);
         String authorizationOpenToken = accountConfig.getAuthorizationOpenToken();
 
@@ -94,5 +124,4 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
 
         return new ArrayList<>();
     }
-
 }
