@@ -314,6 +314,7 @@
     <module>org.openhab.binding.surepetcare</module>
     <module>org.openhab.binding.synopanalyzer</module>
     <module>org.openhab.binding.systeminfo</module>
+    <module>org.openhab.binding.switchbot</module>
     <module>org.openhab.binding.tacmi</module>
     <module>org.openhab.binding.tado</module>
     <module>org.openhab.binding.tankerkoenig</module>
