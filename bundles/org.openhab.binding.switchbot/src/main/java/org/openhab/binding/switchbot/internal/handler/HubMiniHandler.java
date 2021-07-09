@@ -35,14 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link CurtainHandler} is responsible for handling commands, which are
+ * The {@link HubMiniHandler} is responsible for handling commands for the Hub Mini, which are
  * sent to one of the channels. It maps the OpenHAB world to the Switchbot world.
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class CurtainHandler extends BaseThingHandler {
+public class HubMiniHandler extends BaseThingHandler {
 
-    private Logger logger = LoggerFactory.getLogger(CurtainHandler.class);
+    private Logger logger = LoggerFactory.getLogger(HubMiniHandler.class);
 
     private CurtainProxy curtainProxy;
 
@@ -51,7 +51,7 @@ public class CurtainHandler extends BaseThingHandler {
 
     private String authorizationOpenToken;
 
-    public CurtainHandler(Thing thing) {
+    public HubMiniHandler(Thing thing) {
         super(thing);
     }
 

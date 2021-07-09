@@ -11,14 +11,14 @@
 		<config-description>
 			<parameter name="authorizationOpenToken" type="text" required="true">
 				<label>Authorization Open Token</label>
-				<description>Token as retrieved in the app.</description>
+				<description>Token as retrieved in the app: a) Go to Profile > Preference b) Tap App Version 10 times. Developer
+					Options will show up c) Tap Developer Options d) Tap Get Token</description>
 				<context>text</context>
 			</parameter>
 		</config-description>
 	</bridge-type>
 
 
-	<!-- Sample Thing Type -->
 	<thing-type id="curtain">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="switchbotAccount"/>
@@ -27,7 +27,42 @@
 		<label>Switchbot Curtain</label>
 		<description>Switchbot Curtain</description>
 
-		<!-- <channels> <channel id="channel1" typeId="sample-channel"/> </channels> -->
+		<channels>
+			<channel id="calibrate" typeId="calibrate"/>
+			<channel id="moving" typeId="moving"/>
+			<channel id="group" typeId="group"/>
+			<channel id="slide-position" typeId="slide-position"/>
+			<channel id="command" typeId="command"/>
+		</channels>
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec.</description>
+				<default>60</default>
+			</parameter>
+			<parameter name="group" type="boolean" required="true">
+				<label>Is a group</label>
+				<description>Indicates if this thing represents a group of curtain bots</description>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="hubmini">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Hub Mini</label>
+		<description>Switchbot Hub Mini</description>
+
+		<channels>
+			<channel id="command" typeId="command"/>
+		</channels>
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -42,8 +77,46 @@
 		</config-description>
 	</thing-type>
 
-	<!-- Sample Channel Type -->
-	<!-- <channel-type id="sample-channel"> <item-type>Number:Temperature</item-type> <label>Example Temperature</label> Use
-		uppercase words, except prepositions. 2-3 words, max 25 chars -->
-	<!-- <description>Sample channel for switchbot Binding</description> </channel-type> -->
+
+	<channel-type id="calibrate">
+		<item-type>Switch</item-type>
+		<label>Is Calibrated</label>
+		<description>Indicates if it has been calibrated</description>
+		<state readOnly="true" pattern="%s"/>
+	</channel-type>
+
+	<channel-type id="moving">
+		<item-type>Switch</item-type>
+		<label>Moving</label>
+		<description>Indicates if the bot is currently moving</description>
+		<state readOnly="true" pattern="%s"/>
+	</channel-type>
+
+	<channel-type id="group">
+		<item-type>Switch</item-type>
+		<label>Is a Group</label>
+		<description>Indicates if this bot is part of a dual setup group.</description>
+		<state readOnly="true" pattern="%s"/>
+	</channel-type>
+
+	<channel-type id="slide-position">
+		<item-type>Number</item-type>
+		<label>Slide Position</label>
+		<description>Indicates how far the curtain is open</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="command">
+		<item-type>String</item-type>
+		<label>Send Command</label>
+		<description>Send Commands to Switchbot Curtain. (turnOff is closed, turnOn is open)</description>
+		<state readOnly="false" pattern="%s">
+			<options>
+				<option value="turnOff">turnOff</option>
+				<option value="turnOn">turnOn</option>
+			</options>
+		</state>
+	</channel-type>
+
+
 </thing:thing-descriptions>

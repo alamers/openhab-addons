@@ -1,6 +1,11 @@
 package org.openhab.binding.switchbot.internal.discovery;
 
-public class StatusModel {
+/**
+ * Represents the json model of the status call.
+ *
+ * @author Arjan Lamers - Initial contribution
+ */
+public class CurtainStatusModel {
 
     /*
      * Example json body from https://github.com/OpenWonderLabs/SwitchBotAPI
@@ -27,10 +32,10 @@ public class StatusModel {
         private String deviceId;
         private String deviceType;
         private String hubDeviceId;
-        private boolean calibrate;
-        private boolean group;
-        private boolean moving;
-        private int slidePosition;
+        private Boolean calibrate;
+        private Boolean group;
+        private Boolean moving;
+        private Integer slidePosition;
 
         public String getDeviceId() {
             return deviceId;
@@ -56,35 +61,35 @@ public class StatusModel {
             this.hubDeviceId = hubDeviceId;
         }
 
-        public boolean isCalibrate() {
+        public Boolean getCalibrate() {
             return calibrate;
         }
 
-        public void setCalibrate(boolean calibrate) {
+        public void setCalibrate(Boolean calibrate) {
             this.calibrate = calibrate;
         }
 
-        public boolean isGroup() {
+        public Boolean getGroup() {
             return group;
         }
 
-        public void setGroup(boolean group) {
+        public void setGroup(Boolean group) {
             this.group = group;
         }
 
-        public boolean isMoving() {
+        public Boolean getMoving() {
             return moving;
         }
 
-        public void setMoving(boolean moving) {
+        public void setMoving(Boolean moving) {
             this.moving = moving;
         }
 
-        public int getSlidePosition() {
+        public Integer getSlidePosition() {
             return slidePosition;
         }
 
-        public void setSlidePosition(int slidePosition) {
+        public void setSlidePosition(Integer slidePosition) {
             this.slidePosition = slidePosition;
         }
     }

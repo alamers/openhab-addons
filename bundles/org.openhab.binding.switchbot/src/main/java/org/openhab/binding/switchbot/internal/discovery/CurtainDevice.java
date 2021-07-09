@@ -11,8 +11,8 @@ public class CurtainDevice extends SwitchbotDevice {
 
     private boolean group;
 
-    public CurtainDevice(String name, String deviceId, DeviceType deviceType, boolean group) {
-        super(name, deviceId, deviceType);
+    public CurtainDevice(String name, String deviceId, boolean group) {
+        super(name, deviceId, DeviceType.CURTAIN);
         this.group = group;
     }
 

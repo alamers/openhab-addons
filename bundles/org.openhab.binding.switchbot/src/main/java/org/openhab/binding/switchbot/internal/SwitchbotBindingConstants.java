@@ -29,8 +29,16 @@ public class SwitchbotBindingConstants {
     // List of all Thing Type UIDs
     public static final ThingTypeUID BRIDGE_TYPE_SWITCHBOT_ACCOUNT = new ThingTypeUID(BINDING_ID, "switchbotAccount");
     public static final ThingTypeUID THING_TYPE_CURTAIN = new ThingTypeUID(BINDING_ID, "curtain");
+    public static final ThingTypeUID THING_TYPE_HUB_MINI = new ThingTypeUID(BINDING_ID, "hubmini");
 
     public static final String COMMAND = "command";
 
     public static final String CONFIG_DEVICE_ID = "deviceId";
+    public static final String CONFIG_GROUP = "group";
+
+    // curtain channels
+    public static final String CHANNEL_CALIBRATE = "calibrate";
+    public static final String CHANNEL_MOVING = "moving";
+    public static final String CHANNEL_GROUP = "group";
+    public static final String CHANNEL_SLIDE_POSITION = "slide-position";
 }

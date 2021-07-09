@@ -1,6 +1,9 @@
 # Switchbot Binding
 
-This binding provides access to Switchbot devices via a Switchbot Account bridge. (An alternative route via direct bluetooth access could be implemented but is not yet done).
+This binding provides access to Switchbot devices via a Switchbot Account bridge. 
+
+(An alternative route via direct bluetooth access could be implemented but is not yet done).
+The implementation is largely based on the Neato binding by Patrik Wimnell and Jeff Lauterbach, and adapted from there.
 
 
 ## Supported Things

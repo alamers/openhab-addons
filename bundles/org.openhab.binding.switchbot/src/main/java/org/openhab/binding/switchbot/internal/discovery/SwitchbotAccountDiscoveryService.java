@@ -90,9 +90,13 @@ public class SwitchbotAccountDiscoveryService extends AbstractDiscoveryService {
         logger.debug("addThing(): Adding new Switchbot device ({}) to the inbox", device.getName());
 
         Map<String, Object> properties = new HashMap<>();
-        ThingUID thingUID = new ThingUID(SwitchbotBindingConstants.THING_TYPE_CURTAIN, bridgeUID, device.getDeviceId());
+        ThingUID thingUID = new ThingUID(device.getDeviceType().toThingType(), bridgeUID, device.getDeviceId());
 
         properties.put(SwitchbotBindingConstants.CONFIG_DEVICE_ID, device.getDeviceId());
+
+        if (device instanceof CurtainDevice) {
+            properties.put(SwitchbotBindingConstants.CONFIG_GROUP, ((CurtainDevice) device).isGroup());
+        }
 
         thingDiscovered(DiscoveryResultBuilder.create(thingUID).withLabel(device.getName()).withBridge(bridgeUID)
                 .withProperties(properties).build());

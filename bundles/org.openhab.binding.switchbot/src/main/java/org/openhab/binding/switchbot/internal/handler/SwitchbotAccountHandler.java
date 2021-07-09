@@ -21,13 +21,16 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.switchbot.internal.config.SwitchbotAccountConfig;
 import org.openhab.binding.switchbot.internal.discovery.AllDevicesModel;
 import org.openhab.binding.switchbot.internal.discovery.CurtainDevice;
+import org.openhab.binding.switchbot.internal.discovery.HubMiniDevice;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotDevice;
 import org.openhab.core.io.net.http.HttpUtil;
 import org.openhab.core.thing.Bridge;
 import org.openhab.core.thing.ChannelUID;
+import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
+import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,20 +93,20 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
                     if (device.isGroup()) {
                         if (device.isMaster()) {
                             devices.add(new CurtainDevice(device.getDeviceName() + " (master)", device.getDeviceId(),
-                                    SwitchbotDevice.DeviceType.CURTAIN, false));
+                                    false));
                             String groupId = device.getCurtainDevicesIds().get(0) + "-"
                                     + device.getCurtainDevicesIds().get(1);
-                            devices.add(new CurtainDevice(device.getDeviceName() + " (group)", groupId,
-                                    SwitchbotDevice.DeviceType.CURTAIN, true));
+                            devices.add(new CurtainDevice(device.getDeviceName() + " (group)", groupId, true));
                         } else {
                             devices.add(new CurtainDevice(device.getDeviceName() + " (slave)", device.getDeviceId(),
-                                    SwitchbotDevice.DeviceType.CURTAIN, false));
+                                    false));
                         }
                     } else {
-                        devices.add(new CurtainDevice(device.getDeviceName(), device.getDeviceId(),
-                                SwitchbotDevice.DeviceType.CURTAIN, false));
+                        devices.add(new CurtainDevice(device.getDeviceName(), device.getDeviceId(), false));
                     }
                     break;
+                case "Hub Mini":
+                    devices.add(new HubMiniDevice(device.getDeviceName(), device.getDeviceId()));
                 default:
                     logger.warn("Unknown device type discovered, will not be added to inbox: {} with deviceId {}",
                             device.getDeviceType(), device.getDeviceId());
@@ -123,5 +126,11 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
         }
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
+        ((CurtainHandler) childHandler)
+                .setAuthorizationOpenToken(getConfigAs(SwitchbotAccountConfig.class).getAuthorizationOpenToken());
     }
 }
