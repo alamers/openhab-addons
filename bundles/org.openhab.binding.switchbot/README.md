@@ -10,6 +10,10 @@ The implementation is largely based on the Neato binding by Patrik Wimnell and J
 
 This supports Switchbot Curtain and Switchbot Hub Mini (as that is all I can test). Other devices should be easy to add but I have no way of testing it.
 
+Current state: 
+* curtains are autodiscovered after adding a Switchbot Account bridge
+* curtains support turnOff/turnOn (close/open) commands
+
 
 ## Discovery
 
