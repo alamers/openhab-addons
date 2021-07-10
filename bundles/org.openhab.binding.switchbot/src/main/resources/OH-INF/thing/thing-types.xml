@@ -42,8 +42,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec.</description>
-				<default>60</default>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
 			</parameter>
 			<parameter name="group" type="boolean" required="true">
 				<label>Is a group</label>
@@ -68,11 +68,6 @@
 			<parameter name="deviceId" type="text" required="true">
 				<label>device id</label>
 				<description>The id of the device</description>
-			</parameter>
-			<parameter name="refreshInterval" type="integer" unit="s" min="30">
-				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec.</description>
-				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>

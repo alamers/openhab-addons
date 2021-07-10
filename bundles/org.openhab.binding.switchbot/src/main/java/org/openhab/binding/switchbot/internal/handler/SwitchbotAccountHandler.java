@@ -107,6 +107,7 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
                     break;
                 case "Hub Mini":
                     devices.add(new HubMiniDevice(device.getDeviceName(), device.getDeviceId()));
+                    break;
                 default:
                     logger.warn("Unknown device type discovered, will not be added to inbox: {} with deviceId {}",
                             device.getDeviceType(), device.getDeviceId());

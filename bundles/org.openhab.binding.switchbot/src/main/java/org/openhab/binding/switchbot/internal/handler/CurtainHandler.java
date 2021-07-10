@@ -28,7 +28,6 @@ import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
-import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class CurtainHandler extends BaseThingHandler {
+public class CurtainHandler extends SwitchbotHandler {
 
     private Logger logger = LoggerFactory.getLogger(CurtainHandler.class);
 
@@ -48,8 +47,6 @@ public class CurtainHandler extends BaseThingHandler {
 
     private int refreshTime;
     private ScheduledFuture<?> refreshTask;
-
-    private String authorizationOpenToken;
 
     public CurtainHandler(Thing thing) {
         super(thing);
@@ -146,9 +143,5 @@ public class CurtainHandler extends BaseThingHandler {
         updateState(CHANNEL_GROUP, curtainState.isGroup() ? OnOffType.ON : OnOffType.OFF);
         updateState(CHANNEL_MOVING, curtainState.isMoving() ? OnOffType.ON : OnOffType.OFF);
         updateState(CHANNEL_SLIDE_POSITION, new DecimalType(curtainState.getSlidePosition()));
-    }
-
-    public void setAuthorizationOpenToken(String authorizationOpenToken) {
-        this.authorizationOpenToken = authorizationOpenToken;
     }
 }

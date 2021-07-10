@@ -89,8 +89,6 @@ public class CurtainProxy {
     }
 
     public void sendCommand(@NonNull String command) throws IOException {
-        // curl -H "Authorization: ..." https://api.switch-bot.com/v1.0/devices/.../status
-
         Properties headers = new Properties();
         headers.setProperty("Authorization", authorizationOpenToken);
 
@@ -120,8 +118,6 @@ public class CurtainProxy {
     }
 
     public CurtainState getDeviceStatus() throws IOException {
-        // curl -H "Authorization: ..." https://api.switch-bot.com/v1.0/devices/.../status
-
         Properties headers = new Properties();
         headers.setProperty("Authorization", authorizationOpenToken);
 
