@@ -1,5 +1,7 @@
 package org.openhab.binding.switchbot.internal.handler;
 
+import static org.openhab.binding.switchbot.internal.SwitchbotBindingConstants.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,10 +96,12 @@ public class CurtainProxy {
 
         CommandModel commandModel;
         switch (command) {
-            case "turnOff":
+            case COMMAND_TURN_OFF:
+            case COMMAND_OPEN:
                 commandModel = CommandModel.TURN_OFF;
                 break;
-            case "turnOn":
+            case COMMAND_TURN_ON:
+            case COMMAND_CLOSE:
                 commandModel = CommandModel.TURN_ON;
                 break;
             default:

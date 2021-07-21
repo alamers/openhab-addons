@@ -38,19 +38,20 @@ Then, add the `SwitchbotAccountBridge` and configure it with that token.
 
 ## Thing Configuration
 
-_Describe what is needed to manually configure a thing, either through the UI or via a thing-file. This should be mainly about its mandatory and optional configuration parameters. A short example entry for a thing file can help!_
-
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+If you configure a `SwitchbotAccountBridge`, all other devices are auto discovered.
 
 ## Channels
 
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
-
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+For now, only the curtain is implemented.
 
 | channel  | type   | description                  |
 |----------|--------|------------------------------|
-| control  | Switch | This is the control channel  |
+| calibrate  | Switch | Indicates if the device is calibrated  |
+| moving  | Switch | Indicates if the device is currently moving  |
+| group  | Switch | Indicates if the device represents multiple devices (is in a group)  |
+| slide-position  | Number | The current slide position  |
+| command  | String | Sends a command to the curtain (`turnOff`/`open` to open, `turnOn`/`close` to close |
+
 
 ## Full Example
 

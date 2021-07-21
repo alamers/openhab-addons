@@ -32,6 +32,10 @@ public class SwitchbotBindingConstants {
     public static final ThingTypeUID THING_TYPE_HUB_MINI = new ThingTypeUID(BINDING_ID, "hubmini");
 
     public static final String COMMAND = "command";
+    public static final String COMMAND_TURN_ON = "turnOn";
+    public static final String COMMAND_TURN_OFF = "turnOff";
+    public static final String COMMAND_OPEN = "open";
+    public static final String COMMAND_CLOSE = "close";
 
     public static final String CONFIG_DEVICE_ID = "deviceId";
     public static final String CONFIG_GROUP = "group";
