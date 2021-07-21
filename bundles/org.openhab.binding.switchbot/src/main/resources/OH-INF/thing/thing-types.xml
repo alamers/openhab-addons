@@ -97,7 +97,7 @@
 	<channel-type id="slide-position">
 		<item-type>Number</item-type>
 		<label>Slide Position</label>
-		<description>Indicates how far the curtain is open</description>
+		<description>Indicates how far the curtain is open (0=closed, 100=open)</description>
 		<state readOnly="false" pattern="%d"/>
 	</channel-type>
 

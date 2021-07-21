@@ -97,11 +97,11 @@ public class CurtainProxy {
         CommandModel commandModel;
         switch (command) {
             case COMMAND_TURN_OFF:
-            case COMMAND_OPEN:
+            case COMMAND_CLOSE:
                 commandModel = CommandModel.TURN_OFF;
                 break;
             case COMMAND_TURN_ON:
-            case COMMAND_CLOSE:
+            case COMMAND_OPEN:
                 commandModel = CommandModel.TURN_ON;
                 break;
             default:

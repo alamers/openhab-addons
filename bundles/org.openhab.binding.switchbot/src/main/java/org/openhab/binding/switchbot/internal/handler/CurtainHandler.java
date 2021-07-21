@@ -62,7 +62,7 @@ public class CurtainHandler extends SwitchbotHandler {
     }
 
     private void sendCommandToDevice(Command command) {
-        logger.debug("Ok - will handle command for CHANNEL_COMMAND");
+        logger.debug("Ok - will handle command '{}' for CHANNEL_COMMAND", command);
 
         try {
             curtainProxy.sendCommand(command.toString());
