@@ -109,8 +109,8 @@
 			<options>
 				<option value="turnOff">turnOff</option>
 				<option value="turnOn">turnOn</option>
-                <option value="open">open</option>
-                <option value="close">close</option>
+				<option value="open">open</option>
+				<option value="close">close</option>
 			</options>
 		</state>
 	</channel-type>
