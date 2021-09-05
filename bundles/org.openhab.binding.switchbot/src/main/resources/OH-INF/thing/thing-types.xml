@@ -32,7 +32,7 @@
 			<channel id="moving" typeId="moving"/>
 			<channel id="group" typeId="group"/>
 			<channel id="slide-position" typeId="slide-position"/>
-			<channel id="command" typeId="command"/>
+			<channel id="command" typeId="commandCurtain"/>
 		</channels>
 
 		<config-description>
@@ -52,13 +52,13 @@
 		</config-description>
 	</thing-type>
 
-	<thing-type id="hubmini">
+	<thing-type id="hub">
 		<supported-bridge-type-refs>
 			<bridge-type-ref id="switchbotAccount"/>
 		</supported-bridge-type-refs>
 
-		<label>Switchbot Hub Mini</label>
-		<description>Switchbot Hub Mini</description>
+		<label>Switchbot Hub</label>
+		<description>Switchbot Hub</description>
 
 		<channels>
 			<channel id="command" typeId="command"/>
@@ -68,6 +68,140 @@
 			<parameter name="deviceId" type="text" required="true">
 				<label>device id</label>
 				<description>The id of the device</description>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="bot">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Bot</label>
+		<description>Switchbot Bot</description>
+
+		<channels>
+			<channel id="command" typeId="commandBot"/>
+			<channel id="power" typeId="power"/>
+		</channels>
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="plug">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Plug</label>
+		<description>Switchbot Plug</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="meter">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Meter</label>
+		<description>Switchbot Meter</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="humidifier">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Humidifier</label>
+		<description>Switchbot Humidifier</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="smartfan">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Smart Fan</label>
+		<description>Switchbot Smart Fan</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
+				<default>600</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -101,7 +235,14 @@
 		<state readOnly="false" pattern="%d"/>
 	</channel-type>
 
-	<channel-type id="command">
+	<channel-type id="power">
+		<item-type>Switch</item-type>
+		<label>Power</label>
+		<description>Indicates if this bot is on or off.</description>
+		<state readOnly="true" pattern="%s"/>
+	</channel-type>
+
+	<channel-type id="commandCurtain">
 		<item-type>String</item-type>
 		<label>Send Command</label>
 		<description>Send Commands to Switchbot Curtain. (turnOff is closed, turnOn is open)</description>
@@ -111,6 +252,19 @@
 				<option value="turnOn">turnOn</option>
 				<option value="open">open</option>
 				<option value="close">close</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="commandBot">
+		<item-type>String</item-type>
+		<label>Send Command</label>
+		<description>Send Commands to Switchbot Bot. </description>
+		<state readOnly="false" pattern="%s">
+			<options>
+				<option value="turnOff">turnOff</option>
+				<option value="turnOn">turnOn</option>
+				<option value="press">press</option>
 			</options>
 		</state>
 	</channel-type>

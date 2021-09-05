@@ -5,9 +5,9 @@ package org.openhab.binding.switchbot.internal.discovery;
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class HubMiniDevice extends SwitchbotDevice {
+public class HubDevice extends SwitchbotDevice {
 
-    public HubMiniDevice(String name, String deviceId) {
-        super(name, deviceId, DeviceType.HUB_MINI);
+    public HubDevice(String name, String deviceId) {
+        super(name, deviceId, DeviceType.HUB);
     }
 }

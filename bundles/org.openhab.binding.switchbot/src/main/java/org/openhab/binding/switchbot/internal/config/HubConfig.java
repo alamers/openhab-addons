@@ -1,6 +1,6 @@
 package org.openhab.binding.switchbot.internal.config;
 
-public class HubMiniConfig {
+public class HubConfig {
     private String deviceId;
 
     public String getDeviceId() {
@@ -13,6 +13,6 @@ public class HubMiniConfig {
 
     @Override
     public String toString() {
-        return "HubMiniConfig [deviceId=" + deviceId + "]";
+        return "HubConfig [deviceId=" + deviceId + "]";
     }
 }

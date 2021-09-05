@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.switchbot.internal.config.SwitchbotAccountConfig;
 import org.openhab.binding.switchbot.internal.discovery.AllDevicesModel;
 import org.openhab.binding.switchbot.internal.discovery.CurtainDevice;
-import org.openhab.binding.switchbot.internal.discovery.HubMiniDevice;
+import org.openhab.binding.switchbot.internal.discovery.HubDevice;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotDevice;
 import org.openhab.core.io.net.http.HttpUtil;
 import org.openhab.core.thing.Bridge;
@@ -89,6 +89,8 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
 
                 // curtains can be grouped. Create individual curtain devices as well as an additional device for the
                 // group.
+                // TODO decide if we want the master / slave actually discovered since it looks like you can't control
+                // them individually if grouped
                 case "Curtain":
                     if (device.isGroup()) {
                         if (device.isMaster()) {
@@ -105,8 +107,18 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
                         devices.add(new CurtainDevice(device.getDeviceName(), device.getDeviceId(), false));
                     }
                     break;
+                case "Hub Plus":
                 case "Hub Mini":
-                    devices.add(new HubMiniDevice(device.getDeviceName(), device.getDeviceId()));
+                    devices.add(new HubDevice(device.getDeviceName(), device.getDeviceId()));
+                    break;
+                case "Bot":
+                case "Plug":
+                case "Meter":
+                case "Humidifier":
+                case "Smart Fan":
+                    logger.warn(
+                            "Known but unsupported device type discovered, will not be added to inbox: {} with deviceId {}",
+                            device.getDeviceType(), device.getDeviceId());
                     break;
                 default:
                     logger.warn("Unknown device type discovered, will not be added to inbox: {} with deviceId {}",

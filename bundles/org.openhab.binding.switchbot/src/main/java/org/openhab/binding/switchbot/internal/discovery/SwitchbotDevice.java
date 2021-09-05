@@ -13,7 +13,12 @@ public class SwitchbotDevice {
 
     public enum DeviceType {
         CURTAIN(THING_TYPE_CURTAIN),
-        HUB_MINI(THING_TYPE_HUB_MINI);
+        BOT(THING_TYPE_BOT),
+        PLUG(THING_TYPE_PLUG),
+        METER(THING_TYPE_METER),
+        HUMIDIFIER(THING_TYPE_HUMIDIFIER),
+        SMARTFAN(THING_TYPE_SMARTFAN),
+        HUB(THING_TYPE_HUB);
 
         private ThingTypeUID thingType;
 

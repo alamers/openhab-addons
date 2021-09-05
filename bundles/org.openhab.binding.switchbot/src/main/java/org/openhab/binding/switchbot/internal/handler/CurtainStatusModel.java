@@ -1,4 +1,4 @@
-package org.openhab.binding.switchbot.internal.discovery;
+package org.openhab.binding.switchbot.internal.handler;
 
 /**
  * Represents the json model of the status call.

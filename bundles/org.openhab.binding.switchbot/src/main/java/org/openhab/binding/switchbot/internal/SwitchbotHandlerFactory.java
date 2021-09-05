@@ -25,8 +25,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotAccountDiscoveryService;
+import org.openhab.binding.switchbot.internal.handler.BotHandler;
 import org.openhab.binding.switchbot.internal.handler.CurtainHandler;
-import org.openhab.binding.switchbot.internal.handler.HubMiniHandler;
+import org.openhab.binding.switchbot.internal.handler.HubHandler;
+import org.openhab.binding.switchbot.internal.handler.HumidifierHandler;
+import org.openhab.binding.switchbot.internal.handler.MeterHandler;
+import org.openhab.binding.switchbot.internal.handler.PlugHandler;
+import org.openhab.binding.switchbot.internal.handler.SmartfanHandler;
 import org.openhab.binding.switchbot.internal.handler.SwitchbotAccountHandler;
 import org.openhab.core.config.discovery.DiscoveryService;
 import org.openhab.core.thing.Bridge;
@@ -49,11 +54,15 @@ import org.osgi.service.component.annotations.Component;
 @Component(configurationPid = "binding.switchbot", service = ThingHandlerFactory.class)
 public class SwitchbotHandlerFactory extends BaseThingHandlerFactory {
 
-    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPE_UIDS = Collections.unmodifiableSet(Stream
-            .of(BRIDGE_TYPE_SWITCHBOT_ACCOUNT, THING_TYPE_CURTAIN, THING_TYPE_HUB_MINI).collect(Collectors.toSet()));
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPE_UIDS = Collections
+            .unmodifiableSet(Stream
+                    .of(BRIDGE_TYPE_SWITCHBOT_ACCOUNT, THING_TYPE_CURTAIN, THING_TYPE_HUB, THING_TYPE_BOT,
+                            THING_TYPE_PLUG, THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN)
+                    .collect(Collectors.toSet()));
 
     public static final Set<ThingTypeUID> DISCOVERABLE_THING_TYPE_UIDS = Collections
-            .unmodifiableSet(Stream.of(THING_TYPE_CURTAIN, THING_TYPE_HUB_MINI).collect(Collectors.toSet()));
+            .unmodifiableSet(Stream.of(THING_TYPE_CURTAIN, THING_TYPE_HUB, THING_TYPE_BOT, THING_TYPE_PLUG,
+                    THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN).collect(Collectors.toSet()));
 
     private Map<ThingUID, ServiceRegistration<DiscoveryService>> discoveryServiceRegistrations = new HashMap<>();
 
@@ -69,8 +78,18 @@ public class SwitchbotHandlerFactory extends BaseThingHandlerFactory {
 
         if (thingTypeUID.equals(THING_TYPE_CURTAIN)) {
             return new CurtainHandler(thing);
-        } else if (thingTypeUID.equals(THING_TYPE_HUB_MINI)) {
-            return new HubMiniHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_HUB)) {
+            return new HubHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_BOT)) {
+            return new BotHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_PLUG)) {
+            return new PlugHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_METER)) {
+            return new MeterHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_HUMIDIFIER)) {
+            return new HumidifierHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_SMARTFAN)) {
+            return new SmartfanHandler(thing);
         } else if (thingTypeUID.equals(BRIDGE_TYPE_SWITCHBOT_ACCOUNT)) {
             SwitchbotAccountHandler handler = new SwitchbotAccountHandler((Bridge) thing);
             registerAccountDiscoveryService(handler);
