@@ -17,7 +17,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.openhab.binding.switchbot.internal.SwitchbotBindingConstants;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
@@ -60,16 +59,15 @@ abstract class SwitchbotHandler extends BaseThingHandler {
     public void handleCommand(@NonNull ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
             refreshStateAndUpdate();
-        } else if (channelUID.getId().equals(SwitchbotBindingConstants.COMMAND)) {
-            sendCommandToDevice(command);
+        } else {
+            CommandModel commandModel = CommandModelAdapter.toCommandModel(channelUID, command);
+            sendCommandToDevice(commandModel);
         }
     }
 
-    private void sendCommandToDevice(Command command) {
-        logger.debug("Ok - will handle command {} for CHANNEL_COMMAND", command);
-
+    private void sendCommandToDevice(CommandModel commandModel) {
         try {
-            apiProxy.sendCommand(command.toString());
+            apiProxy.sendCommand(commandModel);
         } catch (IOException e) {
             logger.debug("Error while processing command from openHAB.", e);
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, e.getMessage());

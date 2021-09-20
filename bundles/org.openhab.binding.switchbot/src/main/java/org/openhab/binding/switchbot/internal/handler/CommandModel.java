@@ -6,9 +6,15 @@ public class CommandModel {
     private String parameter;
     private String commandType;
 
-    public static CommandModel TURN_OFF = new CommandModel("turnOff", "default", "command");
-    public static CommandModel TURN_ON = new CommandModel("turnOn", "default", "command");
-    public static CommandModel PRESS = new CommandModel("press", "default", "command");
+    public static CommandModel TURN_OFF = new CommandModel("turnOff", "default");
+    public static CommandModel TURN_ON = new CommandModel("turnOn", "default");
+    public static CommandModel PRESS = new CommandModel("press", "default");
+
+    public CommandModel(String command, String parameter) {
+        this.command = command;
+        this.parameter = parameter;
+        this.commandType = "command";
+    }
 
     public CommandModel(String command, String parameter, String commandType) {
         this.command = command;

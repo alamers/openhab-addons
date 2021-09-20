@@ -36,7 +36,7 @@
 			<channel id="moving" typeId="moving"/>
 			<channel id="group" typeId="group"/>
 			<channel id="slide-position" typeId="slide-position"/>
-			<channel id="command" typeId="commandCurtain"/>
+			<channel id="command" typeId="command-curtain"/>
 		</channels>
 
 		<config-description>
@@ -85,7 +85,7 @@
 		<description>Switchbot Bot</description>
 
 		<channels>
-			<channel id="command" typeId="commandBot"/>
+			<channel id="command" typeId="command-bot"/>
 			<channel id="power" typeId="power"/>
 		</channels>
 
@@ -110,11 +110,9 @@
 		<label>Switchbot Plug</label>
 		<description>Switchbot Plug</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<channels>
+			<channel id="command" typeId="command-plug"/>
+		</channels>
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -137,11 +135,7 @@
 		<label>Switchbot Meter</label>
 		<description>Switchbot Meter</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<!-- <channels> <channel id="command" typeId="command"/> </channels> -->
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -164,11 +158,10 @@
 		<label>Switchbot Humidifier</label>
 		<description>Switchbot Humidifier</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<channels>
+			<channel id="command" typeId="command-humidifier"/>
+			<channel id="mode" typeId="mode"/>
+		</channels>
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -191,11 +184,10 @@
 		<label>Switchbot Smart Fan</label>
 		<description>Switchbot Smart Fan</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<channels>
+			<channel id="command" typeId="commandSmartfan"/>
+			<channel id="status" typeId="fan-status"/>
+		</channels>
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -218,11 +210,7 @@
 		<label>Switchbot Motion Sensor</label>
 		<description>Switchbot Motion Sensor</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<!-- <channels> <channel id="command" typeId="command"/> </channels> -->
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -245,11 +233,7 @@
 		<label>Switchbot Contact Sensor</label>
 		<description>Switchbot Contact Sensor</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<!-- <channels> <channel id="command" typeId="command"/> </channels> -->
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -272,11 +256,12 @@
 		<label>Switchbot Color Bulb</label>
 		<description>Switchbot Color Bulb</description>
 
-		<!--
-			<channels>
-			<channel id="command" typeId="command"/>
-			</channels>
-		-->
+		<channels>
+			<channel id="command" typeId="command-bulb"/>
+			<channel id="brightness" typeId="brightness"/>
+			<channel id="color" typeId="color"/>
+			<channel id="colorTemperature" typeId="color-temperature"/>
+		</channels>
 
 		<config-description>
 			<parameter name="deviceId" type="text" required="true">
@@ -326,7 +311,52 @@
 		<state readOnly="true" pattern="%s"/>
 	</channel-type>
 
-	<channel-type id="commandCurtain">
+	<channel-type id="mode">
+		<item-type>String</item-type>
+		<label>Humidifier mode</label>
+		<description>auto, set to Auto Mode,
+			101, set atomization efficiency to 34%,
+			102, set atomization efficiency to 67%,
+			103, set atomization efficiency to 100%,
+			0~100, set atomization efficiency to value</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="fan-status">
+		<item-type>String</item-type>
+		<label>set fan status</label>
+		<description>power: off/on,
+			fanMode: 1/2,
+			fanSpeed: 1/2/3/4,
+			shakeRange: 0~120
+			fanMode: 1 (Standard), 2 (Natural). e.g.
+			on,1,1,60</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="brightness">
+		<item-type>Number</item-type>
+		<label>Brightness</label>
+		<description>0-100</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="color">
+		<item-type>String</item-type>
+		<label>Color</label>
+		<description>RGB "{0-255}:{0-255}:{0-255}"</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+	<channel-type id="color-temperature">
+		<item-type>String</item-type>
+		<label>Color Temperature</label>
+		<description>Kelvin {2700-6500}"</description>
+		<state readOnly="false" pattern="%d"/>
+	</channel-type>
+
+
+	<channel-type id="command-curtain">
 		<item-type>String</item-type>
 		<label>Send Command</label>
 		<description>Send Commands to Switchbot Curtain. (turnOff is closed, turnOn is open)</description>
@@ -340,7 +370,7 @@
 		</state>
 	</channel-type>
 
-	<channel-type id="commandBot">
+	<channel-type id="command-bot">
 		<item-type>String</item-type>
 		<label>Send Command</label>
 		<description>Send Commands to Switchbot Bot. </description>
@@ -349,6 +379,43 @@
 				<option value="turnOff">turnOff</option>
 				<option value="turnOn">turnOn</option>
 				<option value="press">press</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="command-plug">
+		<item-type>String</item-type>
+		<label>Send Command</label>
+		<description>Send Commands to Switchbot Plug. </description>
+		<state readOnly="false" pattern="%s">
+			<options>
+				<option value="turnOff">turnOff</option>
+				<option value="turnOn">turnOn</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="command-bulb">
+		<item-type>String</item-type>
+		<label>Send Command</label>
+		<description>Send Commands to Switchbot Color Bulb. </description>
+		<state readOnly="false" pattern="%s">
+			<options>
+				<option value="turnOff">turnOff</option>
+				<option value="turnOn">turnOn</option>
+				<option value="toggle">toggle</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="command-humidifier">
+		<item-type>String</item-type>
+		<label>Send Command</label>
+		<description>Send Commands to Switchbot Humidifier. </description>
+		<state readOnly="false" pattern="%s">
+			<options>
+				<option value="turnOff">turnOff</option>
+				<option value="turnOn">turnOn</option>
 			</options>
 		</state>
 	</channel-type>

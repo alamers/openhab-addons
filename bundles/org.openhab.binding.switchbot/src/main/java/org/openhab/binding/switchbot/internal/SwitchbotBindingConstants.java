@@ -39,7 +39,6 @@ public class SwitchbotBindingConstants {
     public static final ThingTypeUID THING_TYPE_CONTACT_SENSOR = new ThingTypeUID(BINDING_ID, "contactsensor");
     public static final ThingTypeUID THING_TYPE_COLOR_BULB = new ThingTypeUID(BINDING_ID, "colorbulb");
 
-    public static final String COMMAND = "command";
     public static final String COMMAND_TURN_ON = "turnOn";
     public static final String COMMAND_TURN_OFF = "turnOff";
     public static final String COMMAND_OPEN = "open";
@@ -49,6 +48,9 @@ public class SwitchbotBindingConstants {
     public static final String CONFIG_DEVICE_ID = "deviceId";
     public static final String CONFIG_GROUP = "group";
 
+    // generic channels
+    public static final String CHANNEL_COMMAND = "command";
+
     // curtain channels
     public static final String CHANNEL_CALIBRATE = "calibrate";
     public static final String CHANNEL_MOVING = "moving";
@@ -57,4 +59,15 @@ public class SwitchbotBindingConstants {
 
     // bot channels
     public static final String CHANNEL_POWER = "power";
+
+    // humidifier channels
+    public static final String CHANNEL_MODE = "mode";
+
+    // fan channels
+    public static final String CHANNEL_FAN_STATUS = "fan-status";
+
+    // bulb channels
+    public static final String CHANNEL_BRIGHTNESS = "brightness";
+    public static final String CHANNEL_COLOR = "color";
+    public static final String CHANNEL_COLOR_TEMPERATURE = "color-temperature";
 }

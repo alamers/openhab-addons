@@ -1,7 +1,5 @@
 package org.openhab.binding.switchbot.internal.handler;
 
-import static org.openhab.binding.switchbot.internal.SwitchbotBindingConstants.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,26 +32,10 @@ public class SwitchbotApiProxy {
         return deviceId;
     }
 
-    public void sendCommand(@NonNull String command) throws IOException {
+    public void sendCommand(@NonNull CommandModel commandModel) throws IOException {
         Properties headers = new Properties();
         headers.setProperty("Authorization", authorizationOpenToken);
 
-        CommandModel commandModel;
-        switch (command) {
-            case COMMAND_TURN_OFF:
-            case COMMAND_CLOSE:
-                commandModel = CommandModel.TURN_OFF;
-                break;
-            case COMMAND_TURN_ON:
-            case COMMAND_OPEN:
-                commandModel = CommandModel.TURN_ON;
-                break;
-            case COMMAND_PRESS:
-                commandModel = CommandModel.PRESS;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown command: " + command);
-        }
         Gson gson = new Gson();
         String commandJson = gson.toJson(commandModel);
         InputStream stream = new ByteArrayInputStream(commandJson.getBytes(StandardCharsets.UTF_8));
