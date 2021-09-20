@@ -35,6 +35,9 @@ public class SwitchbotBindingConstants {
     public static final ThingTypeUID THING_TYPE_METER = new ThingTypeUID(BINDING_ID, "meter");
     public static final ThingTypeUID THING_TYPE_HUMIDIFIER = new ThingTypeUID(BINDING_ID, "humidifier");
     public static final ThingTypeUID THING_TYPE_SMARTFAN = new ThingTypeUID(BINDING_ID, "smartfan");
+    public static final ThingTypeUID THING_TYPE_MOTION_SENSOR = new ThingTypeUID(BINDING_ID, "motionsensor");
+    public static final ThingTypeUID THING_TYPE_CONTACT_SENSOR = new ThingTypeUID(BINDING_ID, "contactsensor");
+    public static final ThingTypeUID THING_TYPE_COLOR_BULB = new ThingTypeUID(BINDING_ID, "colorbulb");
 
     public static final String COMMAND = "command";
     public static final String COMMAND_TURN_ON = "turnOn";

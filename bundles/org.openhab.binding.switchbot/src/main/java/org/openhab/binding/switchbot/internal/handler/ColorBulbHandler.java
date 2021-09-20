@@ -12,34 +12,34 @@
  */
 package org.openhab.binding.switchbot.internal.handler;
 
-import org.openhab.binding.switchbot.internal.config.PlugConfig;
+import org.openhab.binding.switchbot.internal.config.MeterConfig;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link PlugHandler} is responsible for handling commands, which are
+ * The {@link ColorBulbHandler} is responsible for handling commands, which are
  * sent to one of the channels. It maps the OpenHAB world to the Switchbot world.
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class PlugHandler extends SwitchbotHandler {
+public class ColorBulbHandler extends SwitchbotHandler {
 
-    private Logger logger = LoggerFactory.getLogger(PlugHandler.class);
+    private Logger logger = LoggerFactory.getLogger(ColorBulbHandler.class);
 
-    public PlugHandler(Thing thing) {
+    public ColorBulbHandler(Thing thing) {
         super(thing);
     }
 
     @Override
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
-        logger.debug("Will boot up Switchbot Plug binding");
+        logger.debug("Will boot up Switchbot Color Bulb binding");
 
-        PlugConfig config = getThing().getConfiguration().as(PlugConfig.class);
+        MeterConfig config = getThing().getConfiguration().as(MeterConfig.class);
 
-        logger.debug("Curtain Config: {}", config);
+        logger.debug("Color Bulb Config: {}", config);
 
         refreshTime = config.getRefreshInterval();
         if (refreshTime < 1) {
@@ -55,5 +55,6 @@ public class PlugHandler extends SwitchbotHandler {
 
     @Override
     protected void updateState(SwitchbotApiStatusModel status) {
+        // TODO Auto-generated method stub
     }
 }

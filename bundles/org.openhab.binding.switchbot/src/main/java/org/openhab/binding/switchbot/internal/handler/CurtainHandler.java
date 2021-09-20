@@ -100,11 +100,11 @@ public class CurtainHandler extends SwitchbotHandler {
         logger.debug("Curtain Config: {}", config);
 
         refreshTime = config.getRefreshInterval();
-        if (refreshTime < 30) {
+        if (refreshTime < 1) {
             logger.warn(
-                    "Refresh time [{}] is not valid. Refresh time must be at least 30 seconds.  Setting to minimum of 30 sec",
+                    "Refresh time [{}] is not valid. Refresh time must be at least 1 second.  Setting to minimum of 30 sec",
                     refreshTime);
-            config.setRefreshInterval(30);
+            config.setRefreshInterval(1);
         }
 
         apiProxy = new SwitchbotApiProxy(getCommunicationDeviceId(config), authorizationOpenToken);

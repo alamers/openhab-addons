@@ -12,39 +12,39 @@
  */
 package org.openhab.binding.switchbot.internal.handler;
 
-import org.openhab.binding.switchbot.internal.config.PlugConfig;
+import org.openhab.binding.switchbot.internal.config.MeterConfig;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link PlugHandler} is responsible for handling commands, which are
+ * The {@link MotionSensorHandler} is responsible for handling commands, which are
  * sent to one of the channels. It maps the OpenHAB world to the Switchbot world.
  *
  * @author Arjan Lamers - Initial contribution
  */
-public class PlugHandler extends SwitchbotHandler {
+public class MotionSensorHandler extends SwitchbotHandler {
 
-    private Logger logger = LoggerFactory.getLogger(PlugHandler.class);
+    private Logger logger = LoggerFactory.getLogger(MotionSensorHandler.class);
 
-    public PlugHandler(Thing thing) {
+    public MotionSensorHandler(Thing thing) {
         super(thing);
     }
 
     @Override
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
-        logger.debug("Will boot up Switchbot Plug binding");
+        logger.debug("Will boot up Switchbot Motion Sensor binding");
 
-        PlugConfig config = getThing().getConfiguration().as(PlugConfig.class);
+        MeterConfig config = getThing().getConfiguration().as(MeterConfig.class);
 
         logger.debug("Curtain Config: {}", config);
 
         refreshTime = config.getRefreshInterval();
         if (refreshTime < 1) {
             logger.warn(
-                    "Refresh time [{}] is not valid. Refresh time must be at least 1 seconds.  Setting to minimum of 30 sec",
+                    "Refresh time [{}] is not valid. Refresh time must be at least 1 second.  Setting to minimum of 30 sec",
                     refreshTime);
             config.setRefreshInterval(1);
         }
@@ -55,5 +55,6 @@ public class PlugHandler extends SwitchbotHandler {
 
     @Override
     protected void updateState(SwitchbotApiStatusModel status) {
+        // TODO Auto-generated method stub
     }
 }

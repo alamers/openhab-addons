@@ -74,6 +74,71 @@ public class SwitchbotApiStatusModel {
         private Integer shakeCenter;
         /** only available for Smart Fan devices. the fan's swing range, 0~120° */
         private Integer shakeRange;
+        /** only available for Motion Sensor, Contact Sensor devices. determines if motion is detected */
+        private Boolean moveDetected;
+        /**
+         * has two definitions:
+         * only available for Motion Sensor, Contact Sensor devices. tell the ambient environment is bright or dim.
+         * only available for Color Bulb devices: the brightness value, range from 1 to 100
+         */
+        private String brightness;
+        // private Integer brightness;
+        /** only available for Contact Sensor devices. open/close/timeOutNotClose */
+        private String openState;
+        /** only available for Color Bulb devices. the color value, RGB "255:255:255" */
+        private String color;
+        /** only available for Color Bulb devices. the color temperature value, range from 2700 to 6500 */
+        private Integer colorTemperature;
+        /** only available for Humidifier devices. determines if the water tank is empty or not */
+        private Boolean lackWater;
+
+        public Boolean getMoveDetected() {
+            return moveDetected;
+        }
+
+        public void setMoveDetected(Boolean moveDetected) {
+            this.moveDetected = moveDetected;
+        }
+
+        public String getBrightness() {
+            return brightness;
+        }
+
+        public void setBrightness(String brightness) {
+            this.brightness = brightness;
+        }
+
+        public String getOpenState() {
+            return openState;
+        }
+
+        public void setOpenState(String openState) {
+            this.openState = openState;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public Integer getColorTemperature() {
+            return colorTemperature;
+        }
+
+        public void setColorTemperature(Integer colorTemperature) {
+            this.colorTemperature = colorTemperature;
+        }
+
+        public Boolean getLackWater() {
+            return lackWater;
+        }
+
+        public void setLackWater(Boolean lackWater) {
+            this.lackWater = lackWater;
+        }
 
         public String getDeviceId() {
             return deviceId;

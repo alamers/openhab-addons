@@ -26,10 +26,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotAccountDiscoveryService;
 import org.openhab.binding.switchbot.internal.handler.BotHandler;
+import org.openhab.binding.switchbot.internal.handler.ColorBulbHandler;
+import org.openhab.binding.switchbot.internal.handler.ContactSensorHandler;
 import org.openhab.binding.switchbot.internal.handler.CurtainHandler;
 import org.openhab.binding.switchbot.internal.handler.HubHandler;
 import org.openhab.binding.switchbot.internal.handler.HumidifierHandler;
 import org.openhab.binding.switchbot.internal.handler.MeterHandler;
+import org.openhab.binding.switchbot.internal.handler.MotionSensorHandler;
 import org.openhab.binding.switchbot.internal.handler.PlugHandler;
 import org.openhab.binding.switchbot.internal.handler.SmartfanHandler;
 import org.openhab.binding.switchbot.internal.handler.SwitchbotAccountHandler;
@@ -57,12 +60,14 @@ public class SwitchbotHandlerFactory extends BaseThingHandlerFactory {
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPE_UIDS = Collections
             .unmodifiableSet(Stream
                     .of(BRIDGE_TYPE_SWITCHBOT_ACCOUNT, THING_TYPE_CURTAIN, THING_TYPE_HUB, THING_TYPE_BOT,
-                            THING_TYPE_PLUG, THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN)
+                            THING_TYPE_PLUG, THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN,
+                            THING_TYPE_CONTACT_SENSOR, THING_TYPE_MOTION_SENSOR, THING_TYPE_COLOR_BULB)
                     .collect(Collectors.toSet()));
 
     public static final Set<ThingTypeUID> DISCOVERABLE_THING_TYPE_UIDS = Collections
             .unmodifiableSet(Stream.of(THING_TYPE_CURTAIN, THING_TYPE_HUB, THING_TYPE_BOT, THING_TYPE_PLUG,
-                    THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN).collect(Collectors.toSet()));
+                    THING_TYPE_METER, THING_TYPE_HUMIDIFIER, THING_TYPE_SMARTFAN, THING_TYPE_CONTACT_SENSOR,
+                    THING_TYPE_MOTION_SENSOR, THING_TYPE_COLOR_BULB).collect(Collectors.toSet()));
 
     private Map<ThingUID, ServiceRegistration<DiscoveryService>> discoveryServiceRegistrations = new HashMap<>();
 
@@ -90,6 +95,12 @@ public class SwitchbotHandlerFactory extends BaseThingHandlerFactory {
             return new HumidifierHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_SMARTFAN)) {
             return new SmartfanHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_CONTACT_SENSOR)) {
+            return new ContactSensorHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_MOTION_SENSOR)) {
+            return new MotionSensorHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_COLOR_BULB)) {
+            return new ColorBulbHandler(thing);
         } else if (thingTypeUID.equals(BRIDGE_TYPE_SWITCHBOT_ACCOUNT)) {
             SwitchbotAccountHandler handler = new SwitchbotAccountHandler((Bridge) thing);
             registerAccountDiscoveryService(handler);

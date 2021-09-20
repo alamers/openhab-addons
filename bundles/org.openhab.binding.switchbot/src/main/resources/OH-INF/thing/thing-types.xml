@@ -11,8 +11,12 @@
 		<config-description>
 			<parameter name="authorizationOpenToken" type="text" required="true">
 				<label>Authorization Open Token</label>
-				<description>Token as retrieved in the app: a) Go to Profile > Preference b) Tap App Version 10 times. Developer
-					Options will show up c) Tap Developer Options d) Tap Get Token</description>
+				<description>Token as retrieved in the app:
+					a) Go to Profile > Preference
+					b) Tap App Version 10 times. Developer
+					Options will show up
+					c) Tap Developer Options
+					d) Tap Get Token</description>
 				<context>text</context>
 			</parameter>
 		</config-description>
@@ -42,8 +46,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 			<parameter name="group" type="boolean" required="true">
 				<label>Is a group</label>
@@ -92,8 +96,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -119,8 +123,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -146,8 +150,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -173,8 +177,8 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
@@ -200,12 +204,92 @@
 			</parameter>
 			<parameter name="refreshInterval" type="integer" unit="s" min="30">
 				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec (API allows 1000 calls per day per account).</description>
-				<default>600</default>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
 			</parameter>
 		</config-description>
 	</thing-type>
 
+	<thing-type id="motionsensor">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Motion Sensor</label>
+		<description>Switchbot Motion Sensor</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="contactsensor">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Contact Sensor</label>
+		<description>Switchbot Contact Sensor</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<thing-type id="colorbulb">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="switchbotAccount"/>
+		</supported-bridge-type-refs>
+
+		<label>Switchbot Color Bulb</label>
+		<description>Switchbot Color Bulb</description>
+
+		<!--
+			<channels>
+			<channel id="command" typeId="command"/>
+			</channels>
+		-->
+
+		<config-description>
+			<parameter name="deviceId" type="text" required="true">
+				<label>device id</label>
+				<description>The id of the device</description>
+			</parameter>
+			<parameter name="refreshInterval" type="integer" unit="s" min="30">
+				<label>Refresh Interval</label>
+				<description>Interval the device is polled in sec (API allows 10000 calls per day per account).</description>
+				<default>60</default>
+			</parameter>
+		</config-description>
+	</thing-type>
 
 	<channel-type id="calibrate">
 		<item-type>Switch</item-type>

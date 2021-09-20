@@ -35,18 +35,18 @@ public class MeterHandler extends SwitchbotHandler {
     @Override
     public void initialize() {
         updateStatus(ThingStatus.UNKNOWN);
-        logger.debug("Will boot up Switchbot Curtain binding");
+        logger.debug("Will boot up Switchbot Meter binding");
 
         MeterConfig config = getThing().getConfiguration().as(MeterConfig.class);
 
         logger.debug("Curtain Config: {}", config);
 
         refreshTime = config.getRefreshInterval();
-        if (refreshTime < 30) {
+        if (refreshTime < 1) {
             logger.warn(
-                    "Refresh time [{}] is not valid. Refresh time must be at least 30 seconds.  Setting to minimum of 30 sec",
+                    "Refresh time [{}] is not valid. Refresh time must be at least 1 second.  Setting to minimum of 30 sec",
                     refreshTime);
-            config.setRefreshInterval(30);
+            config.setRefreshInterval(1);
         }
 
         apiProxy = new SwitchbotApiProxy(config.getDeviceId(), authorizationOpenToken);
