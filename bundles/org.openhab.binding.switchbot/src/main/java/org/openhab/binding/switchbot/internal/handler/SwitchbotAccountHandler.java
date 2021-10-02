@@ -20,6 +20,7 @@ import java.util.Properties;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.switchbot.internal.config.SwitchbotAccountConfig;
 import org.openhab.binding.switchbot.internal.discovery.AllDevicesModel;
+import org.openhab.binding.switchbot.internal.discovery.BotDevice;
 import org.openhab.binding.switchbot.internal.discovery.CurtainDevice;
 import org.openhab.binding.switchbot.internal.discovery.HubDevice;
 import org.openhab.binding.switchbot.internal.discovery.SwitchbotDevice;
@@ -85,13 +86,13 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
     private List<SwitchbotDevice> toSwitchbotDevices(AllDevicesModel allDevices) {
         List<SwitchbotDevice> devices = new ArrayList<>();
         for (AllDevicesModel.Device device : allDevices.getBody().getDeviceList()) {
-            switch (device.getDeviceType()) {
+            switch (device.getDeviceType().toLowerCase()) {
 
                 // curtains can be grouped. Create individual curtain devices as well as an additional device for the
                 // group.
                 // TODO decide if we want the master / slave actually discovered since it looks like you can't control
                 // them individually if grouped
-                case "Curtain":
+                case "curtain":
                     if (device.isGroup()) {
                         if (device.isMaster()) {
                             devices.add(new CurtainDevice(device.getDeviceName() + " (master)", device.getDeviceId(),
@@ -107,15 +108,17 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
                         devices.add(new CurtainDevice(device.getDeviceName(), device.getDeviceId(), false));
                     }
                     break;
-                case "Hub Plus":
-                case "Hub Mini":
+                case "hub plus":
+                case "hub mini":
                     devices.add(new HubDevice(device.getDeviceName(), device.getDeviceId()));
                     break;
-                case "Bot":
-                case "Plug":
-                case "Meter":
-                case "Humidifier":
-                case "Smart Fan":
+                case "bot":
+                    devices.add(new BotDevice(device.getDeviceName(), device.getDeviceId()));
+                    break;
+                case "plug":
+                case "meter":
+                case "humidifier":
+                case "smart fan":
                     logger.warn(
                             "Known but unsupported device type discovered, will not be added to inbox: {} with deviceId {}",
                             device.getDeviceType(), device.getDeviceId());
