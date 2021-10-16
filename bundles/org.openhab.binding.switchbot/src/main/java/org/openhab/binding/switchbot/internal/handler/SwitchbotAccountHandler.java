@@ -146,7 +146,7 @@ public class SwitchbotAccountHandler extends BaseBridgeHandler {
 
     @Override
     public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
-        ((CurtainHandler) childHandler)
+        ((SwitchbotHandler) childHandler)
                 .setAuthorizationOpenToken(getConfigAs(SwitchbotAccountConfig.class).getAuthorizationOpenToken());
     }
 }
