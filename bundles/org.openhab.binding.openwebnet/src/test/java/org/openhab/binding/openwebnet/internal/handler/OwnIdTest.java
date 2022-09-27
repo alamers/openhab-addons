@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -22,6 +22,8 @@ import org.openhab.core.thing.Bridge;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.Where;
+import org.openwebnet4j.message.WhereAuxiliary;
+import org.openwebnet4j.message.WhereCEN;
 import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Massimo Valla - Initial contribution
  * @author Andrea Conte - Energy management
+ * @author Giovanni Fabiani - AAuxiliary message support
  */
 @NonNullByDefault
 public class OwnIdTest {
@@ -60,10 +63,10 @@ public class OwnIdTest {
      * BUS Thermo actuator  1#2             1                   4.1             1
      * BUS TempSensor       500             500                 4.500           500
      * BUS Energy           51              51                  18.51           51
-     * -INACTIVE- BUS CEN              51              51                  15.51           51
-     * -INACTIVE- BUS CEN+             212             212                 25.212          212
-     * -INACTIVE- BUS DryContact       399             399                 25.399          399
-     *
+     * BUS CEN              51              51                  15.51           51
+     * BUS CEN+             212             212                 25.212          212
+     * BUS DryContact       399             399                 25.399          399
+     * BUS AUX                4               4                    9.4            4
      */
 // @formatter:on
 
@@ -79,7 +82,12 @@ public class OwnIdTest {
         bus_thermo(new WhereThermo("1"), Who.fromValue(4),"*#4*1*0*0020##" , "1", "4.1", "1"),
         bus_thermo_act(new WhereThermo("1#2"), Who.fromValue(4),"*#4*1#2*20*0##" ,"1", "4.1", "1"),
         bus_tempSensor(new WhereThermo("500"), Who.fromValue(4), "*#4*500*15*1*0020*0001##", "500", "4.500", "500"),
-        bus_energy(new WhereEnergyManagement("51"), Who.fromValue(18), "*#18*51*113##", "51", "18.51", "51");
+        bus_energy(new WhereEnergyManagement("51"), Who.fromValue(18), "*#18*51*113##", "51", "18.51", "51"),
+        bus_cen(new WhereCEN("51"), Who.fromValue(15), "*15*31*51##", "51", "15.51", "51"),
+        bus_cen_plus(new WhereCEN("212"), Who.fromValue(25), "*25*21#31*212##", "212", "25.212", "212"),
+        bus_drycontact(new WhereCEN("399"), Who.fromValue(25), "*25*32#1*399##", "399", "25.399", "399"),
+        bus_aux(new WhereAuxiliary("4"), Who.fromValue(9), "*9*1*4##","4","9.4","4");
+
 
         // @formatter:on
 

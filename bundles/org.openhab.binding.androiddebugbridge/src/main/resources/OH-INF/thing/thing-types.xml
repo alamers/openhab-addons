@@ -11,6 +11,9 @@
 			<channel id="key-event" typeId="key-event-channel"/>
 			<channel id="text" typeId="text-channel"/>
 			<channel id="tap" typeId="tap-channel"/>
+			<channel id="url" typeId="url-channel"/>
+			<channel id="record-input" typeId="record-input-channel"/>
+			<channel id="recorded-input" typeId="recorded-input-channel"/>
 			<channel id="media-volume" typeId="system.volume"/>
 			<channel id="media-control" typeId="system.media-control"/>
 			<channel id="start-package" typeId="start-package-channel"/>
@@ -21,8 +24,9 @@
 			<channel id="screen-state" typeId="screen-state-channel"/>
 			<channel id="shutdown" typeId="shutdown-channel"/>
 			<channel id="awake-state" typeId="awake-state-channel"/>
+			<channel id="start-intent" typeId="start-intent-channel"/>
 		</channels>
-		<representation-property>serial</representation-property>
+		<representation-property>macAddress</representation-property>
 		<config-description>
 			<parameter name="ip" type="text" required="true">
 				<context>network-address</context>
@@ -42,6 +46,11 @@
 			<parameter name="timeout" type="integer" min="1" max="15" unit="s" required="true">
 				<label>Command Timeout</label>
 				<description>Command timeout seconds.</description>
+				<default>5</default>
+			</parameter>
+			<parameter name="recordDuration" type="integer" required="true" min="3" max="20">
+				<label>Record Duration</label>
+				<description>How much time the record-input channel wait for events to record.</description>
 				<default>5</default>
 			</parameter>
 			<parameter name="mediaStateJSONConfig" type="text">
@@ -363,6 +372,24 @@
 		<description>Send tap event to android device</description>
 	</channel-type>
 
+	<channel-type id="url-channel">
+		<item-type>String</item-type>
+		<label>Open Url</label>
+		<description>Open url in the browser</description>
+	</channel-type>
+
+	<channel-type id="record-input-channel">
+		<item-type>String</item-type>
+		<label>Record Input</label>
+		<description>Record input events under provided name</description>
+	</channel-type>
+
+	<channel-type id="recorded-input-channel">
+		<item-type>String</item-type>
+		<label>Recorded Input</label>
+		<description>Send previous recorded input events by name</description>
+	</channel-type>
+
 	<channel-type id="start-package-channel">
 		<item-type>String</item-type>
 		<label>Start Package</label>
@@ -419,6 +446,12 @@
 		<label>Screen State</label>
 		<description>Screen Power State</description>
 		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="start-intent-channel" advanced="true">
+		<item-type>String</item-type>
+		<label>Start Intent</label>
+		<description>Start application intent</description>
 	</channel-type>
 
 </thing:thing-descriptions>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,6 +15,7 @@ package org.openhab.binding.ipcamera.internal;
 import static org.openhab.binding.ipcamera.internal.IpCameraBindingConstants.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -22,6 +23,7 @@ import org.openhab.binding.ipcamera.internal.handler.IpCameraHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.PercentType;
+import org.openhab.core.library.types.StringType;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
@@ -42,14 +44,16 @@ import io.netty.util.ReferenceCountUtil;
 public class DahuaHandler extends ChannelDuplexHandler {
     private IpCameraHandler ipCameraHandler;
     private int nvrChannel;
+    private Pattern boundaryPattern;
 
     public DahuaHandler(IpCameraHandler handler, int nvrChannel) {
         ipCameraHandler = handler;
         this.nvrChannel = nvrChannel;
+        boundaryPattern = Pattern.compile("^-- ?myboundary$", Pattern.MULTILINE);
     }
 
     private void processEvent(String content) {
-        int startIndex = content.indexOf("Code=", 12) + 5;// skip --myboundary
+        int startIndex = content.indexOf("Code=") + 5;// skip Code=
         int endIndex = content.indexOf(";", startIndex + 1);
         if (startIndex == -1 || endIndex == -1) {
             ipCameraHandler.logger.debug("Code= not found in Dahua event. Content was:{}", content);
@@ -63,6 +67,14 @@ public class DahuaHandler extends ChannelDuplexHandler {
             return;
         }
         String action = content.substring(startIndex, endIndex);
+        startIndex = content.indexOf(";data=", startIndex);
+        if (startIndex > 0) {
+            endIndex = content.lastIndexOf("}");
+            if (endIndex > 0) {
+                String data = content.substring(startIndex + 6, endIndex + 1);
+                ipCameraHandler.setChannelState(CHANNEL_LAST_EVENT_DATA, new StringType(data));
+            }
+        }
         switch (code) {
             case "VideoMotion":
                 if ("Start".equals(action)) {
@@ -106,6 +118,7 @@ public class DahuaHandler extends ChannelDuplexHandler {
                     ipCameraHandler.noMotionDetected(CHANNEL_LINE_CROSSING_ALARM);
                 }
                 break;
+            case "AudioAnomaly":
             case "AudioMutation":
                 if ("Start".equals(action)) {
                     ipCameraHandler.audioDetected();
@@ -177,7 +190,9 @@ public class DahuaHandler extends ChannelDuplexHandler {
             case "LensMaskClose":
                 ipCameraHandler.setChannelState(CHANNEL_ENABLE_PRIVACY_MODE, OnOffType.OFF);
                 break;
+            // Skip these so they are not logged.
             case "TimeChange":
+            case "IntelliFrame":
             case "NTPAdjustTime":
             case "StorageChange":
             case "Reboot":
@@ -192,6 +207,41 @@ public class DahuaHandler extends ChannelDuplexHandler {
         }
     }
 
+    private void processSettings(String content) {
+        // determine if the motion detection is turned on or off.
+        if (content.contains("table.MotionDetect[0].Enable=true")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_MOTION_ALARM, OnOffType.ON);
+        } else if (content.contains("table.MotionDetect[" + nvrChannel + "].Enable=false")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_MOTION_ALARM, OnOffType.OFF);
+        }
+
+        // determine if the audio alarm is turned on or off.
+        if (content.contains("table.AudioDetect[0].MutationDetect=true")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_AUDIO_ALARM, OnOffType.ON);
+        } else if (content.contains("table.AudioDetect[0].MutationDetect=false")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_AUDIO_ALARM, OnOffType.OFF);
+        }
+
+        // Handle AudioMutationThreshold alarm
+        if (content.contains("table.AudioDetect[0].MutationThreold=")) {
+            String value = ipCameraHandler.returnValueFromString(content, "table.AudioDetect[0].MutationThreold=");
+            ipCameraHandler.setChannelState(CHANNEL_THRESHOLD_AUDIO_ALARM, PercentType.valueOf(value));
+        }
+
+        // CrossLineDetection alarm on/off
+        if (content.contains("table.VideoAnalyseRule[0][1].Enable=true")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_LINE_CROSSING_ALARM, OnOffType.ON);
+        } else if (content.contains("table.VideoAnalyseRule[0][1].Enable=false")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_LINE_CROSSING_ALARM, OnOffType.OFF);
+        }
+        // Privacy Mode on/off
+        if (content.contains("table.LeLensMask[0].Enable=true")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_PRIVACY_MODE, OnOffType.ON);
+        } else if (content.contains("table.LeLensMask[0].Enable=false")) {
+            ipCameraHandler.setChannelState(CHANNEL_ENABLE_PRIVACY_MODE, OnOffType.OFF);
+        }
+    }
+
     // This handles the incoming http replies back from the camera.
     @Override
     public void channelRead(@Nullable ChannelHandlerContext ctx, @Nullable Object msg) throws Exception {
@@ -200,42 +250,14 @@ public class DahuaHandler extends ChannelDuplexHandler {
         }
         try {
             String content = msg.toString();
-            if (content.startsWith("--myboundary")) {
-                processEvent(content);
-                return;
-            }
             ipCameraHandler.logger.trace("HTTP Result back from camera is \t:{}:", content);
-            // determine if the motion detection is turned on or off.
-            if (content.contains("table.MotionDetect[0].Enable=true")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_MOTION_ALARM, OnOffType.ON);
-            } else if (content.contains("table.MotionDetect[" + nvrChannel + "].Enable=false")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_MOTION_ALARM, OnOffType.OFF);
-            }
-
-            // determine if the audio alarm is turned on or off.
-            if (content.contains("table.AudioDetect[0].MutationDetect=true")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_AUDIO_ALARM, OnOffType.ON);
-            } else if (content.contains("table.AudioDetect[0].MutationDetect=false")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_AUDIO_ALARM, OnOffType.OFF);
-            }
-
-            // Handle AudioMutationThreshold alarm
-            if (content.contains("table.AudioDetect[0].MutationThreold=")) {
-                String value = ipCameraHandler.returnValueFromString(content, "table.AudioDetect[0].MutationThreold=");
-                ipCameraHandler.setChannelState(CHANNEL_THRESHOLD_AUDIO_ALARM, PercentType.valueOf(value));
-            }
-
-            // CrossLineDetection alarm on/off
-            if (content.contains("table.VideoAnalyseRule[0][1].Enable=true")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_LINE_CROSSING_ALARM, OnOffType.ON);
-            } else if (content.contains("table.VideoAnalyseRule[0][1].Enable=false")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_LINE_CROSSING_ALARM, OnOffType.OFF);
-            }
-            // Privacy Mode on/off
-            if (content.contains("table.LeLensMask[0].Enable=true")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_PRIVACY_MODE, OnOffType.ON);
-            } else if (content.contains("table.LeLensMask[0].Enable=false")) {
-                ipCameraHandler.setChannelState(CHANNEL_ENABLE_PRIVACY_MODE, OnOffType.OFF);
+            String[] events = boundaryPattern.split(content);
+            if (events.length > 1) {
+                for (int i = 1; i < events.length; i++) {
+                    processEvent(events[i]);
+                }
+            } else {
+                processSettings(content);
             }
         } finally {
             ReferenceCountUtil.release(msg);

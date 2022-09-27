@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * The {@link NeoHubException} is a custom exception for NeoHub
  *
  * @author Andrew Fiddian-Green - Initial contribution
- * 
+ *
  */
 @NonNullByDefault
 public class NeoHubException extends Exception {
@@ -27,5 +27,9 @@ public class NeoHubException extends Exception {
 
     public NeoHubException(String message) {
         super(message);
+    }
+
+    public NeoHubException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

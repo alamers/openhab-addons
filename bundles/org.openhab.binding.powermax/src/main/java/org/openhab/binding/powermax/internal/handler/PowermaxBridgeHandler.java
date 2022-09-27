@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -49,6 +49,7 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseBridgeHandler;
+import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerService;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
@@ -133,13 +134,12 @@ public class PowermaxBridgeHandler extends BaseBridgeHandler implements Powermax
 
         String threadName = "OH-binding-" + getThing().getUID().getAsString();
 
-        String errorMsg = null;
+        String errorMsg = String.format("@text/offline.config-error-unexpected-thing-type [ \"%s\" ]",
+                getThing().getThingTypeUID().getAsString());
         if (getThing().getThingTypeUID().equals(BRIDGE_TYPE_SERIAL)) {
             errorMsg = initializeBridgeSerial(getConfigAs(PowermaxSerialConfiguration.class), threadName);
         } else if (getThing().getThingTypeUID().equals(BRIDGE_TYPE_IP)) {
             errorMsg = initializeBridgeIp(getConfigAs(PowermaxIpConfiguration.class), threadName);
-        } else {
-            errorMsg = "Unexpected thing type " + getThing().getThingTypeUID();
         }
 
         if (errorMsg == null) {
@@ -188,9 +188,9 @@ public class PowermaxBridgeHandler extends BaseBridgeHandler implements Powermax
                     serialPortManager, threadName, timeZoneProvider);
         } else {
             if (serialPort.startsWith("rfc2217")) {
-                errorMsg = "Please use the IP Connection thing type for a serial over IP connection.";
+                errorMsg = "@text/offline.config-error-invalid-thing-type";
             } else {
-                errorMsg = "serialPort setting must be defined in thing configuration";
+                errorMsg = "@text/offline.config-error-mandatory-serial-port";
             }
         }
         return errorMsg;
@@ -216,7 +216,7 @@ public class PowermaxBridgeHandler extends BaseBridgeHandler implements Powermax
             commManager = new PowermaxCommManager(ip, config.tcpPort, panelType, forceStandardMode, config.autoSyncTime,
                     threadName, timeZoneProvider);
         } else {
-            errorMsg = "ip and port settings must be defined in thing configuration";
+            errorMsg = "@text/offline.config-error-mandatory-ip-port";
         }
         return errorMsg;
     }
@@ -624,24 +624,26 @@ public class PowermaxBridgeHandler extends BaseBridgeHandler implements Powermax
         }
 
         for (Thing thing : getThing().getThings()) {
-            if (thing.getHandler() != null) {
-                PowermaxThingHandler handler = (PowermaxThingHandler) thing.getHandler();
-                if (handler != null) {
-                    if (thing.getThingTypeUID().equals(THING_TYPE_ZONE)) {
-                        // All of the zone state objects will have the same list of values.
-                        // The use of getZone(1) here is just to get any PowermaxZoneState
-                        // and use it to get the list of zone channels.
+            if (!thing.isEnabled()) {
+                continue;
+            }
+            ThingHandler thingHandler = thing.getHandler();
+            if (thingHandler instanceof PowermaxThingHandler) {
+                PowermaxThingHandler handler = (PowermaxThingHandler) thingHandler;
+                if (thing.getThingTypeUID().equals(THING_TYPE_ZONE)) {
+                    // All of the zone state objects will have the same list of values.
+                    // The use of getZone(1) here is just to get any PowermaxZoneState
+                    // and use it to get the list of zone channels.
 
-                        for (Value<?> value : state.getZone(1).getValues()) {
-                            String channelId = value.getChannel();
-                            if ((channel == null) || channel.equals(channelId)) {
-                                handler.updateChannelFromAlarmState(channelId, state);
-                            }
+                    for (Value<?> value : state.getZone(1).getValues()) {
+                        String channelId = value.getChannel();
+                        if ((channel == null) || channel.equals(channelId)) {
+                            handler.updateChannelFromAlarmState(channelId, state);
                         }
-                    } else if (thing.getThingTypeUID().equals(THING_TYPE_X10)) {
-                        if ((channel == null) || channel.equals(X10_STATUS)) {
-                            handler.updateChannelFromAlarmState(X10_STATUS, state);
-                        }
+                    }
+                } else if (thing.getThingTypeUID().equals(THING_TYPE_X10)) {
+                    if ((channel == null) || channel.equals(X10_STATUS)) {
+                        handler.updateChannelFromAlarmState(X10_STATUS, state);
                     }
                 }
             }

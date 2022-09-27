@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -66,7 +66,7 @@ import org.openhab.transform.jinja.internal.profiles.JinjaTransformationProfile;
  */
 @SuppressWarnings({ "ConstantConditions" })
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.WARN)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @NonNullByDefault
 public abstract class AbstractHomeAssistantTests extends JavaTest {
     public static final String BINDING_ID = "mqtt";

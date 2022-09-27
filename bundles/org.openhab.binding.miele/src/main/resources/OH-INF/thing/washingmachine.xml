@@ -22,6 +22,7 @@
 			<channel id="phase" typeId="phase"/>
 			<channel id="rawPhase" typeId="rawPhase"/>
 			<channel id="start" typeId="start"/>
+			<channel id="end" typeId="end"/>
 			<channel id="duration" typeId="duration"/>
 			<channel id="elapsed" typeId="elapsed"/>
 			<channel id="finish" typeId="finish"/>
@@ -29,7 +30,7 @@
 			<channel id="switch" typeId="switch"/>
 			<channel id="target" typeId="targetTemperature">
 				<label>Temperature</label>
-				<description>Temperature of the selected program</description>
+				<description>Temperature of the selected program (10 °C = cold)</description>
 			</channel>
 			<channel id="spinningspeed" typeId="spinningspeed"/>
 			<channel id="powerConsumption" typeId="powerConsumption"/>
@@ -38,12 +39,7 @@
 
 		<representation-property>uid</representation-property>
 
-		<config-description>
-			<parameter name="uid" type="text" required="true">
-				<label>ID</label>
-				<description>The identifier identifies one certain appliance on the ZigBee network.</description>
-			</parameter>
-		</config-description>
+		<config-description-ref uri="thing-type:miele:appliance"/>
 	</thing-type>
 
 </thing:thing-descriptions>

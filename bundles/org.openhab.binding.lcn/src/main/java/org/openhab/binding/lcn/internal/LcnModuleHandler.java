@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -218,7 +218,7 @@ public class LcnModuleHandler extends BaseThingHandler {
             } else if (command instanceof PercentType) {
                 subHandler.handleCommandPercent((PercentType) command, channelGroup, channelUid.getIdWithoutGroup());
             } else if (command instanceof StringType) {
-                subHandler.handleCommandString((StringType) command, number.get());
+                subHandler.handleCommandString((StringType) command, number.orElse(0));
             } else if (command instanceof DecimalType) {
                 DecimalType decimalType = (DecimalType) command;
                 DecimalType nativeValue = getConverter(channelUid).onCommandFromItem(decimalType.doubleValue());

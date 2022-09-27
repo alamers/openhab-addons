@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -20,22 +20,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.miele.internal.FullyQualifiedApplianceIdentifier;
-import org.openhab.binding.miele.internal.handler.ApplianceStatusListener;
+import org.openhab.binding.miele.internal.api.dto.HomeDevice;
+import org.openhab.binding.miele.internal.handler.DiscoveryListener;
 import org.openhab.binding.miele.internal.handler.MieleApplianceHandler;
 import org.openhab.binding.miele.internal.handler.MieleBridgeHandler;
-import org.openhab.binding.miele.internal.handler.MieleBridgeHandler.DeviceClassObject;
-import org.openhab.binding.miele.internal.handler.MieleBridgeHandler.DeviceProperty;
-import org.openhab.binding.miele.internal.handler.MieleBridgeHandler.HomeDevice;
 import org.openhab.core.config.discovery.AbstractDiscoveryService;
 import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.config.discovery.DiscoveryResultBuilder;
+import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.thing.ThingUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonElement;
 
 /**
  * The {@link MieleApplianceDiscoveryService} tracks appliances that are
@@ -45,10 +44,8 @@ import com.google.gson.JsonElement;
  * @author Martin Lepsy - Added protocol information in order so support WiFi devices
  * @author Jacob Laursen - Fixed multicast and protocol support (ZigBee/LAN)
  */
-public class MieleApplianceDiscoveryService extends AbstractDiscoveryService implements ApplianceStatusListener {
-
-    private static final String MIELE_APPLIANCE_CLASS = "com.miele.xgw3000.gateway.hdm.deviceclasses.MieleAppliance";
-    private static final String MIELE_CLASS = "com.miele.xgw3000.gateway.hdm.deviceclasses.Miele";
+@NonNullByDefault
+public class MieleApplianceDiscoveryService extends AbstractDiscoveryService implements DiscoveryListener {
 
     private final Logger logger = LoggerFactory.getLogger(MieleApplianceDiscoveryService.class);
 
@@ -62,13 +59,13 @@ public class MieleApplianceDiscoveryService extends AbstractDiscoveryService imp
     }
 
     public void activate() {
-        mieleBridgeHandler.registerApplianceStatusListener(this);
+        mieleBridgeHandler.registerDiscoveryListener(this);
     }
 
     @Override
     public void deactivate() {
         removeOlderResults(new Date().getTime());
-        mieleBridgeHandler.unregisterApplianceStatusListener(this);
+        mieleBridgeHandler.unregisterDiscoveryListener(this);
     }
 
     @Override
@@ -78,11 +75,9 @@ public class MieleApplianceDiscoveryService extends AbstractDiscoveryService imp
 
     @Override
     public void startScan() {
-        List<HomeDevice> appliances = mieleBridgeHandler.getHomeDevices();
-        if (appliances != null) {
-            for (HomeDevice l : appliances) {
-                onApplianceAddedInternal(l);
-            }
+        List<HomeDevice> appliances = mieleBridgeHandler.getHomeDevicesEmptyOnFailure();
+        for (HomeDevice l : appliances) {
+            onApplianceAddedInternal(l);
         }
     }
 
@@ -101,23 +96,36 @@ public class MieleApplianceDiscoveryService extends AbstractDiscoveryService imp
         ThingUID thingUID = getThingUID(appliance);
         if (thingUID != null) {
             ThingUID bridgeUID = mieleBridgeHandler.getThing().getUID();
-            Map<String, Object> properties = new HashMap<>(2);
+            Map<String, Object> properties = new HashMap<>(9);
 
             FullyQualifiedApplianceIdentifier applianceIdentifier = appliance.getApplianceIdentifier();
-            properties.put(PROTOCOL_PROPERTY_NAME, applianceIdentifier.getProtocol());
+            String vendor = appliance.Vendor;
+            if (vendor != null) {
+                properties.put(Thing.PROPERTY_VENDOR, vendor);
+            }
+            properties.put(Thing.PROPERTY_MODEL_ID, appliance.getApplianceModel());
+            properties.put(Thing.PROPERTY_SERIAL_NUMBER, appliance.getSerialNumber());
+            properties.put(Thing.PROPERTY_FIRMWARE_VERSION, appliance.getFirmwareVersion());
+            String protocolAdapterName = appliance.ProtocolAdapterName;
+            if (protocolAdapterName != null) {
+                properties.put(PROPERTY_PROTOCOL_ADAPTER, protocolAdapterName);
+            }
             properties.put(APPLIANCE_ID, applianceIdentifier.getApplianceId());
-            properties.put(SERIAL_NUMBER_PROPERTY_NAME, appliance.getSerialNumber());
-
-            for (JsonElement dc : appliance.DeviceClasses) {
-                String dcStr = dc.getAsString();
-                if (dcStr.contains(MIELE_CLASS) && !dcStr.equals(MIELE_APPLIANCE_CLASS)) {
-                    properties.put(DEVICE_CLASS, dcStr.substring(MIELE_CLASS.length()));
-                    break;
-                }
+            String deviceClass = appliance.getDeviceClass();
+            if (deviceClass != null) {
+                properties.put(PROPERTY_DEVICE_CLASS, deviceClass);
+            }
+            String connectionType = appliance.getConnectionType();
+            if (connectionType != null) {
+                properties.put(PROPERTY_CONNECTION_TYPE, connectionType);
+            }
+            String connectionBaudRate = appliance.getConnectionBaudRate();
+            if (connectionBaudRate != null) {
+                properties.put(PROPERTY_CONNECTION_BAUD_RATE, connectionBaudRate);
             }
 
             DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withProperties(properties)
-                    .withBridge(bridgeUID).withLabel((String) properties.get(DEVICE_CLASS))
+                    .withBridge(bridgeUID).withLabel(deviceClass != null ? deviceClass : appliance.getApplianceModel())
                     .withRepresentationProperty(APPLIANCE_ID).build();
 
             thingDiscovered(discoveryResult);
@@ -136,32 +144,9 @@ public class MieleApplianceDiscoveryService extends AbstractDiscoveryService imp
         }
     }
 
-    @Override
-    public void onApplianceStateChanged(FullyQualifiedApplianceIdentifier applianceIdentifier, DeviceClassObject dco) {
-        // nothing to do
-    }
-
-    @Override
-    public void onAppliancePropertyChanged(FullyQualifiedApplianceIdentifier applianceIdentifier, DeviceProperty dp) {
-        // nothing to do
-    }
-
-    @Override
-    public void onAppliancePropertyChanged(String serialNumber, DeviceProperty dp) {
-        // nothing to do
-    }
-
-    private ThingUID getThingUID(HomeDevice appliance) {
+    private @Nullable ThingUID getThingUID(HomeDevice appliance) {
         ThingUID bridgeUID = mieleBridgeHandler.getThing().getUID();
-        String modelId = null;
-
-        for (JsonElement dc : appliance.DeviceClasses) {
-            String dcStr = dc.getAsString();
-            if (dcStr.contains(MIELE_CLASS) && !dcStr.equals(MIELE_APPLIANCE_CLASS)) {
-                modelId = dcStr.substring(MIELE_CLASS.length());
-                break;
-            }
-        }
+        String modelId = appliance.getDeviceClass();
 
         if (modelId != null) {
             ThingTypeUID thingTypeUID = getThingTypeUidFromModelId(modelId);
@@ -183,7 +168,7 @@ public class MieleApplianceDiscoveryService extends AbstractDiscoveryService imp
          * coffeemachine. At least until it is known if any models are actually reported
          * as CoffeeMachine, we need this special mapping.
          */
-        if (modelId.equals(MIELE_DEVICE_CLASS_COFFEE_SYSTEM)) {
+        if (MIELE_DEVICE_CLASS_COFFEE_SYSTEM.equals(modelId)) {
             return THING_TYPE_COFFEEMACHINE;
         }
 

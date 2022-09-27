@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -14,7 +14,6 @@ package org.openhab.binding.upnpcontrol.internal.handler;
 
 import static org.openhab.binding.upnpcontrol.internal.UpnpControlBindingConstants.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -188,16 +187,16 @@ public class UpnpRendererHandler extends UpnpHandler {
         if (favoriteSelectChannel != null) {
             favoriteSelectChannelUID = favoriteSelectChannel.getUID();
         } else {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-                    "Channel " + FAVORITE_SELECT + " not defined");
+            String msg = String.format("@text/offline.channel-undefined [ \"%s\" ]", FAVORITE_SELECT);
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, msg);
             return;
         }
         Channel playlistSelectChannel = thing.getChannel(PLAYLIST_SELECT);
         if (playlistSelectChannel != null) {
             playlistSelectChannelUID = playlistSelectChannel.getUID();
         } else {
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-                    "Channel " + PLAYLIST_SELECT + " not defined");
+            String msg = String.format("@text/offline.channel-undefined [ \"%s\" ]", PLAYLIST_SELECT);
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, msg);
             return;
         }
 
@@ -222,8 +221,8 @@ public class UpnpRendererHandler extends UpnpHandler {
     protected void initJob() {
         synchronized (jobLock) {
             if (!upnpIOService.isRegistered(this)) {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                        "UPnP device with UDN " + getUDN() + " not yet registered");
+                String msg = String.format("@text/offline.device-not-registered [ \"%s\" ]", getUDN());
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, msg);
                 return;
             }
 
@@ -232,8 +231,8 @@ public class UpnpRendererHandler extends UpnpHandler {
 
                 getCurrentConnectionInfo();
                 if (!checkForConnectionIds()) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                            "No connection Id's set for UPnP device with UDN " + getUDN());
+                    String msg = String.format("@text/offline.no-connection-ids [ \"%s\" ]", getUDN());
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, msg);
                     return;
                 }
 
@@ -277,7 +276,9 @@ public class UpnpRendererHandler extends UpnpHandler {
             if (UpnpChannelName.channelIdToUpnpChannelName(name) != null) {
                 createChannel(UpnpChannelName.channelIdToUpnpChannelName(name));
             } else {
-                createChannel(name, name, "Vendor specific UPnP volume channel", ITEM_TYPE_VOLUME, CHANNEL_TYPE_VOLUME);
+                String label = String.format("@text/channel.upnpcontrol.vendorvolume.label [ \"%s\" ]", audioChannel);
+                createChannel(name, label, "@text/channel.upnpcontrol.vendorvolume.description", ITEM_TYPE_VOLUME,
+                        CHANNEL_TYPE_VOLUME);
             }
         }
         if (config.mute && !UPNP_MASTER.equals(audioChannel)) {
@@ -285,7 +286,9 @@ public class UpnpRendererHandler extends UpnpHandler {
             if (UpnpChannelName.channelIdToUpnpChannelName(name) != null) {
                 createChannel(UpnpChannelName.channelIdToUpnpChannelName(name));
             } else {
-                createChannel(name, name, "Vendor specific  UPnP mute channel", ITEM_TYPE_MUTE, CHANNEL_TYPE_MUTE);
+                String label = String.format("@text/channel.upnpcontrol.vendormute.label [ \"%s\" ]", audioChannel);
+                createChannel(name, label, "@text/channel.upnpcontrol.vendormute.description", ITEM_TYPE_MUTE,
+                        CHANNEL_TYPE_MUTE);
             }
         }
         if (config.loudness) {
@@ -293,7 +296,8 @@ public class UpnpRendererHandler extends UpnpHandler {
             if (UpnpChannelName.channelIdToUpnpChannelName(name) != null) {
                 createChannel(UpnpChannelName.channelIdToUpnpChannelName(name));
             } else {
-                createChannel(name, name, "Vendor specific  UPnP loudness channel", ITEM_TYPE_LOUDNESS,
+                String label = String.format("@text/channel.upnpcontrol.vendorloudness.label [ \"%s\" ]", audioChannel);
+                createChannel(name, label, "@text/channel.upnpcontrol.vendorloudness.description", ITEM_TYPE_LOUDNESS,
                         CHANNEL_TYPE_LOUDNESS);
             }
         }
@@ -411,22 +415,18 @@ public class UpnpRendererHandler extends UpnpHandler {
      */
     public void setCurrentURI(String URI, String URIMetaData) {
         String uri = "";
-        try {
-            uri = URLDecoder.decode(URI.trim(), StandardCharsets.UTF_8.name());
-            // Some renderers don't send a URI Last Changed event when the same URI is requested, so don't wait for it
-            // before starting to play
-            if (!uri.equals(nowPlayingUri) && !playingNotification) {
-                CompletableFuture<Boolean> settingURI = isSettingURI;
-                if (settingURI != null) {
-                    settingURI.complete(false);
-                }
-                isSettingURI = new CompletableFuture<Boolean>(); // set this so we don't start playing when not finished
-                                                                 // setting URI
-            } else {
-                logger.debug("New URI {} is same as previous on renderer {}", nowPlayingUri, thing.getLabel());
+        uri = URLDecoder.decode(URI.trim(), StandardCharsets.UTF_8);
+        // Some renderers don't send a URI Last Changed event when the same URI is requested, so don't wait for it
+        // before starting to play
+        if (!uri.equals(nowPlayingUri) && !playingNotification) {
+            CompletableFuture<Boolean> settingURI = isSettingURI;
+            if (settingURI != null) {
+                settingURI.complete(false);
             }
-        } catch (UnsupportedEncodingException ignore) {
-            uri = URI;
+            isSettingURI = new CompletableFuture<Boolean>(); // set this so we don't start playing when not finished
+                                                             // setting URI
+        } else {
+            logger.debug("New URI {} is same as previous on renderer {}", nowPlayingUri, thing.getLabel());
         }
 
         Map<String, String> inputs = new HashMap<>();
@@ -1244,18 +1244,14 @@ public class UpnpRendererHandler extends UpnpHandler {
         String uri = "";
         String currentUri = "";
         String nextUri = "";
-        try {
-            if (value != null) {
-                uri = URLDecoder.decode(value.trim(), StandardCharsets.UTF_8.name());
-            }
-            if (current != null) {
-                currentUri = URLDecoder.decode(current.getRes().trim(), StandardCharsets.UTF_8.name());
-            }
-            if (next != null) {
-                nextUri = URLDecoder.decode(next.getRes(), StandardCharsets.UTF_8.name());
-            }
-        } catch (UnsupportedEncodingException ignore) {
-            // If not valid current URI, we assume there is none
+        if (value != null) {
+            uri = URLDecoder.decode(value.trim(), StandardCharsets.UTF_8);
+        }
+        if (current != null) {
+            currentUri = URLDecoder.decode(current.getRes().trim(), StandardCharsets.UTF_8);
+        }
+        if (next != null) {
+            nextUri = URLDecoder.decode(next.getRes(), StandardCharsets.UTF_8);
         }
 
         if (playingNotification && uri.equals(notificationUri)) {
@@ -1635,15 +1631,9 @@ public class UpnpRendererHandler extends UpnpHandler {
             String mediaRes = media.getRes().trim();
             String entryRes = (entry != null) ? entry.getRes().trim() : "";
 
-            try {
-                String mediaUrl = URLDecoder.decode(mediaRes, StandardCharsets.UTF_8.name());
-                String entryUrl = URLDecoder.decode(entryRes, StandardCharsets.UTF_8.name());
-                isCurrent = mediaUrl.equals(entryUrl);
-            } catch (UnsupportedEncodingException e) {
-                logger.debug("Renderer {} unsupported encoding for new {} or current {} res URL, trying string compare",
-                        thing.getLabel(), mediaRes, entryRes);
-                isCurrent = mediaRes.equals(entryRes);
-            }
+            String mediaUrl = URLDecoder.decode(mediaRes, StandardCharsets.UTF_8);
+            String entryUrl = URLDecoder.decode(entryRes, StandardCharsets.UTF_8);
+            isCurrent = mediaUrl.equals(entryUrl);
 
             logger.trace("Current queue res: {}", entryRes);
             logger.trace("Updated media res: {}", mediaRes);

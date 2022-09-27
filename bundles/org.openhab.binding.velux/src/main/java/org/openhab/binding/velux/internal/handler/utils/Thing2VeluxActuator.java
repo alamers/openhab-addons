@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -136,10 +136,10 @@ public class Thing2VeluxActuator {
      * @return <b>bridgeProductIndex</B> for accessing the Velux device (or ProductBridgeIndex.UNKNOWN if not found).
      */
     public ProductBridgeIndex getProductBridgeIndex() {
-        if (thisProduct == VeluxProduct.UNKNOWN) {
+        if (VeluxProduct.UNKNOWN.equals(thisProduct)) {
             mapThing2Velux();
         }
-        if (thisProduct == VeluxProduct.UNKNOWN) {
+        if (VeluxProduct.UNKNOWN.equals(thisProduct)) {
             return ProductBridgeIndex.UNKNOWN;
         }
         return thisProduct.getBridgeProductIndex();
@@ -152,7 +152,7 @@ public class Thing2VeluxActuator {
      * @return <b>isKnown</B> as boolean.
      */
     public boolean isKnown() {
-        return (!(this.getProductBridgeIndex() == ProductBridgeIndex.UNKNOWN));
+        return (!(ProductBridgeIndex.UNKNOWN.equals(getProductBridgeIndex())));
     }
 
     /**
@@ -163,10 +163,10 @@ public class Thing2VeluxActuator {
      * @return <b>isInverted</B> for handling of values of the Velux device (or false if not found)..
      */
     public boolean isInverted() {
-        if (thisProduct == VeluxProduct.UNKNOWN) {
+        if (VeluxProduct.UNKNOWN.equals(thisProduct)) {
             mapThing2Velux();
         }
-        if (thisProduct == VeluxProduct.UNKNOWN) {
+        if (VeluxProduct.UNKNOWN.equals(thisProduct)) {
             logger.warn("isInverted(): Thing not found in Velux Bridge.");
         }
         return isInverted;

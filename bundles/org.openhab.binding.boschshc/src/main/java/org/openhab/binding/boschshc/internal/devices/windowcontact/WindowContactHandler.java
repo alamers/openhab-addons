@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,7 +17,7 @@ import static org.openhab.binding.boschshc.internal.devices.BoschSHCBindingConst
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.boschshc.internal.devices.BoschSHCHandler;
+import org.openhab.binding.boschshc.internal.devices.BoschSHCDeviceHandler;
 import org.openhab.binding.boschshc.internal.exceptions.BoschSHCException;
 import org.openhab.binding.boschshc.internal.services.shuttercontact.ShutterContactService;
 import org.openhab.binding.boschshc.internal.services.shuttercontact.ShutterContactState;
@@ -27,12 +27,12 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.types.State;
 
 /**
- * The {@link BoschSHCHandler} is responsible for handling Bosch window/door contacts.
+ * Detects open windows and doors.
  *
  * @author Stefan Kästle - Initial contribution
  */
 @NonNullByDefault
-public class WindowContactHandler extends BoschSHCHandler {
+public class WindowContactHandler extends BoschSHCDeviceHandler {
 
     public WindowContactHandler(Thing thing) {
         super(thing);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,7 +17,7 @@ import static org.openhab.binding.boschshc.internal.devices.BoschSHCBindingConst
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openhab.binding.boschshc.internal.devices.BoschSHCHandler;
+import org.openhab.binding.boschshc.internal.devices.BoschSHCDeviceHandler;
 import org.openhab.binding.boschshc.internal.exceptions.BoschSHCException;
 import org.openhab.binding.boschshc.internal.services.shuttercontrol.OperationState;
 import org.openhab.binding.boschshc.internal.services.shuttercontrol.ShutterControlService;
@@ -30,12 +30,12 @@ import org.openhab.core.thing.Thing;
 import org.openhab.core.types.Command;
 
 /**
- * Handler for a shutter control device
+ * Control of your shutter to take any position you desire.
  * 
  * @author Christian Oeing - Initial contribution
  */
 @NonNullByDefault
-public class ShutterControlHandler extends BoschSHCHandler {
+public class ShutterControlHandler extends BoschSHCDeviceHandler {
     /**
      * Utility functions to convert data between Bosch things and openHAB items
      */

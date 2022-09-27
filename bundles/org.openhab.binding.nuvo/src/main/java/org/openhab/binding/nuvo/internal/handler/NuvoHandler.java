@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -12,20 +12,27 @@
  */
 package org.openhab.binding.nuvo.internal.handler;
 
+import static org.eclipse.jetty.http.HttpMethod.GET;
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.openhab.binding.nuvo.internal.NuvoBindingConstants.*;
 
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,9 +40,16 @@ import java.util.stream.IntStream;
 
 import javax.measure.Unit;
 import javax.measure.quantity.Time;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
 import org.openhab.binding.nuvo.internal.NuvoException;
 import org.openhab.binding.nuvo.internal.NuvoStateDescriptionOptionProvider;
 import org.openhab.binding.nuvo.internal.NuvoThingActions;
@@ -43,12 +57,16 @@ import org.openhab.binding.nuvo.internal.communication.NuvoCommand;
 import org.openhab.binding.nuvo.internal.communication.NuvoConnector;
 import org.openhab.binding.nuvo.internal.communication.NuvoDefaultConnector;
 import org.openhab.binding.nuvo.internal.communication.NuvoEnum;
+import org.openhab.binding.nuvo.internal.communication.NuvoImageResizer;
 import org.openhab.binding.nuvo.internal.communication.NuvoIpConnector;
 import org.openhab.binding.nuvo.internal.communication.NuvoMessageEvent;
 import org.openhab.binding.nuvo.internal.communication.NuvoMessageEventListener;
 import org.openhab.binding.nuvo.internal.communication.NuvoSerialConnector;
 import org.openhab.binding.nuvo.internal.communication.NuvoStatusCodes;
 import org.openhab.binding.nuvo.internal.configuration.NuvoThingConfiguration;
+import org.openhab.binding.nuvo.internal.dto.JAXBUtils;
+import org.openhab.binding.nuvo.internal.dto.NuvoMenu;
+import org.openhab.binding.nuvo.internal.dto.NuvoMenu.Source.TopMenu;
 import org.openhab.core.io.transport.serial.SerialPortManager;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.NextPreviousType;
@@ -87,6 +105,7 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
     private static final long CLOCK_SYNC_INTERVAL_SEC = 3600;
     private static final long INITIAL_POLLING_DELAY_SEC = 30;
     private static final long INITIAL_CLOCK_SYNC_DELAY_SEC = 10;
+    private static final long PING_TIMEOUT_SEC = 60;
     // spec says wait 50ms, min is 100
     private static final long SLEEP_BETWEEN_CMD_MS = 100;
     private static final Unit<Time> API_SECOND_UNIT = Units.SECOND;
@@ -95,7 +114,7 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
     private static final String SOURCE = "SOURCE";
     private static final String CHANNEL_DELIMIT = "#";
     private static final String UNDEF = "UNDEF";
-    private static final String GC_STR = "NV-IG8";
+    private static final String GC_STR = "NV-I8G";
 
     private static final int MAX_ZONES = 20;
     private static final int MAX_SRC = 6;
@@ -105,6 +124,10 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
     private static final int MIN_EQ = -18;
     private static final int MAX_EQ = 18;
 
+    private static final int MPS4_PORT = 5006;
+
+    private static final byte[] NO_ART = { 0 };
+
     private static final Pattern ZONE_PATTERN = Pattern
             .compile("^ON,SRC(\\d{1}),(MUTE|VOL\\d{1,2}),DND([0-1]),LOCK([0-1])$");
     private static final Pattern DISP_PATTERN = Pattern.compile("^DISPLINE(\\d{1}),\"(.*)\"$");
@@ -112,15 +135,15 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
             .compile("^DISPINFO,DUR(\\d{1,6}),POS(\\d{1,6}),STATUS(\\d{1,2})$");
     private static final Pattern ZONE_CFG_PATTERN = Pattern.compile("^BASS(.*),TREB(.*),BAL(.*),LOUDCMP([0-1])$");
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy,MM,dd,HH,mm");
-
     private final Logger logger = LoggerFactory.getLogger(NuvoHandler.class);
     private final NuvoStateDescriptionOptionProvider stateDescriptionProvider;
     private final SerialPortManager serialPortManager;
+    private final HttpClient httpClient;
 
     private @Nullable ScheduledFuture<?> reconnectJob;
     private @Nullable ScheduledFuture<?> pollingJob;
     private @Nullable ScheduledFuture<?> clockSyncJob;
+    private @Nullable ScheduledFuture<?> pingJob;
 
     private NuvoConnector connector = new NuvoDefaultConnector();
     private long lastEventReceived = System.currentTimeMillis();
@@ -129,19 +152,34 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
     private boolean isGConcerto = false;
     private Object sequenceLock = new Object();
 
+    private boolean isAnyOhNuvoNet = false;
+    private NuvoMenu nuvoMenus = new NuvoMenu();
+    private HashMap<String, Integer> nuvoNetSrcMap = new HashMap<String, Integer>();
+    private HashMap<String, String> favPrefixMap = new HashMap<String, String>();
+    private HashMap<String, String[]> favoriteMap = new HashMap<String, String[]>();
+
+    private HashMap<String, byte[]> albumArtMap = new HashMap<String, byte[]>();
+    private HashMap<String, Integer> albumArtIds = new HashMap<String, Integer>();
+    private HashMap<String, String> dispInfoCache = new HashMap<String, String>();
+
     Set<Integer> activeZones = new HashSet<>(1);
 
     // A tree map that maps the source ids to source labels
     TreeMap<String, String> sourceLabels = new TreeMap<String, String>();
 
+    // Indicates if there is a need to poll status because of a disconnection used for MPS4 systems
+    boolean pollStatusNeeded = true;
+    boolean isMps4 = false;
+
     /**
      * Constructor
      */
     public NuvoHandler(Thing thing, NuvoStateDescriptionOptionProvider stateDescriptionProvider,
-            SerialPortManager serialPortManager) {
+            SerialPortManager serialPortManager, HttpClient httpClient) {
         super(thing);
         this.stateDescriptionProvider = stateDescriptionProvider;
         this.serialPortManager = serialPortManager;
+        this.httpClient = httpClient;
     }
 
     @Override
@@ -174,14 +212,68 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
             return;
         }
 
-        if (serialPort != null) {
+        if (serialPort != null && !serialPort.isEmpty()) {
             connector = new NuvoSerialConnector(serialPortManager, serialPort, uid);
         } else if (port != null) {
             connector = new NuvoIpConnector(host, port, uid);
+            this.isMps4 = (port.intValue() == MPS4_PORT);
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
                     "Either Serial port or Host & Port must be specifed");
             return;
+        }
+
+        if (this.isMps4) {
+            logger.debug("Port set to {} configuring binding for MPS4 compatability", MPS4_PORT);
+
+            this.isAnyOhNuvoNet = (config.nuvoNetSrc1 == 2 || config.nuvoNetSrc2 == 2 || config.nuvoNetSrc3 == 2
+                    || config.nuvoNetSrc4 == 2 || config.nuvoNetSrc5 == 2 || config.nuvoNetSrc6 == 2);
+
+            if (this.isAnyOhNuvoNet) {
+                logger.debug("At least one source is configured as an openHAB NuvoNet source");
+                loadMenuConfiguration(config);
+
+                nuvoNetSrcMap.put("1", config.nuvoNetSrc1);
+                nuvoNetSrcMap.put("2", config.nuvoNetSrc2);
+                nuvoNetSrcMap.put("3", config.nuvoNetSrc3);
+                nuvoNetSrcMap.put("4", config.nuvoNetSrc4);
+                nuvoNetSrcMap.put("5", config.nuvoNetSrc5);
+                nuvoNetSrcMap.put("6", config.nuvoNetSrc6);
+
+                favoriteMap.put("1",
+                        !config.favoritesSrc1.isEmpty() ? config.favoritesSrc1.split(COMMA) : new String[0]);
+                favoriteMap.put("2",
+                        !config.favoritesSrc2.isEmpty() ? config.favoritesSrc2.split(COMMA) : new String[0]);
+                favoriteMap.put("3",
+                        !config.favoritesSrc3.isEmpty() ? config.favoritesSrc3.split(COMMA) : new String[0]);
+                favoriteMap.put("4",
+                        !config.favoritesSrc4.isEmpty() ? config.favoritesSrc4.split(COMMA) : new String[0]);
+                favoriteMap.put("5",
+                        !config.favoritesSrc5.isEmpty() ? config.favoritesSrc5.split(COMMA) : new String[0]);
+                favoriteMap.put("6",
+                        !config.favoritesSrc6.isEmpty() ? config.favoritesSrc6.split(COMMA) : new String[0]);
+
+                favPrefixMap.put("1", config.favPrefix1);
+                favPrefixMap.put("2", config.favPrefix2);
+                favPrefixMap.put("3", config.favPrefix3);
+                favPrefixMap.put("4", config.favPrefix4);
+                favPrefixMap.put("5", config.favPrefix5);
+                favPrefixMap.put("6", config.favPrefix6);
+
+                albumArtIds.put("S1", 0);
+                albumArtIds.put("S2", 0);
+                albumArtIds.put("S3", 0);
+                albumArtIds.put("S4", 0);
+                albumArtIds.put("S5", 0);
+                albumArtIds.put("S6", 0);
+
+                albumArtMap.put("S1", NO_ART);
+                albumArtMap.put("S2", NO_ART);
+                albumArtMap.put("S3", NO_ART);
+                albumArtMap.put("S4", NO_ART);
+                albumArtMap.put("S5", NO_ART);
+                albumArtMap.put("S6", NO_ART);
+            }
         }
 
         if (numZones != null) {
@@ -201,20 +293,72 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
             updateThing(editThing().withChannels(channels).build());
         }
 
+        // Build a list of State options for the global favorites using user config values (if supplied)
+        String[] favoritesArr = !config.favoriteLabels.isEmpty() ? config.favoriteLabels.split(COMMA) : new String[0];
+        List<StateOption> favoriteLabelsStateOptions = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            if (favoritesArr.length > i) {
+                favoriteLabelsStateOptions.add(new StateOption(String.valueOf(i + 1), favoritesArr[i]));
+            } else if (favoritesArr.length == 0) {
+                favoriteLabelsStateOptions.add(new StateOption(String.valueOf(i + 1), "Favorite " + (i + 1)));
+            }
+        }
+
+        // Put the global favorites labels on all active zones
+        activeZones.forEach(zoneNum -> {
+            stateDescriptionProvider.setStateOptions(
+                    new ChannelUID(getThing().getUID(),
+                            ZONE.toLowerCase() + zoneNum + CHANNEL_DELIMIT + CHANNEL_TYPE_FAVORITE),
+                    favoriteLabelsStateOptions);
+        });
+
         if (config.clockSync) {
             scheduleClockSyncJob();
         }
 
         scheduleReconnectJob();
         schedulePollingJob();
+        schedulePingTimeoutJob();
         updateStatus(ThingStatus.UNKNOWN);
     }
 
     @Override
     public void dispose() {
+        if (this.isAnyOhNuvoNet) {
+            try {
+                // disable NuvoNet for each source that was configured as an openHAB NuvoNet source
+                nuvoNetSrcMap.forEach((srcNum, val) -> {
+                    if (val == 2) {
+                        try {
+                            connector.sendCommand(SRC_KEY + srcNum + "DISPINFOTWO0,0,0,0,0,0,0");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                            connector.sendCommand(
+                                    SRC_KEY + srcNum + "DISPLINES0,0,0,\"Source Unavailable\",\"\",\"\",\"\"");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                            connector.sendCommand("SCFG" + srcNum + "NUVONET0");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        } catch (NuvoException | InterruptedException e) {
+                            logger.debug("Error sending command to disable NuvoNet source: {}", srcNum);
+                        }
+                    }
+                });
+
+                // need '1' flag for sources configured as an MPS4 NuvoNet source, but disable openHAB NuvoNet sources
+                connector.sendCommand("SNUMBERS" + (nuvoNetSrcMap.get("1") == 1 ? ONE : ZERO) + COMMA
+                        + (nuvoNetSrcMap.get("2") == 1 ? ONE : ZERO) + COMMA
+                        + (nuvoNetSrcMap.get("3") == 1 ? ONE : ZERO) + COMMA
+                        + (nuvoNetSrcMap.get("4") == 1 ? ONE : ZERO) + COMMA
+                        + (nuvoNetSrcMap.get("5") == 1 ? ONE : ZERO) + COMMA
+                        + (nuvoNetSrcMap.get("6") == 1 ? ONE : ZERO));
+            } catch (NuvoException e) {
+                logger.debug("Error sending SNUMBERS command to disable NuvoNet sources");
+            }
+        }
+
         cancelReconnectJob();
         cancelPollingJob();
         cancelClockSyncJob();
+        cancelPingTimeoutJob();
         closeConnection();
         super.dispose();
     }
@@ -235,7 +379,7 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
     }
 
     /**
-     * Handle a command the UI
+     * Handle a command from the UI
      *
      * @param channelUID the channel sending the command
      * @param command the command received
@@ -396,6 +540,54 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
                             connector.sendCommand(command == OnOffType.ON ? NuvoCommand.PAGE_ON : NuvoCommand.PAGE_OFF);
                         }
                         break;
+                    case CHANNEL_TYPE_SENDCMD:
+                        if (command instanceof StringType) {
+                            String commandStr = command.toString();
+                            if (commandStr.contains(DISP_INFO_TWO)) {
+                                String sourceKey = commandStr.split(DISP_INFO_TWO)[0];
+                                dispInfoCache.put(sourceKey, commandStr);
+
+                                // if 'albumartid' is present, substitute it with the albumArtId hex string
+                                connector.sendCommand(commandStr.replace(ALBUM_ART_ID,
+                                        (OFFSET_ZERO + Integer.toHexString(albumArtIds.get(sourceKey)))));
+                            } else {
+                                connector.sendCommand(commandStr);
+                            }
+                        }
+                        break;
+                    case CHANNEL_ART_URL:
+                        if (command instanceof StringType) {
+                            String url = command.toString();
+                            if (url.startsWith(HTTP) || url.startsWith(HTTPS)) {
+                                try {
+                                    ContentResponse contentResponse = httpClient.newRequest(url).method(GET)
+                                            .timeout(10, TimeUnit.SECONDS).send();
+                                    int httpStatus = contentResponse.getStatus();
+                                    if (httpStatus == OK_200) {
+                                        albumArtMap.put(target.getId(),
+                                                NuvoImageResizer.resizeImage(contentResponse.getContent(), 80, 80));
+                                    } else {
+                                        albumArtMap.put(target.getId(), NO_ART);
+                                        albumArtIds.put(target.getId(), 0);
+                                        return;
+                                    }
+                                } catch (InterruptedException | TimeoutException | ExecutionException e) {
+                                    albumArtMap.put(target.getId(), NO_ART);
+                                    albumArtIds.put(target.getId(), 0);
+                                    return;
+                                }
+                                albumArtIds.put(target.getId(), Math.abs(url.hashCode()));
+
+                                // re-send the cached DISPINFOTWO message, substituting in the new albumArtId
+                                if (dispInfoCache.get(target.getId()) != null) {
+                                    connector.sendCommand(dispInfoCache.get(target.getId()).replace(ALBUM_ART_ID,
+                                            (OFFSET_ZERO + Integer.toHexString(albumArtIds.get(target.getId())))));
+                                }
+                            } else {
+                                albumArtMap.put(target.getId(), NO_ART);
+                                albumArtIds.put(target.getId(), 0);
+                            }
+                        }
                 }
             } catch (NuvoException e) {
                 logger.warn("Command {} from channel {} failed: {}", command, channel, e.getMessage());
@@ -429,6 +621,7 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
         if (connector.isConnected()) {
             connector.close();
             connector.removeEventListener(this);
+            pollStatusNeeded = true;
             logger.debug("closeConnection(): disconnected");
         }
     }
@@ -446,7 +639,7 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
         String type = evt.getType();
         String key = evt.getKey();
         String updateData = evt.getValue().trim();
-        if (this.getThing().getStatus() == ThingStatus.OFFLINE) {
+        if (this.getThing().getStatus() != ThingStatus.ONLINE) {
             updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, this.versionString);
         }
 
@@ -455,10 +648,22 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
                 this.versionString = updateData;
                 // Determine if we are a Grand Concerto or not
                 if (this.versionString.contains(GC_STR)) {
+                    logger.debug("Grand Concerto detected");
                     this.isGConcerto = true;
                     connector.setEssentia(false);
+                } else {
+                    logger.debug("Grand Concerto not detected");
                 }
                 break;
+            case TYPE_RESTART:
+                logger.debug("Restart message received; re-sending initialization messages");
+                enableNuvonet(false);
+                return;
+            case TYPE_PING:
+                logger.debug("Ping message received- rescheduling ping timeout");
+                schedulePingTimeoutJob();
+                // Return here because receiving a ping does not indicate that one can poll
+                return;
             case TYPE_ALLOFF:
                 activeZones.forEach(zoneNum -> {
                     updateChannelState(NuvoEnum.valueOf(ZONE + zoneNum), CHANNEL_TYPE_POWER, OFF);
@@ -538,6 +743,85 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
                 logger.debug("Zone Button pressed: Source: {} - Button: {}", key, updateData);
                 updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS, updateData);
                 break;
+            case TYPE_ZONE_BUTTON2:
+                String buttonAction = NuvoStatusCodes.BUTTON_CODE.get(updateData);
+
+                if (buttonAction != null) {
+                    logger.debug("Zone NuvoNet Button pressed: Source: {} - Button: {}", key, buttonAction);
+                    updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS, buttonAction);
+                } else {
+                    logger.debug("Zone NuvoNet Button pressed: Source: {} - Unknown button code: {}", key, updateData);
+                    updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS, updateData);
+                }
+                break;
+            case TYPE_MENU_ITEM_SELECTED:
+                String[] updateDataSplit = updateData.split(COMMA);
+                String zoneSource = updateDataSplit[0];
+                String menuId = updateDataSplit[1];
+                int menuItemIdx = Integer.parseInt(updateDataSplit[2]) - 1;
+
+                boolean exitMenu = false;
+                if ("0xFFFFFFFF".equals(menuId)) {
+                    TopMenu topMenuItem = nuvoMenus.getSource().get(Integer.parseInt(key) - 1).getTopMenu()
+                            .get(menuItemIdx);
+                    logger.debug("Top Menu item selected: Source: {} - Menu Item: {}", key, topMenuItem.getText());
+                    updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS, topMenuItem.getText());
+
+                    List<String> subMenuItems = topMenuItem.getItems();
+
+                    if (subMenuItems.isEmpty()) {
+                        exitMenu = true;
+                    } else {
+                        // send submenu (maximum of 20 items)
+                        int subMenuSize = subMenuItems.size() < 20 ? subMenuItems.size() : 20;
+                        try {
+                            connector.sendCommand(zoneSource + "MENU" + (menuItemIdx + 11) + ",0,0," + subMenuSize
+                                    + ",0,0," + subMenuSize + ",\"" + topMenuItem.getText() + "\"");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+
+                            for (int i = 0; i < subMenuSize; i++) {
+                                connector.sendCommand(
+                                        zoneSource + "MENUITEM" + (i + 1) + ",0,0,\"" + subMenuItems.get(i) + "\"");
+                            }
+                        } catch (NuvoException | InterruptedException e) {
+                            logger.debug("Error sending sub menu for {}", zoneSource);
+                        }
+                    }
+                } else {
+                    // a sub menu item was selected
+                    TopMenu topMenuItem = nuvoMenus.getSource().get(Integer.parseInt(key) - 1).getTopMenu()
+                            .get(Integer.decode(menuId) - 11);
+                    String subMenuItem = topMenuItem.getItems().get(menuItemIdx);
+
+                    logger.debug("Sub Menu item selected: Source: {} - Menu Item: {}", key,
+                            topMenuItem.getText() + "|" + subMenuItem);
+                    updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS,
+                            topMenuItem.getText() + "|" + subMenuItem);
+                    exitMenu = true;
+                }
+
+                if (exitMenu) {
+                    try {
+                        // tell the zone to exit the menu
+                        connector.sendCommand(zoneSource + "MENU0,0,0,0,0,0,0,\"\"");
+                    } catch (NuvoException e) {
+                        logger.debug("Error sending exit menu command for {}", zoneSource);
+                    }
+                }
+                break;
+            case TYPE_ZONE_MENUREQ:
+                logger.debug("Menu Request: Source: {} - Value: {}", key, updateData);
+                // For now we only support one level deep menus. If third field is '1', indicates go back to main menu.
+                String[] menuDataSplit = updateData.split(",");
+                if (menuDataSplit.length > 3 && ONE.equals(menuDataSplit[2])) {
+                    try {
+                        connector.sendCommand(menuDataSplit[0] + "MENU0xFFFFFFFF,0,0,0,0,0,0,\"\"");
+                    } catch (NuvoException e) {
+                        logger.debug("Error sending main menu command for {}", menuDataSplit[0]);
+                    }
+                }
+
+                break;
             case TYPE_ZONE_CONFIG:
                 logger.debug("Zone Configuration: Zone: {} - Value: {}", key, updateData);
                 // example: BASS1,TREB-2,BALR2,LOUDCMP1
@@ -553,10 +837,199 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
                     logger.debug("no match on message: {}", updateData);
                 }
                 break;
+            case TYPE_ALBUM_ART_REQ:
+                logger.debug("Album Art Request for Source: {} - Data: {}", key, updateData);
+                // 0x620FD879,80,80,2,0x00C0C0C0,0,0,0,0,1
+                String[] albumArtReq = updateData.split(COMMA);
+                albumArtIds.put(SRC_KEY + key, Integer.decode(albumArtReq[0]));
+
+                try {
+                    if (albumArtMap.get(SRC_KEY + key).length > 1) {
+                        connector.sendCommand(SRC_KEY + key + ALBUM_ART_AVAILABLE + albumArtIds.get(SRC_KEY + key)
+                                + COMMA + albumArtMap.get(SRC_KEY + key).length);
+                    } else {
+                        connector.sendCommand(SRC_KEY + key + ALBUM_ART_AVAILABLE + ZERO_COMMA);
+                    }
+                } catch (NuvoException e) {
+                    logger.debug("Error sending ALBUMARTAVAILABLE command for source: {}", key);
+                }
+                break;
+            case TYPE_ALBUM_ART_FRAG_REQ:
+                logger.debug("Album Art Fragment Request for Source: {} - Data: {}", key, updateData);
+                // 0x620FD879,0,750 (id, requested offset from start of image, byte length requested)
+                String[] albumArtFragReq = updateData.split(COMMA);
+                int requestedId = Integer.decode(albumArtFragReq[0]);
+                int offset = Integer.parseInt(albumArtFragReq[1]);
+                int length = Integer.parseInt(albumArtFragReq[2]);
+
+                if (requestedId == albumArtIds.get(SRC_KEY + key)) {
+                    byte[] chunk = new byte[length];
+                    byte[] albumArtBytes = albumArtMap.get(SRC_KEY + key);
+
+                    if (albumArtBytes != null) {
+                        System.arraycopy(albumArtBytes, offset, chunk, 0, length);
+                        final String frag = Base64.getEncoder().encodeToString(chunk);
+                        try {
+                            connector.sendCommand(SRC_KEY + key + ALBUM_ART_FRAG + requestedId + COMMA + offset + COMMA
+                                    + frag.length() + COMMA + frag);
+                        } catch (NuvoException e) {
+                            logger.debug("Error sending ALBUMARTFRAG command for source: {}, artId: {}", key,
+                                    requestedId);
+                        }
+                    }
+                }
+                break;
+            case TYPE_FAVORITE_REQ:
+                logger.debug("Favorite request for source: {} - favoriteId: {}", key, updateData);
+                try {
+                    int playlistIdx = Integer.parseInt(updateData, 16) - 1000;
+                    updateChannelState(NuvoEnum.valueOf(SOURCE + key), CHANNEL_BUTTON_PRESS,
+                            "PLAY_MUSIC_PRESET:" + favoriteMap.get(key)[playlistIdx]);
+                } catch (NumberFormatException nfe) {
+                    logger.debug("Unable to parse favoriteId: {}", updateData);
+                }
+                break;
             default:
                 logger.debug("onNewMessageEvent: unhandled key {}", key);
-                break;
+                // Return here because receiving an unknown message does not indicate that one can poll
+                return;
         }
+
+        if (isMps4 && pollStatusNeeded) {
+            pollStatus();
+        }
+    }
+
+    private void loadMenuConfiguration(NuvoThingConfiguration config) {
+        StringBuilder menuXml = new StringBuilder("<menu>");
+
+        if (!config.menuXmlSrc1.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc1 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        if (!config.menuXmlSrc2.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc2 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        if (!config.menuXmlSrc3.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc3 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        if (!config.menuXmlSrc4.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc4 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        if (!config.menuXmlSrc5.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc5 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        if (!config.menuXmlSrc6.isEmpty()) {
+            menuXml.append("<source>" + config.menuXmlSrc6 + "</source>");
+        } else {
+            menuXml.append("<source/>");
+        }
+        menuXml.append("</menu>");
+
+        try {
+            JAXBContext ctx = JAXBUtils.JAXBCONTEXT_NUVO_MENU;
+            if (ctx != null) {
+                Unmarshaller unmarshaller = ctx.createUnmarshaller();
+                if (unmarshaller != null) {
+                    XMLStreamReader xsr = JAXBUtils.XMLINPUTFACTORY
+                            .createXMLStreamReader(new StringReader(menuXml.toString()));
+                    NuvoMenu menu = (NuvoMenu) unmarshaller.unmarshal(xsr);
+                    if (menu != null) {
+                        nuvoMenus = menu;
+                        return;
+                    }
+                }
+            }
+            logger.debug("No JAXBContext available to parse Nuvo Menu XML");
+        } catch (JAXBException | XMLStreamException e) {
+            logger.warn("Error processing Nuvo Menu XML: {}", e.getLocalizedMessage());
+        }
+    }
+
+    private void enableNuvonet(boolean showReady) {
+        if (!this.isAnyOhNuvoNet) {
+            return;
+        }
+
+        // enable NuvoNet for each source configured as an openHAB NuvoNet source
+        nuvoNetSrcMap.forEach((srcNum, val) -> {
+            if (val == 2) {
+                try {
+                    connector.sendCommand("SCFG" + srcNum + "NUVONET1");
+                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                } catch (NuvoException | InterruptedException e) {
+                    logger.debug("Error sending SCFG command for source: {}", srcNum);
+                }
+            }
+        });
+
+        try {
+            // set '1' flag for each source configured as an MPS4 NuvoNet source or openHAB NuvoNet source
+            connector.sendCommand("SNUMBERS" + (nuvoNetSrcMap.get("1") > 0 ? ONE : ZERO) + COMMA
+                    + (nuvoNetSrcMap.get("2") > 0 ? ONE : ZERO) + COMMA + (nuvoNetSrcMap.get("3") > 0 ? ONE : ZERO)
+                    + COMMA + (nuvoNetSrcMap.get("4") > 0 ? ONE : ZERO) + COMMA
+                    + (nuvoNetSrcMap.get("5") > 0 ? ONE : ZERO) + COMMA + (nuvoNetSrcMap.get("6") > 0 ? ONE : ZERO));
+            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+        } catch (NuvoException | InterruptedException e) {
+            logger.debug("Error sending SNUMBERS command");
+        }
+
+        // go though each source and if is openHAB NuvoNet then configure menu, favorites, etc.
+        nuvoNetSrcMap.forEach((srcNum, val) -> {
+            if (val == 2) {
+                try {
+                    List<TopMenu> topMenuItems = nuvoMenus.getSource().get(Integer.parseInt(srcNum) - 1).getTopMenu();
+
+                    if (!topMenuItems.isEmpty()) {
+                        connector.sendCommand(
+                                SRC_KEY + srcNum + "MENU," + (topMenuItems.size() < 10 ? topMenuItems.size() : 10));
+                        Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+
+                        for (int i = 0; i < (topMenuItems.size() < 10 ? topMenuItems.size() : 10); i++) {
+                            connector.sendCommand(SRC_KEY + srcNum + "MENUITEM" + (i + 1) + ","
+                                    + (topMenuItems.get(i).getItems().isEmpty() ? ZERO : ONE) + ",0,\""
+                                    + topMenuItems.get(i).getText() + "\"");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        }
+                    }
+
+                    String[] favorites = favoriteMap.get(srcNum);
+                    if (favorites != null) {
+                        connector.sendCommand(SRC_KEY + srcNum + "FAVORITES"
+                                + (favorites.length < 20 ? favorites.length : 20) + COMMA
+                                + ("1".equals(srcNum) ? ONE : ZERO) + COMMA + ("2".equals(srcNum) ? ONE : ZERO) + COMMA
+                                + ("3".equals(srcNum) ? ONE : ZERO) + COMMA + ("4".equals(srcNum) ? ONE : ZERO) + COMMA
+                                + ("5".equals(srcNum) ? ONE : ZERO) + COMMA + ("6".equals(srcNum) ? ONE : ZERO));
+                        Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+
+                        for (int i = 0; i < (favorites.length < 20 ? favorites.length : 20); i++) {
+                            connector.sendCommand(SRC_KEY + srcNum + "FAVORITESITEM" + (i + 1000) + ",0,0,\""
+                                    + favPrefixMap.get(srcNum) + favorites[i] + "\"");
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        }
+                    }
+
+                    if (showReady) {
+                        connector.sendCommand(SRC_KEY + srcNum + "DISPINFOTWO0,0,0,0,0,0,0");
+                        Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        connector.sendCommand(SRC_KEY + srcNum + "DISPLINES0,0,0,\"Ready\",\"\",\"\",\"\"");
+                        Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                    }
+
+                } catch (NuvoException | InterruptedException e) {
+                    logger.debug("Error configuring NuvoNet for source: {}", srcNum);
+                }
+            }
+        });
     }
 
     /**
@@ -569,72 +1042,97 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
             if (!connector.isConnected()) {
                 logger.debug("Trying to reconnect...");
                 closeConnection();
-                String error = null;
                 if (openConnection()) {
-                    synchronized (sequenceLock) {
-                        try {
-                            long prevUpdateTime = lastEventReceived;
-
-                            connector.sendCommand(NuvoCommand.GET_CONTROLLER_VERSION);
-
-                            NuvoEnum.VALID_SOURCES.forEach(source -> {
-                                try {
-                                    connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.NAME);
-                                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
-                                    connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.DISPINFO);
-                                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
-                                    connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.DISPLINE);
-                                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
-                                } catch (NuvoException | InterruptedException e) {
-                                    logger.debug("Error Querying Source data: {}", e.getMessage());
-                                }
-                            });
-
-                            // Query all active zones to get their current status and eq configuration
-                            activeZones.forEach(zoneNum -> {
-                                try {
-                                    connector.sendQuery(NuvoEnum.valueOf(ZONE + zoneNum), NuvoCommand.STATUS);
-                                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
-                                    connector.sendCfgCommand(NuvoEnum.valueOf(ZONE + zoneNum), NuvoCommand.EQ_QUERY,
-                                            BLANK);
-                                    Thread.sleep(SLEEP_BETWEEN_CMD_MS);
-                                } catch (NuvoException | InterruptedException e) {
-                                    logger.debug("Error Querying Zone data: {}", e.getMessage());
-                                }
-                            });
-
-                            // prevUpdateTime should have changed if a zone update was received
-                            if (prevUpdateTime == lastEventReceived) {
-                                error = "Controller not responding to status requests";
-                            } else {
-                                List<StateOption> sourceStateOptions = new ArrayList<>();
-                                sourceLabels.keySet().forEach(key -> {
-                                    sourceStateOptions.add(new StateOption(key, sourceLabels.get(key)));
-                                });
-
-                                // Put the source labels on all active zones
-                                activeZones.forEach(zoneNum -> {
-                                    stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(),
-                                            ZONE.toLowerCase() + zoneNum + CHANNEL_DELIMIT + CHANNEL_TYPE_SOURCE),
-                                            sourceStateOptions);
-                                });
-                            }
-                        } catch (NuvoException e) {
-                            error = "First command after connection failed";
-                            logger.debug("{}: {}", error, e.getMessage());
-                        }
+                    logger.debug("Reconnected");
+                    // Polling status will disconnect from MPS4 on reconnect
+                    if (!isMps4) {
+                        pollStatus();
                     }
+                    enableNuvonet(true);
                 } else {
-                    error = "Reconnection failed";
-                }
-                if (error != null) {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, error);
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, "Reconnection failed");
                     closeConnection();
-                } else {
-                    updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, this.versionString);
                 }
             }
         }, 1, RECON_POLLING_INTERVAL_SEC, TimeUnit.SECONDS);
+    }
+
+    /**
+     * If a ping is not received within ping interval the connection is closed and a reconnect job is scheduled
+     */
+    private void schedulePingTimeoutJob() {
+        if (isMps4) {
+            logger.debug("Schedule Ping Timeout job");
+            cancelPingTimeoutJob();
+            pingJob = scheduler.schedule(() -> {
+                closeConnection();
+                scheduleReconnectJob();
+            }, PING_TIMEOUT_SEC, TimeUnit.SECONDS);
+        } else {
+            logger.debug("Ping Timeout job not valid for serial connections");
+        }
+    }
+
+    /**
+     * Cancel the ping timeout job
+     */
+    private void cancelPingTimeoutJob() {
+        ScheduledFuture<?> pingJob = this.pingJob;
+        if (pingJob != null) {
+            pingJob.cancel(true);
+            this.pingJob = null;
+        }
+    }
+
+    private void pollStatus() {
+        pollStatusNeeded = false;
+        scheduler.submit(() -> {
+            synchronized (sequenceLock) {
+                try {
+                    connector.sendCommand(NuvoCommand.GET_CONTROLLER_VERSION);
+
+                    NuvoEnum.VALID_SOURCES.forEach(source -> {
+                        try {
+                            connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.NAME);
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                            connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.DISPINFO);
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                            connector.sendQuery(NuvoEnum.valueOf(source), NuvoCommand.DISPLINE);
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        } catch (NuvoException | InterruptedException e) {
+                            logger.debug("Error Querying Source data: {}", e.getMessage());
+                        }
+                    });
+
+                    // Query all active zones to get their current status and eq configuration
+                    activeZones.forEach(zoneNum -> {
+                        try {
+                            connector.sendQuery(NuvoEnum.valueOf(ZONE + zoneNum), NuvoCommand.STATUS);
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                            connector.sendCfgCommand(NuvoEnum.valueOf(ZONE + zoneNum), NuvoCommand.EQ_QUERY, BLANK);
+                            Thread.sleep(SLEEP_BETWEEN_CMD_MS);
+                        } catch (NuvoException | InterruptedException e) {
+                            logger.debug("Error Querying Zone data: {}", e.getMessage());
+                        }
+                    });
+
+                    List<StateOption> sourceStateOptions = new ArrayList<>();
+                    sourceLabels.keySet().forEach(key -> {
+                        sourceStateOptions.add(new StateOption(key, sourceLabels.get(key)));
+                    });
+
+                    // Put the source labels on all active zones
+                    activeZones.forEach(zoneNum -> {
+                        stateDescriptionProvider.setStateOptions(
+                                new ChannelUID(getThing().getUID(),
+                                        ZONE.toLowerCase() + zoneNum + CHANNEL_DELIMIT + CHANNEL_TYPE_SOURCE),
+                                sourceStateOptions);
+                    });
+                } catch (NuvoException e) {
+                    logger.debug("Error polling status from Nuvo: {}", e.getMessage());
+                }
+            }
+        });
     }
 
     /**
@@ -652,8 +1150,14 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
      * Schedule the polling job
      */
     private void schedulePollingJob() {
-        logger.debug("Schedule polling job");
         cancelPollingJob();
+
+        if (isMps4) {
+            logger.debug("MPS4 doesn't support polling");
+            return;
+        } else {
+            logger.debug("Schedule polling job");
+        }
 
         // when the Nuvo amp is off, this will keep the connection (esp Serial over IP) alive and detect if the
         // connection goes down
@@ -702,7 +1206,8 @@ public class NuvoHandler extends BaseThingHandler implements NuvoMessageEventLis
         clockSyncJob = scheduler.scheduleWithFixedDelay(() -> {
             if (this.isGConcerto) {
                 try {
-                    connector.sendCommand(NuvoCommand.CFGTIME.getValue() + DATE_FORMAT.format(new Date()));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy,MM,dd,HH,mm");
+                    connector.sendCommand(NuvoCommand.CFGTIME.getValue() + dateFormat.format(new Date()));
                 } catch (NuvoException e) {
                     logger.debug("Error syncing clock: {}", e.getMessage());
                 }

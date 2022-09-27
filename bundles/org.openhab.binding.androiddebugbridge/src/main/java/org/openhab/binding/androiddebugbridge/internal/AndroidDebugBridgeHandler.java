@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,10 +16,13 @@ import static org.openhab.binding.androiddebugbridge.internal.AndroidDebugBridge
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -36,6 +39,7 @@ import org.openhab.core.thing.ThingStatus;
 import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.types.Command;
+import org.openhab.core.types.CommandOption;
 import org.openhab.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +55,6 @@ import com.google.gson.JsonSyntaxException;
  */
 @NonNullByDefault
 public class AndroidDebugBridgeHandler extends BaseThingHandler {
-
     public static final String KEY_EVENT_PLAY = "126";
     public static final String KEY_EVENT_PAUSE = "127";
     public static final String KEY_EVENT_NEXT = "87";
@@ -61,7 +64,10 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
     private static final String SHUTDOWN_POWER_OFF = "POWER_OFF";
     private static final String SHUTDOWN_REBOOT = "REBOOT";
     private static final Gson GSON = new Gson();
+    private static final Pattern RECORD_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]*$");
     private final Logger logger = LoggerFactory.getLogger(AndroidDebugBridgeHandler.class);
+
+    private final AndroidDebugBridgeDynamicCommandDescriptionProvider commandDescriptionProvider;
     private final AndroidDebugBridgeDevice adbConnection;
     private int maxMediaVolume = 0;
     private AndroidDebugBridgeConfiguration config = new AndroidDebugBridgeConfiguration();
@@ -69,17 +75,16 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
     private AndroidDebugBridgeMediaStatePackageConfig @Nullable [] packageConfigs = null;
     private boolean deviceAwake = false;
 
-    public AndroidDebugBridgeHandler(Thing thing) {
+    public AndroidDebugBridgeHandler(Thing thing,
+            AndroidDebugBridgeDynamicCommandDescriptionProvider commandDescriptionProvider) {
         super(thing);
+        this.commandDescriptionProvider = commandDescriptionProvider;
         this.adbConnection = new AndroidDebugBridgeDevice(scheduler);
     }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        var currentConfig = config;
-        if (currentConfig == null) {
-            return;
-        }
+        AndroidDebugBridgeConfiguration currentConfig = config;
         try {
             if (!adbConnection.isConnected()) {
                 // try reconnect
@@ -115,6 +120,9 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
                 break;
             case TAP_CHANNEL:
                 adbConnection.sendTap(command.toFullString());
+                break;
+            case URL_CHANNEL:
+                adbConnection.openUrl(command.toFullString());
                 break;
             case MEDIA_VOLUME_CHANNEL:
                 handleMediaVolume(channelUID, command);
@@ -170,7 +178,55 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
                         updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.GONE, "Rebooting");
                         break;
                 }
+                break;
+            case START_INTENT_CHANNEL:
+                if (command instanceof RefreshType) {
+                    return;
+                }
+                adbConnection.startIntent(command.toFullString());
+                break;
+            case RECORD_INPUT_CHANNEL:
+                recordDeviceInput(command);
+                break;
+            case RECORDED_INPUT_CHANNEL:
+                String recordName = getRecordPropertyName(command);
+                var inputCommand = this.getThing().getProperties().get(recordName);
+                if (inputCommand != null) {
+                    adbConnection.sendInputEvents(inputCommand);
+                }
+                break;
         }
+    }
+
+    private void recordDeviceInput(Command recordNameCommand)
+            throws AndroidDebugBridgeDeviceException, InterruptedException, TimeoutException, ExecutionException {
+        var recordName = recordNameCommand.toFullString();
+        if (!RECORD_NAME_PATTERN.matcher(recordName).matches()) {
+            logger.warn("Invalid record name, accepts alphanumeric values with '_'.");
+            return;
+        }
+        String recordPropertyName = getRecordPropertyName(recordName);
+        logger.debug("RECORD: {}", recordPropertyName);
+        var eventCommand = adbConnection.recordInputEvents();
+        if (eventCommand.isEmpty()) {
+            logger.debug("No events recorded");
+            if (this.getThing().getProperties().containsKey(recordPropertyName)) {
+                this.getThing().setProperty(recordPropertyName, null);
+                updateProperties(editProperties());
+                logger.debug("Record {} deleted", recordName);
+            }
+        } else {
+            updateProperty(recordPropertyName, eventCommand);
+            logger.debug("New record {}: {}", recordName, eventCommand);
+        }
+    }
+
+    private String getRecordPropertyName(String recordName) {
+        return String.format("input-record:%s", recordName);
+    }
+
+    private String getRecordPropertyName(Command recordNameCommand) {
+        return getRecordPropertyName(recordNameCommand.toFullString());
     }
 
     private void handleMediaVolume(ChannelUID channelUID, Command command)
@@ -258,25 +314,37 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
 
     @Override
     public void initialize() {
-        var currentConfig = getConfigAs(AndroidDebugBridgeConfiguration.class);
+        AndroidDebugBridgeConfiguration currentConfig = getConfigAs(AndroidDebugBridgeConfiguration.class);
         config = currentConfig;
         var mediaStateJSONConfig = currentConfig.mediaStateJSONConfig;
         if (mediaStateJSONConfig != null && !mediaStateJSONConfig.isEmpty()) {
             loadMediaStateConfig(mediaStateJSONConfig);
         }
-        adbConnection.configure(currentConfig.ip, currentConfig.port, currentConfig.timeout);
+        adbConnection.configure(currentConfig.ip, currentConfig.port, currentConfig.timeout,
+                currentConfig.recordDuration);
+        var androidVersion = thing.getProperties().get(Thing.PROPERTY_FIRMWARE_VERSION);
+        if (androidVersion != null) {
+            // configure android implementation to use
+            adbConnection.setAndroidVersion(androidVersion);
+        }
         updateStatus(ThingStatus.UNKNOWN);
         connectionCheckerSchedule = scheduler.scheduleWithFixedDelay(this::checkConnection, 0,
                 currentConfig.refreshTime, TimeUnit.SECONDS);
     }
 
     private void loadMediaStateConfig(String mediaStateJSONConfig) {
+        List<CommandOption> commandOptions;
         try {
-            this.packageConfigs = GSON.fromJson(mediaStateJSONConfig,
-                    AndroidDebugBridgeMediaStatePackageConfig[].class);
+            packageConfigs = GSON.fromJson(mediaStateJSONConfig, AndroidDebugBridgeMediaStatePackageConfig[].class);
+            commandOptions = Arrays.stream(packageConfigs)
+                    .map(AndroidDebugBridgeMediaStatePackageConfig::toCommandOption)
+                    .collect(Collectors.toUnmodifiableList());
         } catch (JsonSyntaxException e) {
             logger.warn("unable to parse media state config: {}", e.getMessage());
+            commandOptions = List.of();
         }
+        commandDescriptionProvider.setCommandOptions(new ChannelUID(getThing().getUID(), START_PACKAGE_CHANNEL),
+                commandOptions);
     }
 
     @Override
@@ -292,13 +360,14 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
     }
 
     public void checkConnection() {
-        var currentConfig = config;
-        if (currentConfig == null) {
-            return;
-        }
+        AndroidDebugBridgeConfiguration currentConfig = config;
         try {
             logger.debug("Refresh device {} status", currentConfig.ip);
             if (adbConnection.isConnected()) {
+                if (!ThingStatus.ONLINE.equals(getThing().getStatus())) {
+                    // refresh properties only on state changes
+                    refreshProperties();
+                }
                 updateStatus(ThingStatus.ONLINE);
                 refreshStatus();
             } else {
@@ -313,14 +382,39 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
                 }
                 if (adbConnection.isConnected()) {
                     updateStatus(ThingStatus.ONLINE);
+                    refreshProperties();
                     refreshStatus();
                 }
             }
         } catch (InterruptedException ignored) {
-        } catch (AndroidDebugBridgeDeviceException | ExecutionException e) {
+        } catch (AndroidDebugBridgeDeviceException | AndroidDebugBridgeDeviceReadException | ExecutionException e) {
             logger.debug("Connection checker error: {}", e.getMessage());
             adbConnection.disconnect();
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, e.getMessage());
+        }
+    }
+
+    private void refreshProperties() throws InterruptedException, AndroidDebugBridgeDeviceException,
+            AndroidDebugBridgeDeviceReadException, ExecutionException {
+        // Add some information about the device
+        try {
+            Map<String, String> editProperties = editProperties();
+            editProperties.put(Thing.PROPERTY_SERIAL_NUMBER, adbConnection.getSerialNo());
+            editProperties.put(Thing.PROPERTY_MODEL_ID, adbConnection.getModel());
+            var androidVersion = adbConnection.getAndroidVersion();
+            editProperties.put(Thing.PROPERTY_FIRMWARE_VERSION, androidVersion);
+            // refresh android version to use
+            adbConnection.setAndroidVersion(androidVersion);
+            editProperties.put(Thing.PROPERTY_VENDOR, adbConnection.getBrand());
+            try {
+                editProperties.put(Thing.PROPERTY_MAC_ADDRESS, adbConnection.getMacAddress());
+            } catch (AndroidDebugBridgeDeviceReadException e) {
+                logger.debug("Refresh properties error: {}", e.getMessage());
+            }
+            updateProperties(editProperties);
+        } catch (TimeoutException e) {
+            logger.debug("Refresh properties error: Timeout");
+            return;
         }
     }
 
@@ -331,7 +425,8 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
             awakeState = adbConnection.isAwake();
             deviceAwake = awakeState;
         } catch (TimeoutException e) {
-            logger.warn("Unable to refresh awake state: Timeout");
+            // happen a lot when device is sleeping; abort refresh other channels
+            logger.debug("Unable to refresh awake state: Timeout; aborting channels refresh");
             return;
         }
         var awakeStateChannelUID = new ChannelUID(this.thing.getUID(), AWAKE_STATE_CHANNEL);
@@ -339,6 +434,7 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
             updateState(awakeStateChannelUID, OnOffType.from(awakeState));
         }
         if (!awakeState && !prevDeviceAwake) {
+            // abort refresh channels while device is sleeping, throws many timeouts
             logger.debug("device {} is sleeping", config.ip);
             return;
         }
@@ -381,7 +477,12 @@ public class AndroidDebugBridgeHandler extends BaseThingHandler {
 
     static class AndroidDebugBridgeMediaStatePackageConfig {
         public String name = "";
+        public @Nullable String label;
         public String mode = "";
         public List<Integer> wakeLockPlayStates = List.of();
+
+        public CommandOption toCommandOption() {
+            return new CommandOption(name, label == null ? name : label);
+        }
     }
 }

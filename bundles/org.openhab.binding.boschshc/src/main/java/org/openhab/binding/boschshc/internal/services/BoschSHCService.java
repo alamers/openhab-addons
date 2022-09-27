@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,50 +18,43 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.boschshc.internal.devices.bridge.BoschSHCBridgeHandler;
+import org.openhab.binding.boschshc.internal.devices.bridge.BridgeHandler;
 import org.openhab.binding.boschshc.internal.exceptions.BoschSHCException;
 import org.openhab.binding.boschshc.internal.services.dto.BoschSHCServiceState;
+import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 /**
- * Base class of a service of a Bosch Smart Home device.
- * The services of the devices and their official APIs can be found here: https://apidocs.bosch-smarthome.com/local/
+ * Abstract implementation of a service that supports reading and writing its state using the same JSON message and the
+ * same endpoint.
+ * <p>
+ * The endpoints of this service have the following URL structure:
+ * 
+ * <pre>
+ * https://{IP}:8444/smarthome/devices/{deviceId}/services/{serviceName}/state
+ * </pre>
+ * 
+ * The HTTP client of the bridge will use <code>GET</code> requests to retrieve the state and <code>PUT</code> requests
+ * to set the state.
+ * <p>
+ * The services of the devices and their official APIs can be found
+ * <a href="https://apidocs.bosch-smarthome.com/local/">here</a>.
  * 
  * @author Christian Oeing - Initial contribution
+ * @author David Pace - Service abstraction
  */
 @NonNullByDefault
-public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
+public abstract class BoschSHCService<TState extends BoschSHCServiceState> extends AbstractBoschSHCService {
 
-    private final Logger logger = LoggerFactory.getLogger(BoschSHCService.class);
-
-    /**
-     * Unique service name
-     */
-    private final String serviceName;
+    protected final Logger logger = LoggerFactory.getLogger(BoschSHCService.class);
 
     /**
      * Class of service state
      */
     private final Class<TState> stateClass;
-
-    /**
-     * gson instance to convert a class to json string and back.
-     */
-    private final Gson gson = new Gson();
-
-    /**
-     * Bridge to use for communication from/to the device
-     */
-    private @Nullable BoschSHCBridgeHandler bridgeHandler;
-
-    /**
-     * Id of device the service belongs to
-     */
-    private @Nullable String deviceId;
 
     /**
      * Function to call after receiving state updates from the device
@@ -72,10 +65,11 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
      * Constructor
      * 
      * @param serviceName Unique name of the service.
-     * @param stateClass State class that this service uses for data transfers from/to the device.
+     * @param stateClass State class that this service uses for data transfers
+     *            from/to the device.
      */
     protected BoschSHCService(String serviceName, Class<TState> stateClass) {
-        this.serviceName = serviceName;
+        super(serviceName);
         this.stateClass = stateClass;
     }
 
@@ -84,22 +78,13 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
      * 
      * @param bridgeHandler Bridge to use for communication from/to the device
      * @param deviceId Id of device this service is for
-     * @param stateUpdateListener Function to call when a state update was received from the device.
+     * @param stateUpdateListener Function to call when a state update was received
+     *            from the device.
      */
-    public void initialize(BoschSHCBridgeHandler bridgeHandler, String deviceId,
+    public void initialize(BridgeHandler bridgeHandler, String deviceId,
             @Nullable Consumer<TState> stateUpdateListener) {
-        this.bridgeHandler = bridgeHandler;
-        this.deviceId = deviceId;
+        super.initialize(bridgeHandler, deviceId);
         this.stateUpdateListener = stateUpdateListener;
-    }
-
-    /**
-     * Returns the unique name of this service.
-     * 
-     * @return Unique name of the service.
-     */
-    public String getServiceName() {
-        return this.serviceName;
     }
 
     /**
@@ -138,15 +123,15 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
      */
     public @Nullable TState getState()
             throws InterruptedException, TimeoutException, ExecutionException, BoschSHCException {
-        String deviceId = this.deviceId;
+        String deviceId = getDeviceId();
         if (deviceId == null) {
             return null;
         }
-        BoschSHCBridgeHandler bridgeHandler = this.bridgeHandler;
+        BridgeHandler bridgeHandler = getBridgeHandler();
         if (bridgeHandler == null) {
             return null;
         }
-        return bridgeHandler.getState(deviceId, this.serviceName, this.stateClass);
+        return bridgeHandler.getState(deviceId, getServiceName(), getStateClass());
     }
 
     /**
@@ -158,15 +143,15 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
      * @throws TimeoutException
      */
     public void setState(TState state) throws InterruptedException, TimeoutException, ExecutionException {
-        String deviceId = this.deviceId;
+        String deviceId = getDeviceId();
         if (deviceId == null) {
             return;
         }
-        BoschSHCBridgeHandler bridgeHandler = this.bridgeHandler;
+        BridgeHandler bridgeHandler = getBridgeHandler();
         if (bridgeHandler == null) {
             return;
         }
-        bridgeHandler.putState(deviceId, this.serviceName, state);
+        bridgeHandler.putState(deviceId, getServiceName(), state);
     }
 
     /**
@@ -176,7 +161,7 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
      */
     public void onStateUpdate(JsonElement stateData) {
         @Nullable
-        TState state = gson.fromJson(stateData, this.stateClass);
+        TState state = BoschSHCServiceState.fromJson(stateData, this.stateClass);
         if (state == null) {
             this.logger.warn("Received invalid, expected type {}", this.stateClass.getName());
             return;
@@ -194,5 +179,17 @@ public abstract class BoschSHCService<TState extends BoschSHCServiceState> {
         if (stateUpdateListener != null) {
             stateUpdateListener.accept(state);
         }
+    }
+
+    /**
+     * Allows a service to handle a command and create a new state out of it.
+     * The new state still has to be set via setState.
+     * 
+     * @param command Command to handle
+     * @throws BoschSHCException If service can not handle command
+     */
+    public TState handleCommand(Command command) throws BoschSHCException {
+        throw new BoschSHCException(
+                String.format("%s: Can not handle command %s", this.getServiceName(), command.getClass().getName()));
     }
 }

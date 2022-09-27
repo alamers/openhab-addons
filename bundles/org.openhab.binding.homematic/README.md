@@ -157,6 +157,13 @@ The port number of the HMIP server (default = 2010)
 - **cuxdPort**
 The port number of the CUxD daemon (default = 8701)
 
+- **groupPort**
+The port number of the Group daemon (default = 9292)
+
+- **callbackRegTimeout**
+Maximum time in seconds for callback registration in the Homematic gateway (default = 120s).
+For a CCU2, the value may need to be increased to 180s.
+
 - **installModeDuration**
 Time in seconds that the controller will be in install mode when a device discovery is initiated (default = 60)
 
@@ -653,11 +660,26 @@ openhab:send Var_1 REFRESH
 
 In scripts:
 
-```javascript
+:::: tabs
+
+::: tab JavaScript
+ 
+``` javascript
 import org.openhab.core.types.RefreshType
 ...
 Var_1.sendCommand(RefreshType.REFRESH)
 ```
+
+:::
+
+::: tab DSL
+
+``` php
+Var_1.sendCommand(REFRESH)
+```
+:::
+
+::::
 
 **Note:** adding new and removing deleted variables from the GATEWAY-EXTRAS thing is currently not supported.
 You have to delete the thing, start a scan and add it again.
@@ -675,6 +697,13 @@ Examples: HmIP-BROLL, HmIP-FROLL, HmIP-BBL, HmIP-FBL and HmIP-DRBLI4
 |---------|------|--------|
 | openHAB | 0%   | 100%   |
 | CCU     | 100% | 0%     |
+
+** The binding does not receive any status changes from the Homematic gateway**
+
+First of all, make sure that none of the ports needed to receive status changes from the gateway are blocked by firewall settings.
+
+If the computer running openHAB has more than one IP address, a wrong one may have been set as receiver for status changes.
+In this case change the setting for `callbackHost` to the correct address.
 
 ### Debugging and Tracing
 

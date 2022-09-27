@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -26,12 +26,14 @@ public class HomekitSettings {
 
     public String name = "openHAB";
     public int port = 9123;
+    public int instances = 1;
     public String pin = "031-45-154";
     public String setupId;
     public String qrCode;
     public int startDelay = 30;
     public boolean useFahrenheitTemperature = false;
     public boolean useOHmDNS = false;
+    public boolean blockUserDeletion = false;
     public String thermostatTargetModeHeat = "HeatOn";
     public String thermostatTargetModeCool = "CoolOn";
     public String thermostatTargetModeAuto = "Auto";
@@ -81,12 +83,17 @@ public class HomekitSettings {
             }
         } else if (!useOHmDNS != other.useOHmDNS) {
             return false;
+        } else if (!blockUserDeletion != other.blockUserDeletion) {
+            return false;
         } else if (!pin.equals(other.pin)) {
             return false;
         } else if (!setupId.equals(other.setupId)) {
             return false;
         }
         if (port != other.port) {
+            return false;
+        }
+        if (instances != other.instances) {
             return false;
         }
         if (thermostatTargetModeAuto == null) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -44,10 +44,16 @@ public enum HomekitAccessoryType {
     SECURITY_SYSTEM("SecuritySystem"),
     OUTLET("Outlet"),
     SPEAKER("Speaker"),
+    SMART_SPEAKER("SmartSpeaker"),
     GARAGE_DOOR_OPENER("GarageDoorOpener"),
     HEATER_COOLER("HeaterCooler"),
     LIGHT_SENSOR("LightSensor"),
     AIR_QUALITY_SENSOR("AirQualitySensor"),
+    BATTERY("Battery"),
+    FILTER_MAINTENANCE("Filter"),
+    FAUCET("Faucet"),
+    MICROPHONE("Microphone"),
+    SLAT("Slat"),
     DUMMY("Dummy");
 
     private static final Map<String, HomekitAccessoryType> TAG_MAP = new HashMap<>();

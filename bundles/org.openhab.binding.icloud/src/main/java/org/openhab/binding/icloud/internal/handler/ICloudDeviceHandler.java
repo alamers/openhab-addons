@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -67,7 +67,7 @@ public class ICloudDeviceHandler extends BaseThingHandler implements ICloudDevic
     public void deviceInformationUpdate(List<ICloudDeviceInformation> deviceInformationList) {
         ICloudDeviceInformation deviceInformationRecord = getDeviceInformationRecord(deviceInformationList);
         if (deviceInformationRecord != null) {
-            if (deviceInformationRecord.getDeviceStatus() == 200) {
+            if (deviceInformationRecord.getDeviceStatus() == 200 || deviceInformationRecord.getDeviceStatus() == 203) {
                 updateStatus(ONLINE);
             } else {
                 updateStatus(OFFLINE, COMMUNICATION_ERROR, "Reported offline by iCloud webservice");

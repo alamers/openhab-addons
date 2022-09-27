@@ -18,7 +18,7 @@
 		</supported-bridge-type-refs>
 
 		<label>In-wall Switch</label>
-		<description>Bosch In-wall switch for light control</description>
+		<description>A simple light control.</description>
 
 		<channels>
 			<channel id="power-switch" typeId="system.power"/>
@@ -36,7 +36,7 @@
 		</supported-bridge-type-refs>
 
 		<label>TwinGuard</label>
-		<description>Bosch TwinGuard environmental sensor</description>
+		<description>The Twinguard smoke detector warns you in case of fire and constantly monitors the air.</description>
 
 		<channels>
 			<channel id="temperature" typeId="temperature"/>
@@ -58,8 +58,8 @@
 			<bridge-type-ref id="shc"/>
 		</supported-bridge-type-refs>
 
-		<label>Window/Door Contact</label>
-		<description>Bosch Contact for windows and doors</description>
+		<label>Door/Window Contact</label>
+		<description>Detects open windows and doors.</description>
 
 		<channels>
 			<channel id="contact" typeId="contact"/>
@@ -75,7 +75,8 @@
 		</supported-bridge-type-refs>
 
 		<label>Motion Detector</label>
-		<description>Bosch Motion Detector</description>
+		<description>Detects every movement through an intelligent combination of passive infra-red technology and an
+			additional temperature sensor.</description>
 
 		<channels>
 			<channel id="latest-motion" typeId="latest-motion"/>
@@ -91,7 +92,7 @@
 		</supported-bridge-type-refs>
 
 		<label>Shutter Control</label>
-		<description>Bosch Shutter Control</description>
+		<description>Control of your shutter to take any position you desire.</description>
 
 		<channels>
 			<channel id="level" typeId="level"/>
@@ -107,11 +108,12 @@
 		</supported-bridge-type-refs>
 
 		<label>Thermostat</label>
-		<description>Bosch Thermostat</description>
+		<description>Radiator thermostat</description>
 
 		<channels>
 			<channel id="temperature" typeId="temperature"/>
 			<channel id="valve-tappet-position" typeId="valve-tappet-position"/>
+			<channel id="child-lock" typeId="child-lock"/>
 		</channels>
 
 		<config-description-ref uri="thing-type:boschshc:device"/>
@@ -124,7 +126,7 @@
 		</supported-bridge-type-refs>
 
 		<label>Climate Control</label>
-		<description>Bosch Climate Control. This is a virtual device which is automatically created for all rooms that have
+		<description>This is a virtual device which is automatically created for all rooms that have
 			thermostats in it.</description>
 
 		<channels>
@@ -135,6 +137,164 @@
 		<config-description-ref uri="thing-type:boschshc:device"/>
 
 	</thing-type>
+
+	<thing-type id="wall-thermostat">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="shc"/>
+		</supported-bridge-type-refs>
+
+		<label>Wall Thermostat</label>
+		<description>Display of the current room temperature as well as the relative humidity in the room.</description>
+
+		<channels>
+			<channel id="temperature" typeId="temperature"/>
+			<channel id="humidity" typeId="humidity"/>
+		</channels>
+
+		<config-description-ref uri="thing-type:boschshc:device"/>
+
+	</thing-type>
+
+	<thing-type id="security-camera-360">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="shc"/>
+		</supported-bridge-type-refs>
+
+		<label>Security Camera 360</label>
+		<description>Indoor security camera with 360° view and motion detection.</description>
+
+		<channels>
+			<channel id="privacy-mode" typeId="privacy-mode"/>
+			<channel id="camera-notification" typeId="camera-notification"/>
+		</channels>
+
+		<config-description-ref uri="thing-type:boschshc:device"/>
+
+	</thing-type>
+
+	<thing-type id="security-camera-eyes">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="shc"/>
+		</supported-bridge-type-refs>
+
+		<label>Security Camera Eyes</label>
+		<description>Outdoor security camera with motion detection and light.</description>
+
+		<channels>
+			<channel id="privacy-mode" typeId="privacy-mode"/>
+			<channel id="camera-notification" typeId="camera-notification"/>
+		</channels>
+
+		<config-description-ref uri="thing-type:boschshc:device"/>
+
+	</thing-type>
+
+	<thing-type id="intrusion-detection-system">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="shc"/>
+		</supported-bridge-type-refs>
+
+		<label>Intrusion Detection System</label>
+		<description>Allows to retrieve and control the state of the intrusion detection alarm system.</description>
+
+		<channels>
+			<channel id="system-availability" typeId="system-availability"/>
+			<channel id="arming-state" typeId="arming-state"/>
+			<channel id="alarm-state" typeId="alarm-state"/>
+			<channel id="active-configuration-profile" typeId="active-configuration-profile"/>
+			<channel id="arm-action" typeId="arm-action"/>
+			<channel id="disarm-action" typeId="disarm-action"/>
+			<channel id="mute-action" typeId="mute-action"/>
+		</channels>
+
+	</thing-type>
+
+	<channel-type id="system-availability">
+		<item-type>Switch</item-type>
+		<label>System Availability</label>
+		<description>Indicates whether the intrusion detection system is available.</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="arming-state">
+		<item-type>String</item-type>
+		<label>Arming State</label>
+		<description>The arming state of the intrusion detection system. Possible values are SYSTEM_ARMING, SYSTEM_ARMED and
+			SYSTEM_DISARMED. This channel is read-only. Use the arm-action and disarm-action channels to arm and disarm the
+			system.</description>
+		<state readOnly="true">
+			<options>
+				<option value="SYSTEM_ARMING">System is currently arming</option>
+				<option value="SYSTEM_ARMED">System is armed</option>
+				<option value="SYSTEM_DISARMED">System is disarmed</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="alarm-state">
+		<item-type>String</item-type>
+		<label>Alarm State</label>
+		<description>The alarm state of the intrusion detection system. Possible values are ALARM_OFF, PRE_ALARM, ALARM_ON,
+			ALARM_MUTED and UNKNOWN.</description>
+		<state readOnly="true">
+			<options>
+				<option value="ALARM_OFF">No alarm</option>
+				<option value="PRE_ALARM">Alarm is about to go off</option>
+				<option value="ALARM_ON">Alarm was triggered</option>
+				<option value="ALARM_MUTED">Alarm is muted</option>
+				<option value="UNKNOWN">Alarm status is unknown</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="active-configuration-profile">
+		<item-type>String</item-type>
+		<label>Active Configuration Profile</label>
+		<description>The name of the active configuration profile used for the intrusion detection system.</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="arm-action">
+		<item-type>String</item-type>
+		<label>Arm Action</label>
+		<description>Arms the intrusion detection system using the given profile ID.</description>
+	</channel-type>
+
+	<channel-type id="disarm-action">
+		<item-type>Switch</item-type>
+		<label>Disarm Action</label>
+		<description>Disarms the intrusion detection system when an ON command is received.</description>
+	</channel-type>
+
+	<channel-type id="mute-action">
+		<item-type>Switch</item-type>
+		<label>Mute Action</label>
+		<description>Mutes the alarm when an ON command is received.</description>
+	</channel-type>
+
+	<channel-type id="privacy-mode">
+		<item-type>Switch</item-type>
+		<label>Privacy Mode</label>
+		<description>If privacy mode is enabled, the camera is disabled and vice versa.</description>
+		<state>
+			<options>
+				<option value="ENABLED">Privacy mode enabled (camera disabled)</option>
+				<option value="DISABLED">Privacy mode disabled (camera enabled)</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="camera-notification">
+		<item-type>Switch</item-type>
+		<label>Camera Notifications</label>
+		<description>Enables or disables notifications for the camera.</description>
+		<state>
+			<options>
+				<option value="ENABLED">Enable notifications</option>
+				<option value="DISABLED">Disable notifications</option>
+			</options>
+		</state>
+	</channel-type>
 
 	<channel-type id="temperature">
 		<item-type>Number:Temperature</item-type>
@@ -257,6 +417,12 @@
 		<label>Setpoint Temperature</label>
 		<description>Desired temperature.</description>
 		<state min="5" max="30" step="0.5" pattern="%.1f %unit%" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="child-lock">
+		<item-type>Switch</item-type>
+		<label>Child Lock</label>
+		<description>Indicates if it is possible to set the desired temperature on the device.</description>
 	</channel-type>
 
 </thing:thing-descriptions>

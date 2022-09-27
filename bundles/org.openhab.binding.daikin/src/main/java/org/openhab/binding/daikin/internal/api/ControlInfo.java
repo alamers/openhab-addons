@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.daikin.internal.api.Enums.AdvancedMode;
 import org.openhab.binding.daikin.internal.api.Enums.FanMovement;
 import org.openhab.binding.daikin.internal.api.Enums.FanSpeed;
 import org.openhab.binding.daikin.internal.api.Enums.Mode;
@@ -44,13 +45,13 @@ public class ControlInfo {
     public FanMovement fanMovement = FanMovement.STOPPED;
     /* Not supported by all units. Sets the target humidity for dehumidifying. */
     public Optional<Integer> targetHumidity = Optional.empty();
-    public SpecialMode specialMode = SpecialMode.UNKNOWN;
+    public AdvancedMode advancedMode = AdvancedMode.UNKNOWN;
 
     private ControlInfo() {
     }
 
     public static ControlInfo parse(String response) {
-        LOGGER.debug("Parsing string: \"{}\"", response);
+        LOGGER.trace("Parsing string: \"{}\"", response);
 
         Map<String, String> responseMap = InfoParser.parse(response);
 
@@ -66,8 +67,8 @@ public class ControlInfo {
                 .map(value -> FanMovement.fromValue(value)).orElse(FanMovement.STOPPED);
         info.targetHumidity = Optional.ofNullable(responseMap.get("shum")).flatMap(value -> InfoParser.parseInt(value));
 
-        info.specialMode = Optional.ofNullable(responseMap.get("adv")).map(value -> SpecialMode.fromValue(value))
-                .orElse(SpecialMode.UNKNOWN);
+        info.advancedMode = Optional.ofNullable(responseMap.get("adv")).map(value -> AdvancedMode.fromValue(value))
+                .orElse(AdvancedMode.UNKNOWN);
         return info;
     }
 
@@ -81,5 +82,9 @@ public class ControlInfo {
         params.put("shum", targetHumidity.map(value -> value.toString()).orElse(""));
 
         return params;
+    }
+
+    public SpecialMode getSpecialMode() {
+        return SpecialMode.fromAdvancedMode(advancedMode);
     }
 }

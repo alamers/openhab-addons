@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -105,7 +105,7 @@ public class DeviceThingHandler extends AbstractKNXThingHandler {
 
     private void cancelChannelFutures() {
         for (ScheduledFuture<?> future : channelFutures.values()) {
-            if (future != null && !future.isDone()) {
+            if (!future.isDone()) {
                 future.cancel(true);
             }
         }
@@ -121,7 +121,7 @@ public class DeviceThingHandler extends AbstractKNXThingHandler {
     @Override
     protected void cancelReadFutures() {
         for (ScheduledFuture<?> future : readFutures.values()) {
-            if (future != null && !future.isDone()) {
+            if (!future.isDone()) {
                 future.cancel(true);
             }
         }

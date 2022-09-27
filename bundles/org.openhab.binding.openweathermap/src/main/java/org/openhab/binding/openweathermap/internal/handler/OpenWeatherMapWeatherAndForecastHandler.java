@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -27,16 +27,15 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpResponseException;
 import org.openhab.binding.openweathermap.internal.config.OpenWeatherMapWeatherAndForecastConfiguration;
-import org.openhab.binding.openweathermap.internal.connection.OpenWeatherMapCommunicationException;
-import org.openhab.binding.openweathermap.internal.connection.OpenWeatherMapConfigurationException;
 import org.openhab.binding.openweathermap.internal.connection.OpenWeatherMapConnection;
 import org.openhab.binding.openweathermap.internal.dto.OpenWeatherMapJsonDailyForecastData;
 import org.openhab.binding.openweathermap.internal.dto.OpenWeatherMapJsonHourlyForecastData;
 import org.openhab.binding.openweathermap.internal.dto.OpenWeatherMapJsonWeatherData;
-import org.openhab.binding.openweathermap.internal.dto.base.Rain;
-import org.openhab.binding.openweathermap.internal.dto.base.Snow;
+import org.openhab.binding.openweathermap.internal.dto.base.Precipitation;
 import org.openhab.binding.openweathermap.internal.dto.forecast.daily.FeelsLikeTemp;
 import org.openhab.core.config.core.Configuration;
+import org.openhab.core.i18n.CommunicationException;
+import org.openhab.core.i18n.ConfigurationException;
 import org.openhab.core.i18n.TimeZoneProvider;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.thing.Channel;
@@ -163,7 +162,7 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
 
     @Override
     protected boolean requestData(OpenWeatherMapConnection connection)
-            throws OpenWeatherMapCommunicationException, OpenWeatherMapConfigurationException {
+            throws CommunicationException, ConfigurationException {
         logger.debug("Update weather and forecast data of thing '{}'.", getThing().getUID());
         try {
             weatherData = connection.getWeatherData(location);
@@ -173,7 +172,7 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
             if (forecastDays > 0) {
                 try {
                     dailyForecastData = connection.getDailyForecastData(location, forecastDays);
-                } catch (OpenWeatherMapConfigurationException e) {
+                } catch (ConfigurationException e) {
                     if (e.getCause() instanceof HttpResponseException) {
                         forecastDays = 0;
                         Configuration editConfig = editConfiguration();
@@ -193,7 +192,7 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
             }
             return true;
         } catch (JsonSyntaxException e) {
-            logger.debug("JsonSyntaxException occurred during execution: {}", e.getLocalizedMessage(), e);
+            logger.debug("JsonSyntaxException occurred during execution: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -301,11 +300,11 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
                     state = getQuantityTypeState(localWeatherData.getClouds().getAll(), PERCENT);
                     break;
                 case CHANNEL_RAIN:
-                    Rain rain = localWeatherData.getRain();
+                    Precipitation rain = localWeatherData.getRain();
                     state = getQuantityTypeState(rain == null ? 0 : rain.getVolume(), MILLI(METRE));
                     break;
                 case CHANNEL_SNOW:
-                    Snow snow = localWeatherData.getSnow();
+                    Precipitation snow = localWeatherData.getSnow();
                     state = getQuantityTypeState(snow == null ? 0 : snow.getVolume(), MILLI(METRE));
                     break;
                 case CHANNEL_VISIBILITY:
@@ -395,11 +394,11 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
                     state = getQuantityTypeState(forecastData.getClouds().getAll(), PERCENT);
                     break;
                 case CHANNEL_RAIN:
-                    Rain rain = forecastData.getRain();
+                    Precipitation rain = forecastData.getRain();
                     state = getQuantityTypeState(rain == null ? 0 : rain.getVolume(), MILLI(METRE));
                     break;
                 case CHANNEL_SNOW:
-                    Snow snow = forecastData.getSnow();
+                    Precipitation snow = forecastData.getSnow();
                     state = getQuantityTypeState(snow == null ? 0 : snow.getVolume(), MILLI(METRE));
                     break;
             }
@@ -462,7 +461,7 @@ public class OpenWeatherMapWeatherAndForecastHandler extends AbstractOpenWeather
                     state = getQuantityTypeState(forecastData.getTemp().getMax(), CELSIUS);
                     break;
                 case CHANNEL_APPARENT_TEMPERATURE:
-                    FeelsLikeTemp feelsLikeTemp = forecastData.getFeelsLikeTemp();
+                    FeelsLikeTemp feelsLikeTemp = forecastData.getFeelsLike();
                     if (feelsLikeTemp != null) {
                         state = getQuantityTypeState(feelsLikeTemp.getDay(), CELSIUS);
                     }

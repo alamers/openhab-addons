@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -52,9 +52,6 @@ public class Main {
 
         try {
             scheduler = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-
-            logger.info("System properties={}",
-                    System.getProperties().get(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY));
 
             ParadoxBuilderFactory factory = new ParadoxBuilderFactory();
             ICommunicatorBuilder builder = factory.createBuilder(PanelType.EVO192);

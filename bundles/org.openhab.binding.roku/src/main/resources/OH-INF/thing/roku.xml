@@ -121,7 +121,7 @@
 				<option value="VolumeDown">Volume Down</option>
 				<option value="VolumeMute">Volume Mute</option>
 				<option value="ChannelUp">Channel Up</option>
-				<option value="Channel Down">Channel Down</option>
+				<option value="ChannelDown">Channel Down</option>
 				<option value="InputTuner">Input Tuner</option>
 				<option value="InputHDMI1">Input HDMI1</option>
 				<option value="InputHDMI2">Input HDMI2</option>
@@ -129,6 +129,7 @@
 				<option value="InputHDMI4">Input HDMI4</option>
 				<option value="InputAV1">Input AV1</option>
 				<option value="PowerOff">Power Off</option>
+				<option value="PowerOn">Power On</option>
 			</options>
 		</state>
 	</channel-type>

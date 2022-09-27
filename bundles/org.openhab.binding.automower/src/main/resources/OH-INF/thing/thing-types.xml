@@ -12,19 +12,17 @@
 		<config-description>
 			<parameter name="appKey" type="text" required="true">
 				<label>Application Key</label>
-				<description>The Application Key is required to communication with the Automower Connect Api at
+				<description>The Application Key is required to communicate with the Automower Connect API at
 					https://developer.husqvarnagroup.cloud/. It can be obtained by
 					registering an Application on the Husqvarna Website.
 					This application also needs to be connected to the
 					"Authentication API" and the "Automower Connect API"</description>
 			</parameter>
-			<parameter name="userName" type="text" required="true">
-				<label>User Name</label>
-				<description>The user name for which the application key has been issued</description>
-			</parameter>
-			<parameter name="password" type="text" required="true">
-				<context>password</context>
-				<description>The password for the given user</description>
+			<parameter name="appSecret" type="text" required="true">
+				<label>Application Secret</label>
+				<description>The Application Secret is required to communicate with the Automower Connect API at
+					https://developer.husqvarnagroup.cloud/. It can be obtained by
+					registering an Application on the Husqvarna Website.</description>
 			</parameter>
 			<parameter name="pollingInterval" type="integer" required="false" unit="s">
 				<label>Polling Interval</label>
@@ -45,6 +43,7 @@
 		<description>An automatic lawn mower</description>
 
 		<channels>
+			<!-- Status -->
 			<channel id="name" typeId="nameType"/>
 			<channel id="mode" typeId="modeType"/>
 			<channel id="activity" typeId="activityType"/>
@@ -56,12 +55,68 @@
 			<channel id="planner-next-start" typeId="plannerNextStartTimestampType"/>
 			<channel id="planner-override-action" typeId="plannerOverrideActionType"/>
 			<channel id="calendar-tasks" typeId="calendarTasksType"/>
+			<!-- Commands -->
 			<channel id="start" typeId="start"/>
 			<channel id="resume_schedule" typeId="resumeSchedule"/>
 			<channel id="pause" typeId="pause"/>
 			<channel id="park" typeId="park"/>
 			<channel id="park_until_next_schedule" typeId="parkUntilNextSchedule"/>
 			<channel id="park_until_further_notice" typeId="parkUntilFurtherNotice"/>
+
+			<!-- Positions -->
+			<channel id="last-position" typeId="positionType">
+				<description>Last Position</description>
+			</channel>
+			<channel id="position01" typeId="positionType"/>
+			<channel id="position02" typeId="positionType"/>
+			<channel id="position03" typeId="positionType"/>
+			<channel id="position04" typeId="positionType"/>
+			<channel id="position05" typeId="positionType"/>
+			<channel id="position06" typeId="positionType"/>
+			<channel id="position07" typeId="positionType"/>
+			<channel id="position08" typeId="positionType"/>
+			<channel id="position09" typeId="positionType"/>
+			<channel id="position10" typeId="positionType"/>
+			<channel id="position11" typeId="positionType"/>
+			<channel id="position12" typeId="positionType"/>
+			<channel id="position13" typeId="positionType"/>
+			<channel id="position14" typeId="positionType"/>
+			<channel id="position15" typeId="positionType"/>
+			<channel id="position16" typeId="positionType"/>
+			<channel id="position17" typeId="positionType"/>
+			<channel id="position18" typeId="positionType"/>
+			<channel id="position19" typeId="positionType"/>
+			<channel id="position20" typeId="positionType"/>
+			<channel id="position21" typeId="positionType"/>
+			<channel id="position22" typeId="positionType"/>
+			<channel id="position23" typeId="positionType"/>
+			<channel id="position24" typeId="positionType"/>
+			<channel id="position25" typeId="positionType"/>
+			<channel id="position26" typeId="positionType"/>
+			<channel id="position27" typeId="positionType"/>
+			<channel id="position28" typeId="positionType"/>
+			<channel id="position29" typeId="positionType"/>
+			<channel id="position30" typeId="positionType"/>
+			<channel id="position31" typeId="positionType"/>
+			<channel id="position32" typeId="positionType"/>
+			<channel id="position33" typeId="positionType"/>
+			<channel id="position34" typeId="positionType"/>
+			<channel id="position35" typeId="positionType"/>
+			<channel id="position36" typeId="positionType"/>
+			<channel id="position37" typeId="positionType"/>
+			<channel id="position38" typeId="positionType"/>
+			<channel id="position39" typeId="positionType"/>
+			<channel id="position40" typeId="positionType"/>
+			<channel id="position41" typeId="positionType"/>
+			<channel id="position42" typeId="positionType"/>
+			<channel id="position43" typeId="positionType"/>
+			<channel id="position44" typeId="positionType"/>
+			<channel id="position45" typeId="positionType"/>
+			<channel id="position46" typeId="positionType"/>
+			<channel id="position47" typeId="positionType"/>
+			<channel id="position48" typeId="positionType"/>
+			<channel id="position49" typeId="positionType"/>
+			<channel id="position50" typeId="positionType"/>
 		</channels>
 
 		<properties>
@@ -84,6 +139,7 @@
 		</config-description>
 
 	</thing-type>
+
 
 	<channel-type id="nameType">
 		<item-type>String</item-type>
@@ -198,6 +254,13 @@
 		<item-type>String</item-type>
 		<label>Planner Info JSON</label>
 		<description>The channel providing a JSON with the information about the planner tasks.</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="positionType">
+		<item-type>Location</item-type>
+		<label>GPS Position</label>
+		<description>The channel providing a waypoint of the mower's activity.</description>
 		<state readOnly="true"/>
 	</channel-type>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2022 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -28,6 +28,7 @@ import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.ChannelUID;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingStatus;
+import org.openhab.core.thing.ThingStatusDetail;
 import org.openhab.core.thing.ThingStatusInfo;
 import org.openhab.core.thing.ThingTypeUID;
 import org.openhab.core.types.Command;
@@ -107,20 +108,23 @@ public class OpenWebNetEnergyHandler extends OpenWebNetThingHandler {
                         "subscribeToActivePowerChanges() Refreshing subscription for the next {}min for WHERE={} to active power changes notification",
                         ENERGY_SUBSCRIPTION_PERIOD, deviceWhere);
             }
-
-            try {
-                bridgeHandler.gateway.send(EnergyManagement.setActivePowerNotificationsTime(deviceWhere.value(),
-                        ENERGY_SUBSCRIPTION_PERIOD));
-                isFirstSchedulerLaunch = false;
-            } catch (Exception e) {
-                if (isFirstSchedulerLaunch) {
-                    logger.warn(
-                            "subscribeToActivePowerChanges() For WHERE={} could not subscribe to active power changes notifications. Exception={}",
-                            deviceWhere, e.getMessage());
-                } else {
-                    logger.warn(
-                            "subscribeToActivePowerChanges() Unable to refresh subscription to active power changes notifications for WHERE={}. Exception={}",
-                            deviceWhere, e.getMessage());
+            Where w = deviceWhere;
+            if (w == null) {
+                logger.warn("subscribeToActivePowerChanges() WHERE=null. Skipping");
+            } else {
+                try {
+                    send(EnergyManagement.setActivePowerNotificationsTime(w.value(), ENERGY_SUBSCRIPTION_PERIOD));
+                    isFirstSchedulerLaunch = false;
+                } catch (Exception e) {
+                    if (isFirstSchedulerLaunch) {
+                        logger.warn(
+                                "subscribeToActivePowerChanges() For WHERE={} could not subscribe to active power changes notifications. Exception={}",
+                                w, e.getMessage());
+                    } else {
+                        logger.warn(
+                                "subscribeToActivePowerChanges() Unable to refresh subscription to active power changes notifications for WHERE={}. Exception={}",
+                                w, e.getMessage());
+                    }
                 }
             }
         }, 0, ENERGY_SUBSCRIPTION_PERIOD - 1, TimeUnit.MINUTES);
@@ -129,9 +133,9 @@ public class OpenWebNetEnergyHandler extends OpenWebNetThingHandler {
     @Override
     public void dispose() {
         if (notificationSchedule != null) {
+            ScheduledFuture<?> ns = notificationSchedule;
+            ns.cancel(false);
             logger.debug("dispose() scheduler stopped.");
-
-            notificationSchedule.cancel(false);
         }
         super.dispose();
     }
@@ -143,22 +147,22 @@ public class OpenWebNetEnergyHandler extends OpenWebNetThingHandler {
 
     @Override
     protected void requestChannelState(ChannelUID channel) {
-        logger.debug("requestChannelState() thingUID={} channel={}", thing.getUID(), channel.getId());
+        super.requestChannelState(channel);
         Where w = deviceWhere;
         if (w != null) {
             try {
                 send(EnergyManagement.requestActivePower(w.value()));
             } catch (OWNException e) {
-                logger.debug("Exception while requesting channel {} state: {}", channel, e.getMessage(), e);
+                logger.debug("Exception while requesting state for channel {}: {} ", channel, e.getMessage());
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, e.getMessage());
             }
-        } else {
-            logger.warn("Could not requestChannelState(): deviceWhere is null");
         }
     }
 
     @Override
     protected void refreshDevice(boolean refreshAll) {
-        requestChannelState(new ChannelUID("any:any:any:any"));
+        logger.debug("--- refreshDevice() : refreshing SINGLE... ({})", thing.getUID());
+        requestChannelState(new ChannelUID(thing.getUID(), CHANNEL_POWER));
     }
 
     @Override
