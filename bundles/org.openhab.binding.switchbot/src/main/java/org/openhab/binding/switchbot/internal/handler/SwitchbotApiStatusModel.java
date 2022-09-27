@@ -58,7 +58,7 @@ public class SwitchbotApiStatusModel {
          */
         private Boolean group;
         /** only available for Curtain devices. determines if a Curtain is moving or not */
-        private Boolean moving;
+        private String moving; // typed as a string since it can be false or a number :(
         /**
          * only available for Curtain devices. the percentage of the distance between the calibrated open position and
          * close position that a Curtain has moved to
@@ -236,11 +236,11 @@ public class SwitchbotApiStatusModel {
             this.group = group;
         }
 
-        public Boolean getMoving() {
+        public String getMoving() {
             return moving;
         }
 
-        public void setMoving(Boolean moving) {
+        public void setMoving(String moving) {
             this.moving = moving;
         }
 

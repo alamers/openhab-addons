@@ -136,7 +136,7 @@ public class CurtainHandler extends SwitchbotHandler {
         CurtainState curtainState = new CurtainState();
         curtainState.setCalibrate(status.getBody().getCalibrate());
         curtainState.setGroup(status.getBody().getGroup());
-        curtainState.setMoving(status.getBody().getMoving());
+        curtainState.setMoving(!status.getBody().getMoving().equals("false")); // moving is either false or a number :(
         curtainState.setSlidePosition(status.getBody().getSlidePosition());
 
         return curtainState;
